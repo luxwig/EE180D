@@ -163,21 +163,47 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     }
     fprintf(stderr,"\n");
    
+   
+   
+   
+   
     //getting y gyro data and extracting features 
-    double* y_gyro = (double*)malloc(sizeof(double)*_BUFFER*2);
+    double* y_gyro = (double*)malloc(sizeof(double)*data_buf_size);
     double* abs_max = (double*)malloc(sizeof(double));
     double* rel_min = (double*)malloc(sizeof(double));
     double* rel_max = (double*)malloc(sizeof(double));
+    double* ygyro_features = (double*)malloc(sizeof(double)*_BUFFER*2);
+    
     get_ygyro(data_buf, data_buf_size, y_gyro); //data_val is complete //data num is size
+    
+    /* fprintf(stderr," TESTING \n");
+     for (j = 0; j <data_buf_size; j++)
+    {
+        fprintf(stderr,"%f,",y_gyro[j]);          //CORRECT
+        fprintf(stderr,"\n");
+    }
+       fprintf(stderr,"\n");
+    */
+       
     int x; 
     int iterate = *seg_num;
+     fprintf(stderr,"number of segment dividers: %d \n", iterate);
     for(x=0; x < iterate - 1; x++){
-    int length = seg[x+1] - seg[x];
-     y_gyro_features_2(data_buf, length, seg[x], seg[x+1],abs_max,rel_min, rel_max);
+      int length = seg[x+1] - seg[x];
+      y_gyro_features_2(y_gyro, length, seg[x], seg[x+1],abs_max,rel_min, rel_max);
+      create_ygyro_feature_array(x, ygyro_features,abs_max, rel_min, rel_max);
     }
-    //const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype
-    
-              //adding features to array 
+      
+      fprintf(stderr," TESTING2 \n");
+     for (j = 0; j < *seg_num *_YGYRO_N_FEATURES - 4; j+=4)
+    {
+        fprintf(stderr,"%f, %f, %f, %f",ygyro_features[j], ygyro_features[j+1], ygyro_features[j+2], ygyro_features[j+3]);                          //CORRECT
+        fprintf(stderr,"\n");
+    }
+    fprintf(stderr,"number of features: %d \n", j);
+        
+            
+             //adding features to array 
     int seg_iterator = 0;
     if (features->size[0] == 0 || features->size[1] == 0)
         return _FALSE;
@@ -187,8 +213,11 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         //use seg array to get length of interval //can we make this the interval length? 
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator];
 	seg_iterator++;
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = 4;
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = fntype;
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = ygyro_features[*f_num*_YGYRO_N_FEATURES];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = ygyro_features[*f_num*_YGYRO_N_FEATURES+1];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+7] = ygyro_features[*f_num*_YGYRO_N_FEATURES+2];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+8] = ygyro_features[*f_num*_YGYRO_N_FEATURES+3];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9] = fntype;
         
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
@@ -200,7 +229,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
     
-    //exit(1); //testing 
+   // exit(1); //testing 
     return _TRUE;
 }
 
@@ -540,17 +569,17 @@ void eliminate_offset( double *x_accel_data, int segment_length, double gravity_
 	}
 }
 double y_gyro_features_1( const double* segment, int begin, int end){
-	return w_minima_double_seg(segment, begin, end);
+	return w_minima_double_seg((double*)segment, begin, end);
 }
 
 void y_gyro_features_2( const double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max)
 {
-	//find absolute max
+	//find absolute max  of first 3/4
     int c, index;
     double max;
     max = segment[begin];
     index = begin;
-    for (c = index; c < end; c++) {
+    for (c = index; c < (end - (segment_length/4)); c++) {
         if (segment[c] > max) {
             index = c;
             max = segment[c];
@@ -558,11 +587,11 @@ void y_gyro_features_2( const double* segment, int segment_length, int begin, in
     }
 	*abs_max = segment[index]; 
 	
-	//start at least 20 points away for next maximum, could be 25 or 50 
-	//or find a better way to do this 
-	int index_2 = index +=20; 
+	//start at least 50 points away for next maximum, could be 25 or 50 
+	//or find a better way to do this //what about when 0 is crossed ?
+	int index_2 = index +50; 
 	max = 0;
-	for( c = index_2; c < end; c++) {
+	for(c = index_2; c < end; c++) {
 		if(segment[c] > max) {
 			index_2 = c; 
 			max = segment[c]; 
@@ -571,15 +600,19 @@ void y_gyro_features_2( const double* segment, int segment_length, int begin, in
 	*rel_max = segment[index_2];
 	
 	//find minimum between them 
-	*rel_min = w_minima_double_seg(segment, index, index_2);
+	*rel_min = w_minima_double_seg((double*)segment, index, index_2);
 }
 
-void create_ygyro_feature_array(double* ygyro_data, double* ygyro_features, int* seg_val, size_t seg_num)
+void create_ygyro_feature_array(int i, double* ygyro_features, double* abs_max, double* rel_min, double* rel_max)
 {
-	double y_gyro_abs_min;
-	int i;
-	for (i = 0; i < seg_num; i++)
-	{
-		y_gyro_abs_min = y_gyro_features_1(ygyro_data, seg_val[i], seg_val[i + 1]);
-	}
+	 double feature_1 = *abs_max / *rel_max;               /* max1/max2 */
+   double feature_2 = *abs_max / *rel_min ;               /* max1/min */
+   double feature_3 = *rel_max / *rel_min ;                /*max2/min */
+   double feature_4 = (*rel_max + *abs_max) / *rel_min;   /* (max1 + max2)/min */
+   
+		ygyro_features[i*_YGYRO_N_FEATURES] = feature_1; 
+    ygyro_features[i*_YGYRO_N_FEATURES +1] = feature_2;                                                            
+    ygyro_features[i*_YGYRO_N_FEATURES +2] =  feature_3;                                                            
+    ygyro_features[i*_YGYRO_N_FEATURES +3] =  feature_4;                                                          
+               
 }

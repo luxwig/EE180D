@@ -6,7 +6,7 @@
 #define _TRAIN_DATA_SIZE 17   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       6
+#define _FIRST_LEVEL_FEATURES       9
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -20,12 +20,12 @@
 #define _GYRO_Z_OFFSET  7
 
 
-//walk neural network and run neural network use same number of features
+//walk neural network and run neural network use same number of features          //not sure how these things should change 
 #define _WALK_N_FEATURES    (5+4) //second level + first level
 #define _RUN_N_FEATURES     (5+4) //second level +  first level 
 #define _ASCEND_N_FEATURES  (5+4) //second level
 #define _DESCEND_N_FEATURES (5+4) //second level
-
+#define _YGYRO_N_FEATURES 4 //first level 
 
 #define _TRUE   1
 #define _FALSE  0

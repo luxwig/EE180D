@@ -74,6 +74,7 @@ void eliminate_offset( double *x_accel_data, int segment_length, double gravity_
 void y_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max);
 double y_gyro_features_1(const double* segment, int begin, int end);
 void get_ygyro(const double* data_buf, const int data_buf_size, double *y_gyro);
+void create_ygyro_feature_array(int i, double* ygyro_features, double* abs_max, double* rel_min, double* rel_max);
 
 #endif
 
