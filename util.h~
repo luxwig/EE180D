@@ -1,6 +1,6 @@
 #ifndef UTIL_H
 #define UTIL_H
-#define _GNU_SOURCE
+
 /* Include files */
 #include <math.h>
 #include <stddef.h>

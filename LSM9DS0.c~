@@ -23,7 +23,7 @@ Development environment specifics:
 	This code requires the Intel mraa library to function; for more
 	information see https://github.com/intel-iot-devkit/mraa
 ******************************************************************************/
-#define _BSD_SOURCE
+
 #include <stdio.h>
 #include <mraa/i2c.h>
 #include "LSM9DS0.h"
