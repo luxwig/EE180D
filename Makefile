@@ -4,7 +4,7 @@ INCLUDES=-I/usr/local/include
 LDFLAGS=-lm -lfann -L/usr/local/lib 
 IMPORTDIR=matlab_import
 FANNDIR=FANN
-SOURCES=main.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
+SOURCES=main.c get_feature_from_file.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=main
 
@@ -16,7 +16,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	rm -rf main
+	rm -rf main train.txt test.txt feature.net
 	rm -rf *.o
 	rm -rf ${IMPORTDIR}/*.o
 	rm -rf ${FANNDIR}/*.o

@@ -17,9 +17,7 @@
 void get_feature(const emxArray_real_T *m, emxArray_real_T *r, emxArray_real_T
                  *features)
 {
-  int i;
   emxArray_real_T *b_m;
-  int j;
   int i0;
   int loop_ub;
   emxArray_real_T *varargin_1;
