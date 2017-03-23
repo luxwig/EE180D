@@ -39,8 +39,8 @@ void main_get_feature(void)
   const int fntype[] = {0x1, 0x1, 0x1, 0x1, 0x2, 0x2, 0x2, 0x4, 0x4, 0x4,
                   0xF0, 0xF0,0xF0, 0xF0, 0xF0, 0xF0, 0xF0,0xF0, 0xF0, 0xF0};
   
-  int i;
-  double data_m [_BUFFER*8];
+  int i, j;
+  double data_m [_BUFFER*4];
   double *f_m=NULL;
   size_t n, num, train_num;
   
@@ -59,20 +59,14 @@ void main_get_feature(void)
       free(f_m);
       f_m = NULL;
   }
+ 
   char* fn_train = "train.txt";
-  char* fn_test = "test.txt";
+  
   fd = fopen(fn_train, "w");
-  FILE* ft = fopen(fn_test, "w");
+  
   fprintf(fd, "%zu 4 3\n", train_num);
   for (i = 0; i < num; i++) {
-     if (data_m[i*5+4] == 0xF0)
-        fprintf(ft, "%f %f %f %f\n", 
-             data_m[i*5], 
-             data_m[i*5+1], 
-             data_m[i*5+2], 
-             data_m[i*5+3]);
-     else {
-     fprintf(fd, "%f %f %f %f\n", 
+     fprintf(fd, "%lf %lf %lf %lf\n", 
              data_m[i*5], 
              data_m[i*5+1], 
              data_m[i*5+2], 
@@ -81,12 +75,27 @@ void main_get_feature(void)
          fprintf(fd, "1 -1 -1\n");
      if (data_m[i*5+4] == 0x2)
          fprintf(fd, "-1 1 -1\n");
-     if (data_m[i*5+4] == 0x4)
-         fprintf(fd, "-1 -1 1\n");}
+      if (data_m[i*5+4] == 0x4)
+         fprintf(fd, "-1 -1 1\n");
   }
-  fclose(fd); fclose(ft);
-  train_data(fn_train, "feature.net", 4, 3);
-  test_data(fn_test,"feature.net");
+  fclose(fd); 
+  
+  struct fann* ann;
+  train_from_data(fn_train, "feature.net", 4, 3, &ann);
+  double predict[3];
+  for (i = 0; i < num; i++)
+    if (data_m[i*5+4] == 0xF0) {
+        fprintf(stderr, "%lf %lf %lf %lf\n", 
+             data_m[i*5], 
+             data_m[i*5+1], 
+             data_m[i*5+2], 
+             data_m[i*5+3]);
+        test_from_data(&data_m[i*5], 1, ann, predict);
+        fprintf(stderr, "\t%f\t%f\t%f\n",predict[0], predict[1], predict[2]);
+        j = predict[0]>predict[1]?0:1;
+        j = predict[j]>predict[2]?j:2;
+        printf("\t%d\n", j+1);
+     }
 }
 
 int main(int argc, const char * const argv[])

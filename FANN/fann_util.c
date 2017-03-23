@@ -1,9 +1,30 @@
 #include "fann_util.h"
-#include "fann.h"
 
 #include <unistd.h>
 #include <stdio.h>
 #include "floatfann.h"
+
+void train_from_data(const char* fn_train, const char* fn_model, const unsigned int num_input, const unsigned int num_output, struct fann** ann)
+{
+    fprintf(stderr, "FILE: %s\n", fn_train);
+    const unsigned int num_layers = 3;
+    const unsigned int num_neurons_hidden = 14;
+    const float desired_error = (const float) 0.0001;
+    const unsigned int max_epochs = 20000;
+    const unsigned int epochs_between_reports = 100;
+
+    *ann = fann_create_standard(num_layers, num_input,
+        num_neurons_hidden, num_output);
+
+    fann_set_activation_function_hidden(*ann, FANN_SIGMOID_SYMMETRIC);
+    fann_set_activation_function_output(*ann, FANN_SIGMOID_SYMMETRIC);
+
+    fann_train_on_file(*ann, fn_train, max_epochs,
+        epochs_between_reports, desired_error);
+
+    fann_save(*ann, fn_model);
+
+}
 
 void train_data(const char* fn_train, const char* fn_model, const unsigned int num_input, const unsigned int num_output)
 {
@@ -27,6 +48,24 @@ void train_data(const char* fn_train, const char* fn_model, const unsigned int n
 
     fann_destroy(ann);
 
+}
+
+
+void test_from_data(double* data, int n, struct fann* ann, double* predict)
+{
+    int i,j,
+    num_input  = fann_get_num_input(ann),
+    num_output = fann_get_num_output(ann);
+    fann_type *calc_out, *input;
+    input = (fann_type*)malloc(sizeof(fann_type) * num_input);
+    // FANN SUCKS <<< THEY USE FLOAT
+    for(i = 0; i < n; i++){
+        for (j = 0; j < num_input; j++)
+            input[j] = data[i*num_input+j];
+        calc_out = fann_run(ann, input);
+        for (j = 0; j < num_output; j++)
+            predict[i*num_output+j] = calc_out[j];
+    } 
 }
 
 void test_data(const char* fn_test, const char* fn_model)
