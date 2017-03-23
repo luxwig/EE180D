@@ -61,14 +61,14 @@ void main_get_feature(void)
       td[i].m_data        = data_val;
       td[i].m_num_data    = data_num;
       td[i].m_divider     = seg_val;
-      td[i].m_num_divider = data_num;
+      td[i].m_num_divider = seg_num;
       td[i].m_type        = fntype[i];
       free(f_m);
       i++;
   }
 
   mo_classfication(data_fm, train_num, WALK1);
-//  train_walk_neural_network(td, i);
+  train_walk_neural_network(td, i);
   /*
   for (i = 0; i < _FILENUM; i++)
   {
