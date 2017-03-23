@@ -11,11 +11,10 @@
 #include "get_feature_emxutil.h"
 #include "zanalysis.h"
 #include "segment.h"
-#include <stdio.h>
 
 /* Function Definitions */
-void get_feature(const emxArray_real_T *m, emxArray_real_T *r, emxArray_real_T
-                 *features)
+void get_feature(const emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T
+                 *r, emxArray_real_T *features)
 {
   emxArray_real_T *b_m;
   int i0;
@@ -26,7 +25,6 @@ void get_feature(const emxArray_real_T *m, emxArray_real_T *r, emxArray_real_T
   int result;
   int b_result;
   int i1;
-
   emxInit_real_T(&b_m, 2);
   i0 = b_m->size[0] * b_m->size[1];
   b_m->size[0] = m->size[0];
@@ -39,7 +37,7 @@ void get_feature(const emxArray_real_T *m, emxArray_real_T *r, emxArray_real_T
 
   emxInit_real_T(&varargin_1, 2);
   emxInit_real_T(&varargin_2, 2);
-  segment(b_m, r);
+  segment(b_m, pos, r);
   zanalysis(r, varargin_1, varargin_2);
   emxFree_real_T(&b_m);
   if (!((varargin_1->size[0] == 0) || (varargin_1->size[1] == 0))) {

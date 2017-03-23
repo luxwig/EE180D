@@ -9,7 +9,6 @@
 #include "rt_nonfinite.h"
 #include "get_feature.h"
 #include "sign.h"
-#include <stdio.h>
 
 /* Function Definitions */
 void b_sign(emxArray_real_T *x)

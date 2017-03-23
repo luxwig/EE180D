@@ -27,6 +27,7 @@ void get_feature_from_file(const char* fn, double* f, int* f_num, double* seg, i
     getline(&line, &len, fd);
 
     emxArray_real_T *r;
+    emxArray_real_T *pos;
     emxArray_real_T *features;
     emxArray_real_T *m;
     *f_num = 0;
@@ -47,10 +48,11 @@ void get_feature_from_file(const char* fn, double* f, int* f_num, double* seg, i
             
     emxInitArray_real_T(&r, 2);
     emxInitArray_real_T(&features, 2);
-
+    emxInitArray_real_T(&pos, 1);
+    
     m = emxCreateWrapper_real_T(data_r,n,7);
 
-    get_feature(m, r, features);
+    get_feature(m, pos, r, features);
     
     fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
     
@@ -62,9 +64,15 @@ void get_feature_from_file(const char* fn, double* f, int* f_num, double* seg, i
             f[*f_num*5], f[*f_num*5+1], f[*f_num*5+2], f[*f_num*5+3]);
         (*f_num)++;
     }
-    
+
+    if (seg!=NULL && seg_num!=NULL)
+    {
+        *seg_num = pos->size[0];
+        memcpy(seg, pos->data, sizeof(double)*(pos->size[0]));
+    }
+
+    emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
-    fclose(fd);
 }

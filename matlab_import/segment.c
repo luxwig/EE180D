@@ -12,10 +12,9 @@
 #include "get_feature_emxutil.h"
 #include "mean.h"
 #include "findpeaks.h"
-#include <stdio.h>
 
 /* Function Definitions */
-void segment(emxArray_real_T *m, emxArray_real_T *r)
+void segment(emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T *r)
 {
   emxArray_real_T *b_m;
   int nm1d2;
@@ -59,6 +58,14 @@ void segment(emxArray_real_T *m, emxArray_real_T *r)
   emxInit_real_T(&p_pos, 2);
   findpeaks(b_m, p_val, p_pos);
   emxFree_real_T(&b_m);
+  i2 = pos->size[0];
+  pos->size[0] = p_pos->size[0];
+  emxEnsureCapacity((emxArray__common *)pos, i2, (int)sizeof(double));
+  nm1d2 = p_pos->size[0];
+  for (i2 = 0; i2 < nm1d2; i2++) {
+    pos->data[i2] = p_pos->data[i2] + 1.0;
+  }
+
   if ((p_val->size[0] == 0) || (p_val->size[1] == 0)) {
     nx = -1;
   } else if (p_val->size[0] > p_val->size[1]) {

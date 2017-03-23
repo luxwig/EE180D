@@ -18,8 +18,8 @@
 #include "get_feature_types.h"
 
 /* Function Declarations */
-extern void get_feature(const emxArray_real_T *m, emxArray_real_T *r,
-  emxArray_real_T *features);
+extern void get_feature(const emxArray_real_T *m, emxArray_real_T *pos,
+  emxArray_real_T *r, emxArray_real_T *features);
 
 #endif
 

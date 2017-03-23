@@ -60,7 +60,7 @@ void main_get_feature(void)
   }
  
   input  = (float*)malloc(sizeof(float)*train_num*4);
-  output = (float*)malloc(sizeof(float)*train_num*3);
+  outpu  = (float*)malloc(sizeof(float)*train_num*3);
 
   float output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
   for (i = 0; i < num; i++) {

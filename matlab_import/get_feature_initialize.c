@@ -9,7 +9,6 @@
 #include "rt_nonfinite.h"
 #include "get_feature.h"
 #include "get_feature_initialize.h"
-#include <stdio.h>
 
 /* Function Definitions */
 void get_feature_initialize(void)

@@ -10,7 +10,6 @@
 #include "get_feature.h"
 #include "diff.h"
 #include "get_feature_emxutil.h"
-#include <stdio.h>
 
 /* Function Definitions */
 void diff(const emxArray_real_T *x, emxArray_real_T *y)

@@ -10,7 +10,6 @@
 #include "get_feature.h"
 #include "eml_setop.h"
 #include "get_feature_emxutil.h"
-#include <stdio.h>
 
 /* Function Declarations */
 static double skip_to_last_equal_value(int *k, const emxArray_real_T *x);

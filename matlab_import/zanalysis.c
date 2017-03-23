@@ -12,7 +12,6 @@
 #include "get_feature_emxutil.h"
 #include "sort1.h"
 #include "findpeaks.h"
-#include <stdio.h>
 
 /* Function Definitions */
 void zanalysis(const emxArray_real_T *z_a, emxArray_real_T *val, emxArray_real_T

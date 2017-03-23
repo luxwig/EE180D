@@ -11,7 +11,6 @@
 #include "sort1.h"
 #include "get_feature_emxutil.h"
 #include "sortIdx.h"
-#include <stdio.h>
 
 /* Function Declarations */
 static void b_sort(emxArray_real_T *x, int dim, emxArray_int32_T *idx);

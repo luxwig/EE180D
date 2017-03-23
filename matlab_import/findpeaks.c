@@ -14,7 +14,6 @@
 #include "eml_setop.h"
 #include "diff.h"
 #include "sign.h"
-#include <stdio.h>
 
 /* Function Declarations */
 static void b_findLocalMaxima(const double yTemp[200], emxArray_real_T *iPk,

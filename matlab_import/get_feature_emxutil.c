@@ -9,7 +9,6 @@
 #include "rt_nonfinite.h"
 #include "get_feature.h"
 #include "get_feature_emxutil.h"
-#include <stdio.h>
 
 /* Function Definitions */
 void emxEnsureCapacity(emxArray__common *emxArray, int oldNumel, int elementSize)

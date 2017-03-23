@@ -12,7 +12,6 @@
 #include "rtwtypes.h"
 
 /* Type Definitions */
-#include <stdio.h>
 #ifndef struct_emxArray__common
 #define struct_emxArray__common
 

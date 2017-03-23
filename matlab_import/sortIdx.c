@@ -10,7 +10,6 @@
 #include "get_feature.h"
 #include "sortIdx.h"
 #include "get_feature_emxutil.h"
-#include <stdio.h>
 
 /* Function Declarations */
 static void b_merge(emxArray_int32_T *idx, emxArray_real_T *x, int offset, int

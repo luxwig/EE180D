@@ -9,7 +9,6 @@
 #include "rt_nonfinite.h"
 #include "get_feature.h"
 #include "mean.h"
-#include <stdio.h>
 
 /* Function Definitions */
 double mean(const emxArray_real_T *x)
