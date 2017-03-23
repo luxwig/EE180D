@@ -83,7 +83,7 @@ void train_data(const char* fn_train, const char* fn_model, const unsigned int n
 //n -> number of rows you are passing
 //trained structure
 //predict -> output
-void test_from_data(double* data, int n, struct fann* ann, double* predict)
+void test_from_data(double* data, struct fann* ann, int n, double* predict)
 {
     int i,j,
     num_input  = fann_get_num_input(ann),

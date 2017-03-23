@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -c -Wall
+CFLAGS=-g -c -Wall -Werror
 INCLUDES=-I/usr/local/include
 LDFLAGS=-lm -lfann -L/usr/local/lib 
 IMPORTDIR=matlab_import

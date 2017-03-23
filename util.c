@@ -6,10 +6,11 @@
 #include "matlab_import/get_feature_terminate.h"
 #include "matlab_import/get_feature_emxAPI.h"
 #include "matlab_import/get_feature_initialize.h"
-
+#include "FANN/fann_util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+
 
 /*
     fn: filename
@@ -20,7 +21,8 @@
     fntype: filename type
 */
 
-void segmentation(const char* fn, double* f, int* f_num, double* seg, int* seg_num, int fntype)
+static struct fann* ann;
+void segmentation(const char* fn, double* f, int* f_num, int* seg, int* seg_num, int fntype, double* data_val, int* data_len)
 {
     FILE *fd;
     int j, k;
@@ -75,16 +77,74 @@ void segmentation(const char* fn, double* f, int* f_num, double* seg, int* seg_n
     if (seg!=NULL && seg_num!=NULL)
     {
         *seg_num = pos->size[0];
-        memcpy(seg, pos->data, sizeof(double)*(pos->size[0]));
+        for (j = 0; j < pos->size[0];j++)
+                seg[j] = (int)(pos->data[j]);
     }
 
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
+
+    for (j = 0; j < n*7; j++)
+        data_val[j] = data[j];
+    *data_len = n;
 }
 
 
+void mo_classfication(double* data_fm, size_t n, MoType fntype)
+{
+    float* input, *output;
+    int j, k;
+    if (fntype != TEST)
+    {
+        input  = (float*)malloc(sizeof(float)*n*4);
+        output  = (float*)malloc(sizeof(float)*n*3);
+
+        const float output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
+        for (j = 0; j < n; j++) {
+            input[j*4] = data_fm[j*5], 
+            input[j*4+1] = data_fm[j*5+1], 
+            input[j*4+2] = data_fm[j*5+2], 
+            input[j*4+3] = data_fm[j*5+3];
+            if (((int)data_fm[j*5+4]&0xF0) != 0xF0)
+                memcpy(&output[j*3], output_type[0], sizeof(float)*3);
+            else
+                memcpy(&output[j*3], output_type[(int)data_fm[j*5+4]&0x00F], sizeof(float)*3);
+            for (k = 0; k < 4; k++)
+                fprintf(stderr,"%f ", input[j*4+k]);
+            fprintf(stderr,"\n");
+            for (k = 0; k < 3; k++)
+                fprintf(stderr,"%f ", output[j*3+k]);
+            fprintf(stderr,"\n");
+        }
+    
+  
+        train_from_data(input, output, n, 4, 3, &ann);
+
+    }
+    else
+    {
+    double predict[3];
+    for (j = 0; j < n; j++) {
+        fprintf(stderr, "%lf %lf %lf %lf\n", 
+             data_fm[j*5], 
+             data_fm[j*5+1], 
+             data_fm[j*5+2], 
+             data_fm[j*5+3]);
+        test_from_data(&data_fm[j*5], ann, 1, predict);
+        //1 parameter: 3 features: [max, min, period, .....
+        //2 parameter: 
+
+
+        fprintf(stderr, "\t%f\t%f\t%f\n",predict[0], predict[1], predict[2]);
+        k = predict[0]>predict[1]?0:1;
+        k = predict[k]>predict[2]?k:2;
+        printf("\t%d\n", k+1);
+   }
+   }
+
+}
 void training_session(const TrainingData* td)
 {
     // call Ludwig Training

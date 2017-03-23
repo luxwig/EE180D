@@ -11,10 +11,10 @@ void train_from_data(
         fann_type*   output,
         const unsigned int num_data,
         const unsigned int num_input, 
-        const unsigned int num_output, 
+        const unsigned int num_output,
         struct fann** ann);
 
 void train_from_file(const char* fn_train, const char* fn_model, const unsigned int num_input, const unsigned int num_outputi, struct fann** ann);
 
-void test_from_data(double* data, int n, struct fann* ann, double* predict);
+void test_from_data(double* data, struct fann*, int n, double* predict);
 #endif

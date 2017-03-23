@@ -37,70 +37,63 @@ void main_get_feature(void)
                          "data/DESCEND/4.csv",
                          "data/DESCEND/5.csv",
                          "data/DESCEND/6.csv" };   
-  const int fntype[] = {0x1, 0x1, 0x1, 0x1, 0x2, 0x2, 0x2, 0x3, 0x3, 0x3,
-                  0xF0, 0xF0,0xF0, 0xF0, 0xF0, 0xF0, 0xF0,0xF0, 0xF0, 0xF0};
+  const int fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC,
+                  TEST, TEST,TEST, TEST, TEST, TEST, TEST,TEST, TEST, TEST};
   
-  int i, j;
-  double data_m [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
+  int i;
+  int*   seg_val; 
+  double data_fm [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
+  double* data_val;
   double *f_m=NULL;
-  size_t n, num, train_num;
-  float* input, *output;
+  size_t n, train_num, data_num, seg_num;
   train_num = 0;
-  num = 0;
 
-  for (i = 0; i < _FILENUM; i++)
+  TrainingData td[_SBUFFER];
+  i = 0;
+  while (i<_FILENUM && fntype[i] != TEST)
   {
       f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
+      seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
+      data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
+      segmentation(fn[i], f_m, (int*)&n, seg_val, (int*)&seg_num,  fntype[i], data_val, (int*)&data_num);
+      memcpy(&data_fm[train_num*5],f_m,sizeof(double)*n*5);
+      train_num += n;
+      td[i].m_data        = data_val;
+      td[i].m_num_data    = data_num;
+      td[i].m_divider     = seg_val;
+      td[i].m_num_divider = data_num;
+      td[i].m_type        = fntype[i];
+      free(f_m);
+      i++;
+  }
+
+  mo_classfication(data_fm, train_num, WALK1);
+/*
+  for (i = 0; i < _FILENUM; i++)
+  {
 
 //file, 
-      segmentation(fn[i], f_m, (int*)&n, NULL, NULL,  fntype[i]);
-      memcpy(&data_m[num*5],f_m,sizeof(double)*n*5);
-      if (fntype[i]!=0xF0) train_num += n;
+      if (fntype[i]!=TEST) train_num += n;
       num+=n;
       free(f_m);
       f_m = NULL;
   }
- 
-  input  = (float*)malloc(sizeof(float)*train_num*4);
-  output  = (float*)malloc(sizeof(float)*train_num*3);
+*/
 
-  float output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
-  for (i = 0; i < num; i++) {
-     if (data_m[i*5+4] == 0xF0) continue;
-     input[i*4] = data_m[i*5], 
-     input[i*4+1] = data_m[i*5+1], 
-     input[i*4+2] = data_m[i*5+2], 
-     input[i*4+3] = data_m[i*5+3];
-     memcpy(&output[i*3], output_type[(int)(data_m[i*5+4]-1)], sizeof(float)*3);
-     for (j = 0; j < 4; j++)
-         fprintf(stderr,"%f ", input[i*4+j]);
-     fprintf(stderr,"\n");
-     for (j = 0; j < 3; j++)
-         fprintf(stderr,"%f ", output[i*3+j]);
-     fprintf(stderr,"\n");
+
+  // call regan
+
+
+
+  for (;i<_FILENUM;i++)
+  {
+      f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
+      seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
+      data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
+      segmentation(fn[i], f_m, (int*)&n, seg_val, (int*)&seg_num,  fntype[i], data_val, (int*)&data_num);
+      mo_classfication(f_m, n, TEST); 
+      free(f_m);
   }
-
-  
-  struct fann* ann;
-  train_from_data(input, output, train_num, 4, 3, &ann);
-  double predict[3];
-  for (i = 0; i < num; i++)
-    if (data_m[i*5+4] == 0xF0) {
-        fprintf(stderr, "%lf %lf %lf %lf\n", 
-             data_m[i*5], 
-             data_m[i*5+1], 
-             data_m[i*5+2], 
-             data_m[i*5+3]);
-        test_from_data(&data_m[i*5], 1, ann, predict);
-        //1 parameter: 3 features: [max, min, period, .....
-        //2 parameter: 
-
-
-        fprintf(stderr, "\t%f\t%f\t%f\n",predict[0], predict[1], predict[2]);
-        j = predict[0]>predict[1]?0:1;
-        j = predict[j]>predict[2]?j:2;
-        printf("\t%d\n", j+1);
-     }
 }
 
 int main(int argc, const char * const argv[])
