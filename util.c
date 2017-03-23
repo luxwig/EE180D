@@ -11,7 +11,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+/*
+    fn: filename
+    f: actual data
+    f_num: number of deatures
+    seg: indexes of dividers
+    segm_num: number of segments
+    fntype: filename type
+*/
 
 void get_feature_from_file(const char* fn, double* f, int* f_num, double* seg, int* seg_num, int fntype)
 {
