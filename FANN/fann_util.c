@@ -6,11 +6,11 @@
 #include "fann_train.h"
 
 void train_from_data(
-        fann_type*   input,
-        fann_type*   output,
-        const unsigned int num_data,
-        const unsigned int num_input, 
-        const unsigned int num_output, 
+        fann_type*   input, //contiguous features one array
+        fann_type*   output, //what each contiguous feature should output
+        const unsigned int num_data, //how many intervals
+        const unsigned int num_input, //number of features
+        const unsigned int num_output, //number of options
         struct fann** ann)
 {
     const unsigned int num_layers = 3;
@@ -79,7 +79,10 @@ void train_data(const char* fn_train, const char* fn_model, const unsigned int n
 
 }
 
-
+//data one d pointer contiguous feature points
+//n -> number of rows you are passing
+//trained structure
+//predict -> output
 void test_from_data(double* data, int n, struct fann* ann, double* predict)
 {
     int i,j,

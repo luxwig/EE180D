@@ -14,6 +14,7 @@
 void main_get_feature(void);
 
 #define _FILENUM 20
+#define RANDOM_BUFFER_MULTIPLIER 4
 void main_get_feature(void)
 {
   const char fn[_FILENUM][256] = {"data/WALK/ludwig/1.csv",  
@@ -40,7 +41,8 @@ void main_get_feature(void)
                   0xF0, 0xF0,0xF0, 0xF0, 0xF0, 0xF0, 0xF0,0xF0, 0xF0, 0xF0};
   
   int i, j;
-  double data_m [_BUFFER*4];
+  double data_m [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
+  double data_mm [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
   double *f_m=NULL;
   size_t n, num, train_num;
   float* input, *output;
@@ -51,6 +53,7 @@ void main_get_feature(void)
   {
       f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
 
+//file, 
       get_feature_from_file(fn[i], f_m, (int*)&n, NULL, NULL,  fntype[i]);
       memcpy(&data_m[num*5],f_m,sizeof(double)*n*5);
       if (fntype[i]!=0xF0) train_num += n;
@@ -90,6 +93,10 @@ void main_get_feature(void)
              data_m[i*5+2], 
              data_m[i*5+3]);
         test_from_data(&data_m[i*5], 1, ann, predict);
+        //1 parameter: 3 features: [max, min, period, .....
+        //2 parameter: 
+
+
         fprintf(stderr, "\t%f\t%f\t%f\n",predict[0], predict[1], predict[2]);
         j = predict[0]>predict[1]?0:1;
         j = predict[j]>predict[2]?j:2;
