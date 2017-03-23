@@ -69,12 +69,42 @@ float w_minima_seg(float* a, int begin, int end)
     return a[index];
 }
 
+double w_minima_double_seg(double *a, int begin, int end)
+{
+    int c, index;
+    double min;
+    min = a[begin];
+    index = begin;
+    for (c = index; c < end; c++) {
+        if (a[c] < min) {
+            index = c;
+            min = a[c];
+        }
+    }
+    return a[index];
+}
+
 float w_maxima(float* a, int n) {
     int c, index;
     float max;
     max = a[0];
     index = 0;
     for (c = 1; c < n; c++) {
+        if (a[c] > max) {
+            index = c;
+            max = a[c];
+        }
+    }
+    return a[index];
+}
+
+double w_maxima_double_seg(double *a, int begin, int end)
+{
+    int c, index;
+    double max;
+    max = a[begin];
+    index = begin;
+    for (c = index; c < end; c++) {
         if (a[c] > max) {
             index = c;
             max = a[c];

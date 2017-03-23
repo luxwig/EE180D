@@ -22,9 +22,13 @@ float w_calculateSD(float data[], int n);
 
 float w_walk_minima(float *a, int n);
 float w_minima_seg(float *a, int begin, int end);
+double w_minima_double_seg(double *a, int begin, int end);
+
+
 
 float w_maxima(float *a, int n);
 float w_maxima_seg(float *a, int begin, int end);
+double w_maxima_double_seg(double *a, int begin, int end);
 
 #endif /* statistics_h */
 
