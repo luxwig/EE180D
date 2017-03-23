@@ -37,10 +37,11 @@ void main_get_feature(void)
                          "data/DESCEND/4.csv",
                          "data/DESCEND/5.csv",
                          "data/DESCEND/6.csv" };   
-  const int fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC,
+  const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC,
                   TEST, TEST,TEST, TEST, TEST, TEST, TEST,TEST, TEST, TEST};
-  
-  int i;
+ 
+  MoType mt;
+  int i,j;
   int*   seg_val; 
   double data_fm [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
   double* data_val;
@@ -66,24 +67,8 @@ void main_get_feature(void)
       free(f_m);
       i++;
   }
-  mo_classfication(data_fm, train_num, WALK1);
-  // /train_walk_neural_network(td, i);
-  /*
-  for (i = 0; i < _FILENUM; i++)
-  {
-
-//file, 
-      if (fntype[i]!=TEST) train_num += n;
-      num+=n;
-      free(f_m);
-      f_m = NULL;
-  }
-*/
-
-
-  // call regan
-
-
+  mo_classfication(data_fm, train_num, TRAINING);
+  train_walk_neural_network(td, i);
 
   for (;i<_FILENUM;i++)
   {
@@ -91,7 +76,20 @@ void main_get_feature(void)
       seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
       data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
       segmentation(fn[i], f_m, (int*)&n, seg_val, (int*)&seg_num,  fntype[i], data_val, (int*)&data_num);
-      mo_classfication(f_m, n, TEST); 
+      for (j = 0; j < n; j++) {
+            fprintf(stderr, "%lf %lf %lf %lf\n", 
+                 f_m[j*5], 
+                 f_m[j*5+1], 
+                 f_m[j*5+2], 
+                 f_m[j*5+3]);
+            mt = mo_classfication(&f_m[j*5], n, TEST);
+            printf("%x",mt); 
+            if (mt == TRAINING){
+                mt = test_for_walking_speed(&f_m[j*5],n);
+                printf(" -> %x", mt);
+            }
+            printf("\n");
+      }
       free(f_m);
   }
 }

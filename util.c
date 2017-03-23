@@ -97,11 +97,11 @@ void segmentation(const char* fn, double* f, int* f_num, int* seg, int* seg_num,
 }
 
 
-void mo_classfication(double* data_fm, size_t n, MoType fntype)
+MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 {
     float* input, *output;
     int j, k;
-    if (fntype != TEST)
+    if (fntype == TRAINING) 
     {
         input  = (float*)malloc(sizeof(float)*n*4);
         output  = (float*)malloc(sizeof(float)*n*3);
@@ -126,18 +126,12 @@ void mo_classfication(double* data_fm, size_t n, MoType fntype)
     
   
         train_from_data(input, output, n, 4, 3, &ann);
-
+        return TRAINING;
     }
     else
     {
-    double predict[3];
-    for (j = 0; j < n; j++) {
-        fprintf(stderr, "%lf %lf %lf %lf\n", 
-             data_fm[j*5], 
-             data_fm[j*5+1], 
-             data_fm[j*5+2], 
-             data_fm[j*5+3]);
-        test_from_data(&data_fm[j*5], ann, 1, predict);
+        double predict[3];
+        test_from_data(data_fm, ann, 1, predict);
         //1 parameter: 3 features: [max, min, period, .....
         //2 parameter: 
 
@@ -145,102 +139,55 @@ void mo_classfication(double* data_fm, size_t n, MoType fntype)
         fprintf(stderr, "\t%f\t%f\t%f\n",predict[0], predict[1], predict[2]);
         k = predict[0]>predict[1]?0:1;
         k = predict[k]>predict[2]?k:2;
-        printf("\t%d\n", k+1);
-   }
-   }
-
-}
-void training_session(const TrainingData* td)
-{
-    // call Ludwig Training
+        fprintf(stderr,"\t%d\n", k+1);
+        if (k == 0) return 0;
+        return (k|0xF0);
+    }    
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Training walk
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
- stored_features_contig: features of each segment stored contiguously
- nth_seg: the nth segment of data to extract a set of features from
- begin: begin index in x_axis accel
- end: end index in x_axis accel
- x_axis: raw x_axis accel data
- */
-void fetch_features_in_segment(float* stored_features_contig, int nth_seg, int begin, int end, float* x_axis) {
-    stored_features_contig[nth_seg*WALK_N_FEATURES + WALK_MAXIMA_INDEX] = w_maxima_seg(x_axis, begin, end);
-    stored_features_contig[nth_seg*WALK_N_FEATURES + WALK_MINIMA_INDEX] = w_minima_seg(x_axis, begin, end);
-    stored_features_contig[nth_seg*WALK_N_FEATURES + WALK_PERIOD_INDEX] = (begin - end);
-    return;
-}
-
-
-void compile_features(TrainingData* data_from_file, float* stored_features_contig) {
-    int number_of_dividers = data_from_file->m_num_divider;
-    int number_of_segments = number_of_dividers - 1;
-    stored_features_contig = (float *)malloc(number_of_segments*WALK_N_FEATURES);
-    int begin, end;
-    for(int i = 0; i < number_of_segments; i++) {
-        begin = data_from_file->m_divider[i];
-        end = data_from_file->m_divider[i+1];
-        fetch_features_in_segment(stored_features_contig, i, begin, end, (float *)data_from_file->m_data);
-    }
-}
-
-// void train_from_data(
-//         fann_type*   input, //contiguous features one array
-//         fann_type*   output, //what each contiguous feature should output
-//         const unsigned int num_data, //how many intervals
-//         const unsigned int num_input, //number of features
-//         const unsigned int num_output, //number of options
-//         struct fann** ann) //the neural network object
-// {
-// }
-// struct TrainingData_struct
-// {
-//     double* m_data;
-//     int     m_num_data;
-//     int*    m_divider;
-//     int     m_num_divider;
-//     MoType m_type;
-// };
 
 static struct fann* walk_neural_network;
 
-void train_walk_neural_network(TrainingData* all_file_data[], int nFiles) {
+void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
     float *output;
-    float *single_file_stored_features_contig;
-    input = output = single_file_stored_features_contig = NULL;
+    unsigned int num_data, num_input, num_output;
+    input = output = NULL;
+    num_data = 0;
+    num_input = WALK_N_FEATURES;
+    num_output = WALK_N_OUTPUTS;
 
-    int total_nSamples = 0;
-    int total_nSegments = 0;
     for(int i = 0; i < nFiles; i++) {
-        total_nSamples += all_file_data[i]->m_num_data;
-        total_nSegments += (all_file_data[i]->m_num_divider - 1);
+        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
+        num_data += (all_file_data[i].m_num_divider - 1);
     }
 
-    input = (float*)malloc(total_nSamples*sizeof(float));
-    output = (float*)malloc(total_nSegments*sizeof(float));
-
-    int copied_segments = 0;
-    for(int i = 0; i < nFiles; i++) {
-        int nSegments = all_file_data[i]->m_num_data- 1;
-        for(int j = 0; j < nSegments; j++) {
-            output[j+copied_segments] = (float)all_file_data[i]->m_type;
+    input = (float *)malloc(sizeof(float)*WALK_N_FEATURES*num_data);
+    output = (float *)malloc(sizeof(float)*WALK_N_OUTPUTS*num_data);
+    int n = 0;
+    for(int i = 0; i < nFiles; i++){
+        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
+        int m_num_divider = all_file_data[i].m_num_divider;
+        for(int j = 1; j< m_num_divider; j++) {
+            int start = all_file_data[i].m_divider[j-1];
+            int end = all_file_data[i].m_divider[j];
+            float* convert_m_data = (float*)malloc(sizeof(float)*all_file_data[i].m_num_data);
+            for (int k = 0; k < all_file_data[i].m_num_data; k++){
+                convert_m_data[k] = all_file_data[i].m_data[k*7+1];
+            }
+            float maxima = w_maxima_seg(convert_m_data+1, start, end);
+            float minima = w_minima_seg(convert_m_data+1, start, end);
+            float period = end - start;
+            input[n*WALK_N_FEATURES] = maxima;
+            input[n*WALK_N_FEATURES+1] = minima;
+            input[n*WALK_N_FEATURES+2] = period;
+            output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)*2-1;
+            output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)*2-1;
+            output[n*WALK_N_OUTPUTS+2] = (all_file_data[i].m_type == WALK3)*2-1;
+            output[n*WALK_N_OUTPUTS+3] = (all_file_data[i].m_type == WALK4)*2-1;
+            n++;
         }
-        compile_features(all_file_data[i], single_file_stored_features_contig);
-        /*
-         TODO: use stored_features_contig to train neural network
-        */
-        memcpy(input + WALK_N_FEATURES*copied_segments, single_file_stored_features_contig, sizeof(float));
-        copied_segments += (all_file_data[i]->m_num_divider - 1);
-        free(single_file_stored_features_contig);
     }
-    train_from_data(input, output, total_nSegments, WALK_N_FEATURES, WALK_N_OUTPUTS, &walk_neural_network);
+    train_from_data(input, output, num_data, num_input, num_output, &walk_neural_network);
 }
-/*
-void test_walk_data(float*data, int n) {
-    float maxima = ;
-    float minima = ;
-    float period = n;
 
-}*/
