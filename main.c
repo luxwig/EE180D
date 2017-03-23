@@ -42,7 +42,6 @@ void main_get_feature(void)
   
   int i, j;
   double data_m [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
-  double data_mm [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
   double *f_m=NULL;
   size_t n, num, train_num;
   float* input, *output;
@@ -54,7 +53,7 @@ void main_get_feature(void)
       f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
 
 //file, 
-      get_feature_from_file(fn[i], f_m, (int*)&n, NULL, NULL,  fntype[i]);
+      segmentation(fn[i], f_m, (int*)&n, NULL, NULL,  fntype[i]);
       memcpy(&data_m[num*5],f_m,sizeof(double)*n*5);
       if (fntype[i]!=0xF0) train_num += n;
       num+=n;

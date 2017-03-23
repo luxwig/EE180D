@@ -20,7 +20,7 @@
     fntype: filename type
 */
 
-void get_feature_from_file(const char* fn, double* f, int* f_num, double* seg, int* seg_num, int fntype)
+void segmentation(const char* fn, double* f, int* f_num, double* seg, int* seg_num, int fntype)
 {
     FILE *fd;
     int j, k;
@@ -82,4 +82,10 @@ void get_feature_from_file(const char* fn, double* f, int* f_num, double* seg, i
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
+}
+
+
+void training_session(const TrainingData* td)
+{
+    // call Ludwig Training
 }
