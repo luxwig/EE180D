@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
+<title>UCLA Campus Directory</title>
+<link type="text/css" href="/css/20100820.main.css" rel="stylesheet">
+<link type="text/css" href="/css/20100820.directory.css" rel="stylesheet">
+<!--[if lt IE 7]>
+<link type="text/css" href="/css/20100820.directory-ie6.css" rel="stylesheet">
+<![endif]-->
+<link type="text/css" href="/css/20100820.print.css" rel="stylesheet" media="print">
+
+<script type="text/javascript" src="/js/20100820.search.js"></script>
+<script type="text/javascript" src="/js/20100820.jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/js/20100820.directory.js"></script>
+<noscript>
+<style type="text/css">
+.element {
+	border-top:2px solid #999;
+	display:block;
+	margin:2ex 0;
+	padding-top:1ex;
+	overflow:hide;
+	width:100%;
+}
+</style>
+</noscript>
+</head>
+
+<body id="body">
+
+<div id="visual-wrapper">
+    <div id="top" class="hidden-for-print">
+        <div id="ucla-tools">
+            <span id="date-info">
+                Thu May 28, 2015 | <a id="weatherbug" href="http://www.atmos.ucla.edu/component/option,com_wrapper/Itemid,147/">Weather</a>: 66&ordm;F / 19&ordm;C <img src="/img/weather_sun.gif" alt="weather bug" class="bug">            </span>
+
+            <div id="searchbox">
+                <form id="searchbox_ucla" name="searchform" method="get" action="javascript:submitform()">
+                    <input type='hidden' name='site' value='UCLA'>
+                    <input type='hidden' name='client' value='UCLA'>
+                    <input type='hidden' name='proxystylesheet' value='UCLA'>
+                    <input type='hidden' name='output' value='xml_no_dtd'>
+                    <input type='hidden' name='proxyreload' value='1'>
+                    <input id="searchbox-input" name="q" type="text" size="20" maxlength="255" value="" onfocus="this.id='searchbox-input-no-background'">
+                    <input type="image" name="search" src="/img/search-button.gif" class="searchButton" alt="Submit">
+                </form>
+            </div>
+
+            <ul id="campus-tools">
+                <li class="hide-right-border"><strong>Campus:</strong></li>
+                <li><a href="http://directory.ucla.edu/">Directory</a></li>
+                <li><a href="http://www.ucla.edu/map/">Map</a></li>
+                <li class="hide-right-border"><a href="http://www.registrar.ucla.edu/calendar/">Academic Calendar</a></li>
+            </ul>
+        </div>
+
+        <h1 id="ucla-logo"><a href="http://www.ucla.edu/" accesskey="1"><span>UCLA Gateway</span></a></h1>
+
+        <h5 class="hiddenStructure">Sections</h5>
+
+        <div id="sections">
+            <ul id="audience-section">
+                <li class="first"><a href="http://www.ucla.edu/audience/future.html" title="Prospective Students">Prospective Students</a></li>
+                <li><a href="http://www.ucla.edu/audience/students.html" title="Current Students">Current Students</a></li>
+                <li><a href="http://www.ucla.edu/audience/parents.html" title="Parents">Parents</a></li>
+                <li><a href="http://www.ucla.edu/audience/faculty.html" title="Faculty">Faculty</a></li>
+                <li><a href="http://www.ucla.edu/audience/staff.html" title="Staff">Staff</a></li>
+                <li><a href="http://www.ucla.edu/audience/kids-families.html" title="Kids & Families">Kids &amp; Families</a></li> 
+                <li><a href="http://www.ucla.edu/audience/alumni.html" title="Alumni">Alumni</a></li>
+                <li class="last"><a href="http://www.ucla.edu/audience/visitors.html" title="Visitors">Visitors</a></li>
+            </ul>
+            <ul class="landing-section">
+                <li><a href="http://www.ucla.edu/academics.html" title="Academics">Academics</a></li>
+                <li><a href="http://www.ucla.edu/research.html" title="Research">Research</a></li>
+                <li><a href="http://www.ucla.edu/library.html" title="Library">Library</a></li>
+                <li><a href="http://www.ucla.edu/campusvalues" title="Campus Values">Campus Values</a></li> 
+            </ul>
+            <ul class="landing-section">
+                <li><a href="http://www.ucla.edu/healthsci.html" title="Health Care">Health Care</a></li>
+                <li><a href="http://www.ucla.edu/continuing.html" title="Continuing Education">Continuing Education</a></li>
+                <li><a href="http://www.ucla.edu/engagement.html" title="UCLA in the Community">UCLA in the Community</a></li>
+                <li><a href="http://www.ucla.edu/international.html" title="International">International</a></li>
+            </ul>
+            <ul class="landing-section">
+                <li><a href="http://www.ucla.edu/about.html" title="About UCLA">About UCLA</a></li>
+                <li><a href="http://www.ucla.edu/administration.html" title="Administration">Administration</a></li>
+                <li><a href="http://www.ucla.edu/employment.html" title="Employment">Employment</a></li>
+                <li><a href="https://www.campusservices.ucla.edu/" title="Campus Services">Campus Services</a></li>
+            </ul>
+            <ul class="landing-section lastItem">
+                <li><a href="http://happenings.ucla.edu/" title="Happenings">Happenings</a></li>
+                <li><a href="http://happenings.ucla.edu/sports/" title="Sports">Sports</a></li>
+                <li><a href="http://happenings.ucla.edu/arts/" title="Arts">Arts</a></li>
+                <li><a href="http://happenings.ucla.edu/lectures/" title="Lectures">Lectures</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="visualClear hidden-for-print"><!-- --></div>
+
+    <div id="content">
+
+    <!-- end www.ucla.edu content -->
+
+<div id="directory-container">
+    <div id="directory-content-wrapper"><div id="directory-content">
+        <img alt="Campus Directory" src="/img/directory.jpg">
+
+        <div id="search-wrapper" class="hidden-for-print">
+            <div id="search-box-basic" style="display:block;">
+                <div class="search-toggle">Basic Search | <a href="?searchtype=advanced" id="toggle-advanced-search">Advanced Search</a></div>
+
+                <form action="/search.php" method="post" name="basic-form">
+                    Find a
+                    <input type="radio" name="querytype" id="querytype-person" checked="checked" value="person"> <label for="querytype-person">person</label> /
+                    <input type="radio" name="querytype" id="querytype-department"  value="department"> <label for="querytype-department">department</label>
+
+                    <span style="width:30ex;display:inline-block">
+                        <span style="display:inline-block;" id="school-person">
+                            at
+                            <select name="loc">
+                                <option value="ucla" selected="selected">UCLA</option>
+                                <option value="ucb" >UC Berkeley</option>
+                                <option value="ucd" >UC Davis</option>
+                                <option value="ucm" >UC Merced</option>
+                                <option value="ucr" >UC Riverside</option>
+                                <option value="ucsb">UC Santa Barbara</option>
+                                <option value="ucsd">UC San Diego</option>
+                                <option value="lbl" >Lawrence Berkeley</option>
+                                <option value="llnl">Lawrence Livermore</option>
+                            </select>
+                        </span>
+                        <span style="display:none;" id="school-department"> at <b>UCLA</b></span>
+                    </span>
+                    <input type="text" name="q" value="" id="q">
+                    <input type="hidden" name="searchtype" value="basic">
+                    <input type="submit" class="directory-submit-button" value="Search">
+                </form>
+            </div>
+
+            <div id="search-box-advanced" class="advanced-form" style="display:none;">
+                <div class="search-toggle"><a href="?searchtype=basic" id="toggle-basic-search">Basic Search</a> | Advanced Search</div>
+
+                <fieldset id="advanced-querytype-person" style="display:block;">
+                    <legend>People Search | <a href="?searchtype=advanced;querytype=department" id="toggle-advanced-querytype-department">Department Search</a></legend>
+                    <form action="/search.php" method="post" name="advanced-people-form">
+                        <div>
+                            <label>Search Group:</label>
+                            <select name="group">
+                                <option value="" selected="selected">Faculty, Staff and Students</option>
+                                <option value="staff">Faculty and Staff</option>
+                                <option value="student">Students</option>
+                            </select>
+                        </div>
+
+                        <div><label>Name:</label> <input type="text" name="cn" value=""></div>
+                        <div><label>Email:</label> <input type="text" name="mail" value=""></div>
+                        <div><label>*URL:</label> <input type="text" name="url" value=""></div>
+                        <div><label>Phone:</label> <input type="text" name="telephonenumber" value=""></div>
+                        <div><label>Address:</label> <input type="text" name="postaladdress" value=""></div>
+                        <div><label>*Campus Mail Code:</label> <input type="text" name="postalcode" value=""></div>
+                        <div><label>*Dept Code:</label> <input type="text" name="admcode" value=""></div>
+                        <div><label>*Department:</label> <input type="text" name="department" value=""></div>
+                        <div><label>*Title:</label> <input type="text" name="title" value=""></div>
+
+                        <div><label>&nbsp;</label>
+                            <input type="submit" class="directory-submit-button" value="Search">
+                            <input type="reset" class="directory-submit-button" value="Clear Form">
+                            <input type="hidden" name="querytype" value="person">
+                            <input type="hidden" name="searchtype" value="advanced">
+                        </div>
+                    </form>
+                    <p>Fields marked with (*) limit your search to Faculty &amp; Staff listings.</p>
+                </fieldset>
+
+                <fieldset id="advanced-querytype-department" style="display:none;">
+                    <legend><a href="?searchtype=advanced;querytype=person" id="toggle-advanced-querytype-person">People Search</a> | Department Search</legend>
+
+                    <form action="/search.php" method="post" name="advanced-dept-form">
+                        <div><label>Department:</label> <input type="text" name="ofc" value=""></div>
+                        <div><label>Building:</label> <input type="text" name="campusaddress" value=""></div>
+                        <div><label>Keyword:</label> <input type="text" name="keyword" value=""></div>
+
+                        <div><label>&nbsp;</label>
+                            <input type="submit" class="directory-submit-button" value="Search">
+                            <input type="reset" class="directory-submit-button" value="Clear Form">
+                            <input type="hidden" name="querytype" value="department">
+                            <input type="hidden" name="searchtype" value="advanced">
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+
+
+<p class="page-title">Access Denied</p>
+
+<p>The document you are trying to view is only accessible by computers that belong to the UCLA network or does not exist.  We apologize for any inconvenience that this may have caused you.  If you think this is a server error, please contact the webmaster.</p>
+
+
+    <div id="lightbox"><img id="lightbox-close" src="/img/close.png"><div id="lightbox-surround"><div id="lightbox-content"></div></div></div>
+
+        <div class="privacy-notice">
+            <p><b>Privacy Notice:</b> This campus directory is the property of <span class="content-owner">UCLA</span>.  To protect the privacy of the individuals listed herein, in accordance with the State of California Information Practices Act, this directory may not be used, rented, distributed or sold for commercial purposes.</p>
+            <p>Information obtained from this on-line directory may not be used to provide addresses for mailings to University faculty, staff, and/or students.  Compilation or redistribution of information from this directory is strictly forbidden.</p>
+        </div>
+
+    </div></div>
+
+    <div id="directory-nav" class="hidden-for-print">
+        <ul>
+            <li><a href="http://map.ais.ucla.edu/go/campus-safety" class="emergency"><b>Emergency Info</b></a></li>
+            <li><a href="http://maps.ucla.edu/campus/?a_layers=lyr_evac" class="emergency">Campus Evacuation Areas</a></li>
+            <li>&nbsp;</li>
+            <li><b>Operator</b>: 310-825-4321</li>
+
+            <li><a href="/about.php">About the UCLA Directory</a></li>
+            <li><a href="/browse.php">Browse Directory Sections</a></li>            <li><a href="/dialing.php">Dialing Instructions</a></li>
+            <li><a href="/faq.php">Frequently Asked Questions</a></li>
+            <li><a href="/notary.php">Public Notaries</a></li>
+            <li><a href="/tips.php">Search Tips</a></li>
+            <li><a href="/update.php">Update Directory Listing</a></li>
+
+            <li>&nbsp;</li>
+
+            <li><a href="http://www.cts.ucla.edu/DirSurvey/">Did you find what you need?</a></li>
+        </ul>
+    </div>
+
+</div>
+
+    <!-- return to www.ucla.edu content -->
+
+        <div id="footer" class="hidden-for-print">
+            <ul class="hidden-for-print">
+                <li><a href="http://www.ucla.edu/">UCLA.edu Home</a></li>
+                <li><a href="http://map.ais.ucla.edu/go/campus-safety">Campus Safety</a></li>
+                <li><a href="http://www.diversity.ucla.edu/">Diversity</a></li>
+                <li><a href="http://www.accessweb.ucla.edu/">Disability Resources</a></li>
+                <li><a href="http://newsroom.ucla.edu/portal/ucla/media-contacts.aspx">Media Relations</a></li>
+            </ul>
+        </div>
+
+        <div id="colophon" class="hidden-for-print">
+            <ul>
+                <li id="copyright"><a href="http://www.universityofcalifornia.edu">University of California</a> &copy; 2010 UC Regents</li>
+                <li><a href="http://www.ucla.edu/terms.html">Terms of Use / Privacy Policy</a></li>
+                <li><a href="http://www.ucla.edu/contact.html">Contact</a></li>
+                <li id="connect-with-ucla"><a href="http://www.ucla.edu/connect.html">Connect</a>
+                    <a id="connect-youtube" href="http://youtube.ucla.edu" title="YouTube"><img src="/img/icon-youtube.jpg" alt="YouTube" width="17" height="17" /></a> 
+                    <a id="connect-facebook" href="http://facebook.ucla.edu" title="Facebook"><img src="/img/icon-facebook.jpg" alt="Facebook" width="17" height="17" /></a> 
+                    <a id="connect-itunes" href="http://itunes.ucla.edu" title="iTunes"><img src="/img/icon-itunes.jpg" alt="iTunes" width="17" height="17" /></a> 
+                    <a id="connect-twitter" href="http://twitter.com/ucla" title="Twitter"><img src="/img/icon-twitter.jpg" alt="Twitter" width="17" height="17" /></a> 
+                </li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<script>
+$('.table-colors tr:odd').css('background', '#eee');
+</script>
+
+</body>
+</html>
+
