@@ -191,11 +191,19 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     train_from_data(input, output, num_data, num_input, num_output, &walk_neural_network);
 }
 
-void test_for_walking_speed(double *segment,int length, double* result) 
+MoType test_for_walking_speed(double *segment,int length) 
 {
     double maxima = w_maxima_seg(segment+1, 0, length-1);
     double minima = w_minima_seg(segment+1, 0, length-1);
     double period = length;
     double *features = {maxima, minima, period};
+    double result[4];
     test_from_data(features, &walk_neural_network, length, result);
+    int maximum = 0;
+    for(int i = 0 ; i < WALK_N_OUTPUTS; i++) {
+        if (result[i] > result[maximum]) {
+            maximum = i;
+        }
+    }
+    return maximum+1;
 }
