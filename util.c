@@ -195,8 +195,8 @@ MoType test_for_walking_speed(double *segment,int length)
 {
     double maxima = w_maxima_seg(segment+1, 0, length-1);
     double minima = w_minima_seg(segment+1, 0, length-1);
-    double period = length;
-    double *features = {maxima, minima, period};
+    double period = (double)length;
+    double features[] = {maxima, minima, period};
     double result[4];
     test_from_data(features, &walk_neural_network, length, result);
     int maximum = 0;
@@ -205,5 +205,5 @@ MoType test_for_walking_speed(double *segment,int length)
             maximum = i;
         }
     }
-    return maximum+1;
+    return maxima+1;
 }
