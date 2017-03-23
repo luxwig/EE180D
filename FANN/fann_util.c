@@ -3,8 +3,37 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "floatfann.h"
+#include "fann_train.h"
 
-void train_from_data(const char* fn_train, const char* fn_model, const unsigned int num_input, const unsigned int num_output, struct fann** ann)
+void train_from_data(
+        fann_type*   input,
+        fann_type*   output,
+        const unsigned int num_data,
+        const unsigned int num_input, 
+        const unsigned int num_output, 
+        struct fann** ann)
+{
+    const unsigned int num_layers = 3;
+    const unsigned int num_neurons_hidden = 14;
+    const float desired_error = (const float) 0.0001;
+    const unsigned int max_epochs = 20000;
+    const unsigned int epochs_between_reports = 100;
+
+    struct fann_train_data* t_data = 
+        fann_create_train_array(num_data, num_input, input, num_output, output);
+
+    *ann = fann_create_standard(num_layers, num_input,
+        num_neurons_hidden, num_output);
+
+    fann_set_activation_function_hidden(*ann, FANN_SIGMOID_SYMMETRIC);
+    fann_set_activation_function_output(*ann, FANN_SIGMOID_SYMMETRIC);
+
+    fann_train_on_data(*ann, t_data, max_epochs, epochs_between_reports, desired_error);
+
+}
+
+
+void train_from_file(const char* fn_train, const char* fn_model, const unsigned int num_input, const unsigned int num_output, struct fann** ann)
 {
     fprintf(stderr, "FILE: %s\n", fn_train);
     const unsigned int num_layers = 3;

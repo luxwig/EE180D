@@ -2,7 +2,7 @@ function plotAllAxis( path )
 %PLOTALLAXIS Summary of this function goes here
 %   Detailed explanation goes here
 figure
-`
+
 ltxt = {'X Accelerometer','Y Accelerometer','Z Accelerometer', 'X Gyro','Y Gyro','Z Gyro'};
 m = csvread(path,2,1);
 t = m(:,1);
@@ -14,5 +14,11 @@ for j = [2:7]
         title(ltxt(j-1))
 end
 
+
+figure
+subplot(2,1,1)
+plot(t,m(:,2))
+subplot(2,1,2)
+plot(t,m(:,7))
 end
 

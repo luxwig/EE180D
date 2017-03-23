@@ -1,4 +1,4 @@
-function r = segment(m)
+function [pos, r] = segment(m)
     SAMPLE_RATE = 200;
     
     %fprintf('segment Inside\n');
@@ -9,6 +9,7 @@ function r = segment(m)
     p_pos = [];
     %fprintf('segment Inside - zgyro\n');
     [p_val,p_pos]=findpeaks(zgyro,'MinPeakDistance',200,'MinPeakHeight',50);
+    pos = p_pos + ones(length(p_pos), 1);
     
     tx = zeros(length(p_val)-1,SAMPLE_RATE);
     
@@ -27,6 +28,6 @@ function r = segment(m)
     end
     %fprintf('segment Inside - read return\n');
         %hold off
-     r = tx;
+    r = tx;
 end
 

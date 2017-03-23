@@ -4,7 +4,7 @@ INCLUDES=-I/usr/local/include
 LDFLAGS=-lm -lfann -L/usr/local/lib 
 IMPORTDIR=matlab_import
 FANNDIR=FANN
-SOURCES=main.c get_feature_from_file.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
+SOURCES=main.c util.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=main
 

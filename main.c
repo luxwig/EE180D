@@ -36,18 +36,17 @@ void main_get_feature(void)
                          "data/DESCEND/4.csv",
                          "data/DESCEND/5.csv",
                          "data/DESCEND/6.csv" };   
-  const int fntype[] = {0x1, 0x1, 0x1, 0x1, 0x2, 0x2, 0x2, 0x4, 0x4, 0x4,
+  const int fntype[] = {0x1, 0x1, 0x1, 0x1, 0x2, 0x2, 0x2, 0x3, 0x3, 0x3,
                   0xF0, 0xF0,0xF0, 0xF0, 0xF0, 0xF0, 0xF0,0xF0, 0xF0, 0xF0};
   
   int i, j;
   double data_m [_BUFFER*4];
   double *f_m=NULL;
   size_t n, num, train_num;
-  
+  float* input, *output;
   train_num = 0;
   num = 0;
 
-  FILE *fd; 
   for (i = 0; i < _FILENUM; i++)
   {
       f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
@@ -60,28 +59,28 @@ void main_get_feature(void)
       f_m = NULL;
   }
  
-  char* fn_train = "train.txt";
-  
-  fd = fopen(fn_train, "w");
-  
-  fprintf(fd, "%zu 4 3\n", train_num);
+  input  = (float*)malloc(sizeof(float)*train_num*4);
+  output = (float*)malloc(sizeof(float)*train_num*3);
+
+  float output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
   for (i = 0; i < num; i++) {
-     fprintf(fd, "%lf %lf %lf %lf\n", 
-             data_m[i*5], 
-             data_m[i*5+1], 
-             data_m[i*5+2], 
-             data_m[i*5+3]);
-     if (data_m[i*5+4] == 0x1)
-         fprintf(fd, "1 -1 -1\n");
-     if (data_m[i*5+4] == 0x2)
-         fprintf(fd, "-1 1 -1\n");
-      if (data_m[i*5+4] == 0x4)
-         fprintf(fd, "-1 -1 1\n");
+     if (data_m[i*5+4] == 0xF0) continue;
+     input[i*4] = data_m[i*5], 
+     input[i*4+1] = data_m[i*5+1], 
+     input[i*4+2] = data_m[i*5+2], 
+     input[i*4+3] = data_m[i*5+3];
+     memcpy(&output[i*3], output_type[(int)(data_m[i*5+4]-1)], sizeof(float)*3);
+     for (j = 0; j < 4; j++)
+         fprintf(stderr,"%f ", input[i*4+j]);
+     fprintf(stderr,"\n");
+     for (j = 0; j < 3; j++)
+         fprintf(stderr,"%f ", output[i*3+j]);
+     fprintf(stderr,"\n");
   }
-  fclose(fd); 
+
   
   struct fann* ann;
-  train_from_data(fn_train, "feature.net", 4, 3, &ann);
+  train_from_data(input, output, train_num, 4, 3, &ann);
   double predict[3];
   for (i = 0; i < num; i++)
     if (data_m[i*5+4] == 0xF0) {
