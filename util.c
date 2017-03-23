@@ -1,5 +1,6 @@
 #define get_index(X,Y,N) X+N*Y
 #define WALK_N_FEATURES 3
+#define WALK_N_OUTPUTS 4
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
@@ -120,23 +121,66 @@ void compile_features(TrainingData* data_from_file, float* stored_features_conti
     for(int i = 0; i < number_of_segments; i++) {
         begin = data_from_file->m_divider[i];
         end = data_from_file->m_divider[i+1];
-        fetch_features_in_segment(stored_features_contig, i, begin, end, data_from_file->m_data);
+        fetch_features_in_segment(stored_features_contig, i, begin, end, (float *)data_from_file->m_data);
     }
-    //by now stored_features_contig will have all the features
 }
 
+// void train_from_data(
+//         fann_type*   input, //contiguous features one array
+//         fann_type*   output, //what each contiguous feature should output
+//         const unsigned int num_data, //how many intervals
+//         const unsigned int num_input, //number of features
+//         const unsigned int num_output, //number of options
+//         struct fann** ann) //the neural network object
+// {
+// }
+// struct TrainingData_struct
+// {
+//     double* m_data;
+//     int     m_num_data;
+//     int*    m_divider;
+//     int     m_num_divider;
+//     MoType m_type;
+// };
+
+static struct fann* walk_neural_network;
 
 void train_walk_neural_network(TrainingData* all_file_data[], int nFiles) {
-    float* stored_features_contig;
+    float *input;
+    float *output;
+    float *single_file_stored_features_contig;
+    input = output = single_file_stored_features_contig = NULL;
+
+    int total_nSamples = 0;
+    int total_nSegments = 0;
     for(int i = 0; i < nFiles; i++) {
-        stored_features_contig = NULL;
-        compile_features(all_file_data[i], stored_features_contig);
+        total_nSamples += all_file_data[i]->m_num_data;
+        total_nSegments += (all_file_data[i]->m_num_divider - 1);
+    }
+
+    input = (float*)malloc(total_nSamples*sizeof(float));
+    output = (float*)malloc(total_nSegments*sizeof(float));
+
+    int copied_segments = 0;
+    for(int i = 0; i < nFiles; i++) {
+        int nSegments = all_file_data[i]->m_num_data- 1;
+        for(int j = 0; j < nSegments; j++) {
+            output[j+copied_segments] = (float)all_file_data[i]->m_type;
+        }
+        compile_features(all_file_data[i], single_file_stored_features_contig);
         /*
          TODO: use stored_features_contig to train neural network
         */
-        
-
-        
-        free(stored_features_contig);
+        memcpy(input + WALK_N_FEATURES*copied_segments, single_file_stored_features_contig, sizeof(float));
+        copied_segments += (all_file_data[i]->m_num_divider - 1);
+        free(single_file_stored_features_contig);
     }
+    train_from_data(input, output, total_nSegments, WALK_N_FEATURES, WALK_N_OUTPUTS, &walk_neural_network);
+}
+
+void test_walk_data(float*data, int n) {
+    float maxima = ;
+    float minima = ;
+    float period = n;
+
 }
