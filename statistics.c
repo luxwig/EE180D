@@ -8,9 +8,21 @@
 
 #include "statistics.h"
 
-float w_mean(float *arr, int n)
+double w_mean(double *arr, int n)
 {
-    float total;
+    double total;
+    int i;
+    
+    total = 0.0f;
+    for (i = 0; i < n; i++) {
+        total += arr[i];
+    }
+    return total/((float) n);
+}
+
+double w_mean_float(float *arr, int n)
+{
+    double total;
     int i;
     
     total = 0.0f;

@@ -17,7 +17,8 @@
 /* for fabsf() */
 #include <math.h>
 
-float w_mean(float *arr, int n);
+double w_mean_float(float *arr, int n);
+double w_mean(double *arr, int n);
 float w_calculateSD(float data[], int n);
 
 float w_walk_minima(float *a, int n);

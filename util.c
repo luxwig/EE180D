@@ -1,5 +1,5 @@
 #define get_index(X,Y,N) X+N*Y
-#define WALK_N_FEATURES 3
+#define WALK_N_FEATURES 4
 #define WALK_N_OUTPUTS 4
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
@@ -175,12 +175,13 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             for (int k = 0; k < all_file_data[i].m_num_data; k++){
                 convert_m_data[k] = all_file_data[i].m_data[k*7+1];
             }
-            float maxima = w_maxima_seg(convert_m_data+1, start, end);
-            float minima = w_minima_seg(convert_m_data+1, start, end);
-            float period = end - start;
+            float maxima = w_maxima_seg(convert_m_data, start, end);
+            float minima = w_minima_seg(convert_m_data, start, end);
+            float period = end - start + 1;
             input[n*WALK_N_FEATURES] = maxima;
             input[n*WALK_N_FEATURES+1] = minima;
             input[n*WALK_N_FEATURES+2] = period;
+            input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
             output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)*2-1;
             output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)*2-1;
             output[n*WALK_N_OUTPUTS+2] = (all_file_data[i].m_type == WALK3)*2-1;
@@ -193,17 +194,18 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
 
 MoType test_for_walking_speed(double *segment,int length) 
 {
-    double maxima = w_maxima_double_seg(segment+1, 0, length-1);
-    double minima = w_minima_double_seg(segment+1, 0, length-1);
+    double maxima = w_maxima_double_seg(segment, 0, length);
+    double minima = w_minima_double_seg(segment, 0, length);
     double period = (double)length;
-    double features[] = {maxima, minima, period};
+    double mean = (double)w_mean(segment,length);
+    double features[] = {maxima, minima, period,mean};
     double result[4];
-    test_from_data(features, &walk_neural_network, length, result);
+    test_from_data(features, walk_neural_network, 1, result);
     int maximum = 0;
     for(int i = 0 ; i < WALK_N_OUTPUTS; i++) {
         if (result[i] > result[maximum]) {
             maximum = i;
         }
     }
-    return maxima+1;
+    return (maximum+1);
 }
