@@ -9,7 +9,7 @@ for i = 1:4
     end
 end
 
-filePath = '../data/WALK/ludwig/';
+filePath = '../../data/WALK/ludwig/';
 name = {'1_t.csv','2_t.csv','3_t.csv','4_t.csv'};
 clear walk_t
 walk_t{1,8} = []; 
@@ -36,7 +36,7 @@ for i = 7:7
 end
 %}
 
-filePath = '../data/ASCEND/';
+filePath = '../../data/ASCEND/';
 name = {'1.csv','2.csv','3.csv','4.csv','5.csv','6.csv'};
 clear ascend
 ascend{1,8} = []; 
@@ -63,7 +63,7 @@ for i = 7:7
 end
 %}
 
-filePath = '../data/DESCEND/';
+filePath = '../../data/DESCEND/';
 name = {'1.csv','2.csv','3.csv','4.csv','5.csv','6.csv'};
 clear descend
 descend{1,8} = []; 

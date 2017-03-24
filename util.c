@@ -1,5 +1,5 @@
 #define get_index(X,Y,N) X+N*Y
-#define WALK_N_FEATURES 4
+#define WALK_N_FEATURES 5
 #define WALK_N_OUTPUTS 4
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
@@ -182,6 +182,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             input[n*WALK_N_FEATURES+1] = minima;
             input[n*WALK_N_FEATURES+2] = period;
             input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
+            input[n*WALK_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
             output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)*2-1;
             output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)*2-1;
             output[n*WALK_N_OUTPUTS+2] = (all_file_data[i].m_type == WALK3)*2-1;
@@ -198,7 +199,8 @@ MoType test_for_walking_speed(double *segment,int length)
     double minima = w_minima_double_seg(segment, 0, length);
     double period = (double)length;
     double mean = (double)w_mean(segment,length);
-    double features[] = {maxima, minima, period,mean};
+    double RMS = w_RMS_seg_double(segment,length);
+    double features[] = {maxima, minima, period, mean, RMS};
     double result[4];
     test_from_data(features, walk_neural_network, 1, result);
     int maximum = 0;

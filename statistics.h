@@ -30,6 +30,8 @@ double w_minima_double_seg(double *a, int begin, int end);
 float w_maxima(float *a, int n);
 float w_maxima_seg(float *a, int begin, int end);
 double w_maxima_double_seg(double *a, int begin, int end);
+double w_RMS_seg_double (double arr[], int size);
+double w_RMS_seg (float arr[], int size);
 
 #endif /* statistics_h */
 

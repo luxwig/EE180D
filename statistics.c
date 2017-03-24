@@ -140,6 +140,44 @@ float w_maxima_seg(float* a, int begin, int end)
     return a[index];
 }
 
+double w_RMS_seg (float arr[], int size)
+
+{
+    int i;
+    double sumsq;
+    double RMS;
+    sumsq = 0;
+    
+    
+    for (i = 0; i< size; i++)
+    {
+        sumsq += arr[i]*arr[i];
+        
+    }
+
+    RMS = (1/size)*(sqrt(sumsq));
+    return RMS;
+}
+
+double w_RMS_seg_double (double arr[], int size)
+
+{
+    int i;
+    double sumsq;
+    double RMS;
+    sumsq = 0;
+    
+    
+    for (i = 0; i< size; i++)
+    {
+        sumsq += arr[i]*arr[i];
+        
+    } 
+    
+    RMS = (1/size)*(sqrt(sumsq));
+    return RMS;
+}
+
 int cmpfunc (const void *a, const void *b) {
     return ( *(float*) a - *(float*) b);
 }
