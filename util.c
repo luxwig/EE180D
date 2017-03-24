@@ -1,6 +1,6 @@
 #define get_index(X,Y,N) X+N*Y
-#define WALK_N_FEATURES 4
-#define WALK_N_OUTPUTS 4
+#define WALK_N_FEATURES 9
+#define WALK_N_OUTPUTS 6
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
@@ -148,7 +148,7 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 
 static struct fann* walk_neural_network;
 
-void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
+void train_walk_neural_network(TrainingData all_file_data[], int nFiles, double * f_m) {
     float *input;
     float *output;
     unsigned int num_data, num_input, num_output;
@@ -158,7 +158,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     num_output = WALK_N_OUTPUTS;
 
     for(int i = 0; i < nFiles; i++) {
-        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
+        //if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
         num_data += (all_file_data[i].m_num_divider - 1);
     }
 
@@ -166,7 +166,6 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     output = (float *)malloc(sizeof(float)*WALK_N_OUTPUTS*num_data);
     int n = 0;
     for(int i = 0; i < nFiles; i++){
-        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
         int m_num_divider = all_file_data[i].m_num_divider;
         for(int j = 1; j< m_num_divider; j++) {
             int start = all_file_data[i].m_divider[j-1];
@@ -181,25 +180,37 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             input[n*WALK_N_FEATURES] = maxima;
             input[n*WALK_N_FEATURES+1] = minima;
             input[n*WALK_N_FEATURES+2] = period;
-            input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
+            input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period); 
+            input[n*WALK_N_FEATURES+4] = w_calculateSD(convert_m_data, period);
+            input[n*WALK_N_FEATURES+5] = f_m[n*5];
+            input[n*WALK_N_FEATURES+6] = f_m[n*5+1];
+            input[n*WALK_N_FEATURES+7] = f_m[n*5+2]*period/200;
+            input[n*WALK_N_FEATURES+8] = f_m[n*5+3]*period/200;
+            for (int k = 0; k < 9; k++)
+                printf("%f ", input[n*WALK_N_FEATURES+k]);
+            printf("\n\t");
             output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)*2-1;
             output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)*2-1;
             output[n*WALK_N_OUTPUTS+2] = (all_file_data[i].m_type == WALK3)*2-1;
             output[n*WALK_N_OUTPUTS+3] = (all_file_data[i].m_type == WALK4)*2-1;
+            output[n*WALK_N_OUTPUTS+4] = (all_file_data[i].m_type == ASC)*2-1;
+            output[n*WALK_N_OUTPUTS+5] = (all_file_data[i].m_type == DSC)*2-1;
             n++;
         }
     }
     train_from_data(input, output, num_data, num_input, num_output, &walk_neural_network);
 }
 
-MoType test_for_walking_speed(double *segment,int length) 
+MoType test_for_walking_speed(double *segment,int length, double* f_m) 
 {
     double maxima = w_maxima_double_seg(segment, 0, length);
     double minima = w_minima_double_seg(segment, 0, length);
     double period = (double)length;
     double mean = (double)w_mean(segment,length);
-    double features[] = {maxima, minima, period,mean};
-    double result[4];
+    double std  = w_calculateSD_double(segment, length);
+    double features[] = {maxima, minima, period, mean, std,
+            f_m[0], f_m[1], f_m[2]*period/200, f_m[3]*period/200};
+    double result[WALK_N_OUTPUTS];
     test_from_data(features, walk_neural_network, 1, result);
     int maximum = 0;
     for(int i = 0 ; i < WALK_N_OUTPUTS; i++) {

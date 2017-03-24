@@ -67,8 +67,8 @@ void main_get_feature(void)
       free(f_m);
       i++;
   }
-  mo_classfication(data_fm, train_num, TRAINING);
-  train_walk_neural_network(td, i);
+  // mo_classfication(data_fm, train_num, TRAINING);
+  train_walk_neural_network(td, i, data_fm);
   int k = 0;
   for (;i<_FILENUM;i++)
   {
@@ -82,9 +82,9 @@ void main_get_feature(void)
                  f_m[j*5+1], 
                  f_m[j*5+2], 
                  f_m[j*5+3]);
-            mt = mo_classfication(&f_m[j*5], n, TEST);
-            printf("%x",mt); 
-            if (mt == TRAINING){
+            //mt = mo_classfication(&f_m[j*5], n, TEST);
+            //printf("%x",mt); 
+            //if (mt == TRAINING){
                 int begin = seg_val[j];
                 int end = seg_val[j+1];
                 double *dp =(double*)malloc(sizeof(double)*(end-begin+1)); 
@@ -92,9 +92,9 @@ void main_get_feature(void)
                 {
                     dp[k-begin] = data_val[k*7+1];
                 } 
-                mt = test_for_walking_speed(dp,end-begin+1);
+                mt = test_for_walking_speed(dp,end-begin+1,&f_m[j*5]);
                 printf(" -> %x", mt);
-            }
+            //}
             printf("\n");
       }
       free(f_m);

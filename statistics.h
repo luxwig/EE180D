@@ -17,6 +17,7 @@
 /* for fabsf() */
 #include <math.h>
 
+float w_calculateSD_double(double* data, int n);
 double w_mean_float(float *arr, int n);
 double w_mean(double *arr, int n);
 float w_calculateSD(float data[], int n);

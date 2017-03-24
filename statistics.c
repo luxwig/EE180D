@@ -51,6 +51,26 @@ float w_calculateSD(float* data, int n)
     return sqrt(standardDeviation/n);
 }
 
+float w_calculateSD_double(double* data, int n)
+{
+    float sum = 0.0, mean, standardDeviation = 0.0;
+    
+    int i;
+    
+    for(i=0; i<n; ++i)
+    {
+        sum += data[i];
+    }
+    
+    mean = sum/n;
+    
+    for(i=0; i<n; ++i)
+        standardDeviation += pow(data[i] - mean, 2);
+    
+    return sqrt(standardDeviation/n);
+}
+
+
 float w_minima(float* a, int n)
 {
     int c, index;

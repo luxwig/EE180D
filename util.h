@@ -40,8 +40,8 @@ struct TrainingData_struct
 
 typedef struct TrainingData_struct TrainingData;
 
-void train_walk_neural_network(TrainingData all_file_data[], int nFiles);
-MoType test_for_walking_speed(double *segment,int length);
+void train_walk_neural_network(TrainingData all_file_data[], int nFilesi, double* f_m);
+MoType test_for_walking_speed(double *segment,int length, double* f_m);
 
 #endif
 
