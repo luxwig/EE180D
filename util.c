@@ -99,23 +99,20 @@ void segmentation(const char* fn, double* f, int* f_num, int* seg, int* seg_num,
 
 MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 {
-    float* input, *output;
+    double* input, *output;
     int j, k;
     if (fntype == TRAINING) 
     {
-        input  = (float*)malloc(sizeof(float)*n*4);
-        output  = (float*)malloc(sizeof(float)*n*3);
+        input  = (double*)malloc(sizeof(double)*n*4);
+        output  = (double*)malloc(sizeof(double)*n*3);
 
-        const float output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
+        const double output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
         for (j = 0; j < n; j++) {
-            input[j*4] = data_fm[j*5], 
-            input[j*4+1] = data_fm[j*5+1], 
-            input[j*4+2] = data_fm[j*5+2], 
-            input[j*4+3] = data_fm[j*5+3];
+            memcpy(input+4*j,data_fm+5*j, sizeof(double)*4);
             if (((int)data_fm[j*5+4]&0xF0) != 0xF0)
-                memcpy(&output[j*3], output_type[0], sizeof(float)*3);
+                memcpy(&output[j*3], output_type[0], sizeof(double)*3);
             else
-                memcpy(&output[j*3], output_type[(int)data_fm[j*5+4]&0x00F], sizeof(float)*3);
+                memcpy(&output[j*3], output_type[(int)data_fm[j*5+4]&0x00F], sizeof(double)*3);
             for (k = 0; k < 4; k++)
                 fprintf(stderr,"%f ", input[j*4+k]);
             fprintf(stderr,"\n");
@@ -125,7 +122,7 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         }
     
   
-        train_from_data_float(input, output, n, 4, 3, &ann);
+        train_from_data_double(input, output, n, 4, 3, &ann);
         return TRAINING;
     }
     else
