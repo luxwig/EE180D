@@ -125,13 +125,13 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         }
     
   
-        train_from_data(input, output, n, 4, 3, &ann);
+        train_from_data_float(input, output, n, 4, 3, &ann);
         return TRAINING;
     }
     else
     {
         double predict[3];
-        test_from_data(data_fm, ann, 1, predict);
+        test_from_data_double(data_fm, ann, 1, predict);
         //1 parameter: 3 features: [max, min, period, .....
         //2 parameter: 
 
@@ -190,7 +190,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             n++;
         }
     }
-    train_from_data(input, output, num_data, num_input, num_output, &walk_neural_network);
+    train_from_data_float(input, output, num_data, num_input, num_output, &walk_neural_network);
 }
 
 MoType test_for_walking_speed(double *segment,int length) 
@@ -202,7 +202,7 @@ MoType test_for_walking_speed(double *segment,int length)
     double RMS = w_RMS_seg_double(segment,length);
     double features[] = {maxima, minima, period, mean, RMS};
     double result[4];
-    test_from_data(features, walk_neural_network, 1, result);
+    test_from_data_double(features, walk_neural_network, 1, result);
     int maximum = 0;
     for(int i = 0 ; i < WALK_N_OUTPUTS; i++) {
         if (result[i] > result[maximum]) {
