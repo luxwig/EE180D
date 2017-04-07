@@ -1,10 +1,11 @@
 #include "statistics_2.h"
 
 
+
 float calculate_mean(float *segment, int n)
 {
 	int i;
-    float sum;
+    float sum = 0;
 	
     for (i=0; i<n; i++) {
         sum += arr[i];
@@ -13,7 +14,7 @@ float calculate_mean(float *segment, int n)
 }
 float calculate_standard_deviation(float* segment, int n)
 {
-    float mean;
+    float mean = 0;
 	float sum = 0;
 	float standard_deviation = 0;
     int i;
@@ -37,7 +38,7 @@ float swap(float *a, float *b){
 
 float calculate_median(float *segment, int n){
 	int i, j, k;
-	float median;
+	float median = 0;
 	
 	for(i=0; i<n; i++){
 		for(j=0; j<n-i;j++){
@@ -82,7 +83,8 @@ float calculate_kurtosis(float *segment, int n){
 	float mean = calculate_mean(segment, n);
 	float standard_deviation = calculate_standard_deviation(segment, n);
 	int i;
-	float mean_4, kurtosis;
+	float mean_4 = 0;
+	float kurtosis;
 	float k = 0;
 	
 	for(i=0;i<n;i++){
