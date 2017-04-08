@@ -18,7 +18,7 @@
 
 extern int main(int argc, const char * const argv[]);
 
-void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype, double* data_val, int* data_len);
+void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype);
 
 enum MoType_enum { TRAINING = 0x000,
                    WALK1 = 0x001, WALK2 = 0x002, WALK3 = 0x003, WALK4 = 0x004,

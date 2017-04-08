@@ -27,7 +27,7 @@
 */
 
 static struct fann* ann;
-void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype, double* data_val, int* data_len)
+void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype)
 {
     int j, k;
     double* data_r = (double*)malloc(sizeof(double)*data_buf_size*7);
