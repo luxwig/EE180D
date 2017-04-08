@@ -27,18 +27,10 @@
 */
 
 static struct fann* ann;
-void segmentation(const char* fn, double* f, int* f_num, int* seg, int* seg_num, int fntype, double* data_val, int* data_len)
+void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype, double* data_val, int* data_len)
 {
-    FILE *fd;
     int j, k;
-    double data[_BUFFER*2], data_r[_BUFFER*2];
-    char* line = NULL;
-    double temp;
-    size_t read, len, n;
- 
-    fd = fopen(fn, "r"); 
-    getline(&line, &len, fd);
-    getline(&line, &len, fd);
+    double* data_r = (double*)malloc(sizeof(double)*data_buf_size*7);
 
     emxArray_real_T *r;
     emxArray_real_T *pos;
@@ -46,19 +38,11 @@ void segmentation(const char* fn, double* f, int* f_num, int* seg, int* seg_num,
     emxArray_real_T *m;
     *f_num = 0;
 
-    n = 0;
-    while ((read = getline(&line, &len, fd))!=-1){
-        sscanf(line,"%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
-               &temp, &data[n*7], &data[n*7+1], &data[n*7+2],
-               &data[n*7+3], &data[n*7+4], &data[n*7+5],&data[n*7+6]);
-        n++;
-    }
+    n = data_buf_size;
 
-    fclose(fd);
-    n--;
     for (k = 0; k < n; k++)
-        for (j = 0 ; j<7; j++)
-            data_r[get_index(k,j,n)] = data[k*7+j];
+        for (j = 1 ; j < 8; j++)
+            data_r[get_index(k,j,n)] = data_buf[k*8+j];
             
     emxInitArray_real_T(&r, 2);
     emxInitArray_real_T(&features, 2);
