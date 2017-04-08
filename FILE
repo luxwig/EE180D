@@ -1,0 +1,19 @@
+global.h
+    All macro constant varible used by both training and cf
+
+util.h
+    All macro/non-macro function used by both training and cf
+
+statistics.h
+    Stats function for Regan
+
+statistics_2.h
+    Stats function for Gary
+
+cf.h
+    All function used by only cf
+
+train.h
+    All function used by only training
+
+
