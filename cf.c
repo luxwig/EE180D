@@ -59,10 +59,6 @@ void* data_acq(void* ptr)
     fprintf(stderr, "Finish init of 9DOF...\n");
     while (r_flag) {
         pthread_mutex_lock(&slock);
-        if (bufsize < _MAX_BUF_SIZE)
-            bufsize++;
-        else
-            bufpos = (bufpos+1)%_MAX_BUF_SIZE;
         gettimeofday(&now, NULL);
         current_data[0] = now.tv_sec + now.tv_usec/MILLION;
 
@@ -77,10 +73,14 @@ void* data_acq(void* ptr)
         current_data[5] = gd.x - Go.x;
         current_data[6] = gd.y - Go.y;
         current_data[7] = gd.z - Go.z;
-
         memcpy(buf_ptr + ((bufpos+bufsize)%_MAX_BUF_SIZE)*_DATA_ACQ_SIZE,
                current_data, sizeof(buftype)*8);
-        pthread_mutex_unlock(&slock);
+        if (bufsize < _MAX_BUF_SIZE)
+            bufsize++;
+        else
+            bufpos = (bufpos+1)%_MAX_BUF_SIZE;
+
+                pthread_mutex_unlock(&slock);
         counter = (counter+1)%_WAKE_UP_SPEED;
         if (counter == 0){
             pthread_mutex_lock(&cv_lock);
@@ -118,24 +118,25 @@ void* data_pro(void* ptr)
     int size, pos, i,n;
     n = 0;
     buftype* data_buf = (buftype*) ptr,
-             corret_data_buf[_MAX_BUF_SIZE];
+             correct_data_buf[_MAX_BUF_SIZE*8];
     while (r_flag){ 
         pthread_mutex_lock(&cv_lock);
         pthread_cond_wait(&cv,&cv_lock);
         pthread_mutex_unlock(&cv_lock);
         pthread_mutex_lock(&slock);
         pos = bufpos; size = bufsize;
-        rotate(data_buf, corret_data_buf, size, pos);
+        rotate(data_buf, correct_data_buf, size, pos);
+        fprintf(stderr, "pos: %d\tsize: %d",pos, size);
         pthread_mutex_unlock(&slock);
         /* insert here*/
         sprintf(buffer, "%d.csv", n);
         fprintf(stderr, "Write to %s\n",buffer);
         fn = fopen(buffer,"w");
         for (i = 0; i<size; i++)
-            fprintf(fn,"%lf\t%lf\t%lf\t%lf\n",corret_data_buf[i*_DATA_ACQ_SIZE+1],
-                                   corret_data_buf[i*_DATA_ACQ_SIZE+2],
-                                   corret_data_buf[i*_DATA_ACQ_SIZE+3],
-                                   corret_data_buf[i*_DATA_ACQ_SIZE+4]);
+            fprintf(fn,"%lf\t%lf\t%lf\t%lf\n",correct_data_buf[i*_DATA_ACQ_SIZE+1],
+                                   correct_data_buf[i*_DATA_ACQ_SIZE+2],
+                                   correct_data_buf[i*_DATA_ACQ_SIZE+3],
+                                   correct_data_buf[i*_DATA_ACQ_SIZE+4]);
         n++;
         fclose(fn);
     }
