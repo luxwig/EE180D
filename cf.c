@@ -57,7 +57,6 @@ void* data_acq(void* ptr)
     counter = 0;
     fprintf(stderr, "Finish init of 9DOF...\n");
     while (r_flag) {
-        pthread_mutex_lock(&slock);
         gettimeofday(&now, NULL);
         current_data[0] = now.tv_sec + now.tv_usec/MILLION;
 
@@ -71,7 +70,8 @@ void* data_acq(void* ptr)
         current_data[4] = ad.z;
         current_data[5] = gd.x - Go.x;
         current_data[6] = gd.y - Go.y;
-        current_data[7] = gd.z - Go.z;
+        current_data[7] = gd.z - Go.z; 
+        pthread_mutex_lock(&slock);
         memcpy(buf_ptr + ((bufpos+bufsize)%_MAX_BUF_SIZE)*_DATA_ACQ_SIZE,
                current_data, sizeof(buftype)*8);
         if (bufsize < _MAX_BUF_SIZE)
