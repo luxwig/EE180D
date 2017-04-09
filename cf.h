@@ -8,7 +8,7 @@
 
 #define _DATA_ACQ_SIZE  8
 #define _MAX_BUF_SIZE   65536
-
+#define _WAKE_UP_SPEED	100
 sig_atomic_t volatile r_flag = 1;
 
 int bufpos  = 0;
@@ -31,4 +31,5 @@ void do_signal(int sig)
 void* data_acq(void*);
 void* data_pro(void*);
 
+typedef double buftype;
 #endif
