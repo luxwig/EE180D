@@ -96,19 +96,10 @@ void* data_acq(void* ptr)
 }
 
 
-
-void rotate(const double *raw_data_buf, double *correctly_ordered, int size, int pos)
-{
-    int i, j = 0, remaining_elements = size;
-    //copy from beginning
-    for(i = pos; i < MAX_BUF_SIZE && i < (pos + size); i++, j++, remaining_elements--) {
-        correctly_ordered[j] = raw_data_buf[i];
-    }
-    //if i reaches max_buf_size, copy remaining items from beginning
-    i = 0;
-    while(remaining_elements-- > 0) {
-        correctly_ordered[j++] = raw_data_buf[i++];
-    }    
+/* rotate array to the left by n elements */
+void rotate_array(const double raw_data_buf[], double correctly_ordered[], int pos) {
+    memcpy(correctly_ordered, raw_data_buf+pos * 8, (MAX_BUF_SIZE-pos) * sizeof(double) * 8);
+    memcpy(correctly_ordered+(MAX_BUF_SIZE * 8-pos * 8), raw_data_buf, pos * sizeof(double) * 8);
 }
 
 void* data_pro(void* ptr)
