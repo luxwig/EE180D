@@ -236,6 +236,9 @@ MoType * classify_segments(double* correct_data_buf, int pos, int size) {
         int end_divider = div[i];
         int length_of_segment = end_divider - start_divider;
         MoType segment_motion = mo_classfication(&correct_data_buf[start_divider], length_of_segment, TEST);
+        if(segment_motion == TRAINING) {
+            segment_motion = test_for_walking_speed(&correct_data_buf[start_divider], length_of_segment);
+        }
         latestMotions[j] = segment_motion;
     }
     prev_num_segments = num_segments;
