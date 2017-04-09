@@ -1,14 +1,15 @@
-#include "cf.h"
 #include <mraa/i2c.h>
 #include <sys/time.h>
 #include "LSM9DS0.h"
 #define MILLION 1000000.0
+#include <unistd.h>
 
+
+#include "cf.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <unistd.h>
 #include <string.h>
 
 int main(int argc, const char * const argv[])
@@ -20,19 +21,20 @@ int main(int argc, const char * const argv[])
     pthread_create(&pro, NULL, data_pro, (void*) buffer);
     pthread_join(acq, NULL);
     pthread_join(pro, NULL);
+    return 0;
 }
 
 void* data_acq(void* ptr)
 {
     // Decleration of 9DOF
-	struct timeval now;
+    struct timeval now;
 
-	mraa_i2c_context accel, gyro;
-	double a_res, g_res;
-	accel_scale_t a_scale;
-	gyro_scale_t g_scale;
-	data_t ad, gd;
-	data_t Go;
+    mraa_i2c_context accel, gyro;
+    double a_res, g_res;
+    accel_scale_t a_scale;
+    gyro_scale_t g_scale;
+    data_t ad, gd;
+    data_t Go;
 
     // Decleration of data seg
     buftype* buf_ptr = (buftype*) ptr;
@@ -41,18 +43,17 @@ void* data_acq(void* ptr)
 
     // Init of 9DOF
     a_scale = A_SCALE_4G;
-	g_scale = G_SCALE_500DPS;
-	m_scale = M_SCALE_4GS;	
+    g_scale = G_SCALE_500DPS;
 
-	accel = accel_init();
-	set_accel_scale(accel, a_scale);
-	a_res = calc_accel_res(a_scale);
+    accel = accel_init();
+    set_accel_scale(accel, a_scale);
+    a_res = calc_accel_res(a_scale);
 
-	gyro = gyro_init();
-	set_gyro_scale(gyro, g_scale);
-	g_res = calc_gyro_res(g_scale);
+    gyro = gyro_init();
+    set_gyro_scale(gyro, g_scale);
+    g_res = calc_gyro_res(g_scale);
 
-	Go = calc_gyro_offset(gyro, g_res);
+    Go = calc_gyro_offset(gyro, g_res);
 
     counter = 0;
     fprintf(stderr, "Finish init of 9DOF...\n");
@@ -63,15 +64,14 @@ void* data_acq(void* ptr)
         else
             bufpos = (bufpos+1)%_MAX_BUF_SIZE;
         gettimeofday(&now, NULL);
-		current_data[0] = now.tv_sec + now.tv_usec/MILLION;
+        current_data[0] = now.tv_sec + now.tv_usec/MILLION;
 
-		ad = read_accel(accel, a_res);
-		gd = read_gyro(gyro, g_res);
-		md = read_mag(mag, m_res);
+        ad = read_accel(accel, a_res);
+        gd = read_gyro(gyro, g_res);
 
-		gettimeofday(&now, NULL);
-		current_data[1] = now.tv_sec + now.tv_usec/MILLION;
-		current_data[2] = ad.x;
+        gettimeofday(&now, NULL);
+        current_data[1] = now.tv_sec + now.tv_usec/MILLION;
+        current_data[2] = ad.x;
         current_data[3] = ad.y;
         current_data[4] = ad.z;
         current_data[5] = gd.x - Go.x;
@@ -101,7 +101,7 @@ void rotate(const double *raw_data_buf, double *correctly_ordered, int size, int
 {
     int i, j = 0, remaining_elements = size;
     //copy from beginning
-    for(i = pos; i < MAX_BUF_SIZE && i < (pos + size); i++, j++, remaining_elements--) {
+    for(i = pos; i < _MAX_BUF_SIZE && i < (pos + size); i++, j++, remaining_elements--) {
         correctly_ordered[j] = raw_data_buf[i];
     }
     //if i reaches max_buf_size, copy remaining items from beginning
@@ -116,7 +116,10 @@ void rotate(const double *raw_data_buf, double *correctly_ordered, int size, int
 
 void* data_pro(void* ptr)
 {
-    int size, pos, i;
+    FILE* fn;
+    char buffer [33];
+    int size, pos, i,n;
+    n = 0;
     buftype* data_buf = (buftype*) ptr,
              corret_data_buf[_MAX_BUF_SIZE];
     while (r_flag){ 
@@ -128,11 +131,16 @@ void* data_pro(void* ptr)
         rotate(data_buf, corret_data_buf, size, pos);
         pthread_mutex_unlock(&slock);
         /* insert here*/
-        
-        for (i = bufpos; i<bufpos+bufsize; i++)
-            if (b_l[i%BUFFER] == 299)
-                printf("%d\t", i%BUFFER);
-        printf("\n");
+        sprintf(buffer, "%d.csv", n);
+        fprintf(stderr, "Write to %s\n",buffer);
+        fn = fopen(buffer,"w");
+        for (i = 0; i<size; i++)
+            fprintf(fn,"%lf\t%lf\t%lf\t%lf\n",corret_data_buf[i*_DATA_ACQ_SIZE+1],
+                                   corret_data_buf[i*_DATA_ACQ_SIZE+2],
+                                   corret_data_buf[i*_DATA_ACQ_SIZE+3],
+                                   corret_data_buf[i*_DATA_ACQ_SIZE+4]);
+        n++;
+        fclose(fn);
     }
     return 0;
 }   
