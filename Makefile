@@ -1,10 +1,10 @@
 CC=gcc
 CFLAGS=-g -c -Wall -Werror
 INCLUDES=-I/usr/local/include
-LDFLAGS=-lm -lfann -L/usr/local/lib 
+LDFLAGS=-lm -lfann -L/usr/local/lib -lpthread 
 IMPORTDIR=matlab_import
 FANNDIR=FANN
-SOURCES=main.c util.c statistics.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
+SOURCES=cf.c statistics.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=main
 
