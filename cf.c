@@ -15,7 +15,7 @@ int main(int argc, const char * const argv[])
 {
     signal(SIGINT, do_signal);
     pthread_t acq, pro;
-    buftype* buffer = (buftype*)malloc(sizeof(buftype)*_MAX_BUF_SIZE);
+    buftype* buffer = (buftype*)malloc(sizeof(buftype)*_MAX_BUF_SIZE*8);
     pthread_create(&acq, NULL, data_acq, (void*) buffer);
     pthread_create(&pro, NULL, data_pro, (void*) buffer);
     pthread_join(acq, NULL);
@@ -96,9 +96,9 @@ void* data_acq(void* ptr)
 
 
 /* rotate array to the left by n elements */
-void rotate_array(const double raw_data_buf[], double correctly_ordered[], int pos) {
-    memcpy(correctly_ordered, raw_data_buf+pos * _DATA_ACQ_SIZE, (MAX_BUF_SIZE-pos) * sizeof(double) * _DATA_ACQ_SIZE);
-    memcpy(correctly_ordered+(MAX_BUF_SIZE * _DATA_ACQ_SIZE-pos * _DATA_ACQ_SIZE), raw_data_buf, pos * sizeof(double) * _DATA_ACQ_SIZE);
+void rotate(const double raw_data_buf[], double correctly_ordered[], int pos) {
+    memcpy(correctly_ordered, raw_data_buf+pos * _NUM_DATA_SOURCES, (_MAX_BUF_SIZE-pos) * sizeof(double) * _NUM_DATA_SOURCES);
+    memcpy(correctly_ordered+(_MAX_BUF_SIZE * _NUM_DATA_SOURCES-pos * _NUM_DATA_SOURCES), raw_data_buf, pos * sizeof(double) * _NUM_DATA_SOURCES);
 }
 
 void* data_pro(void* ptr)
@@ -115,7 +115,7 @@ void* data_pro(void* ptr)
         pthread_mutex_unlock(&cv_lock);
         pthread_mutex_lock(&slock);
         pos = bufpos; size = bufsize;
-        rotate(data_buf, correct_data_buf, size, pos);
+        rotate(data_buf, correct_data_buf, pos);
         fprintf(stderr, "pos: %d\tsize: %d",pos, size);
         pthread_mutex_unlock(&slock);
         /* insert here*/
