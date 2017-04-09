@@ -97,8 +97,8 @@ void* data_acq(void* ptr)
 
 /* rotate array to the left by n elements */
 void rotate_array(const double raw_data_buf[], double correctly_ordered[], int pos) {
-    memcpy(correctly_ordered, raw_data_buf+pos * _NUM_DATA_SOURCES, (MAX_BUF_SIZE-pos) * sizeof(double) * _NUM_DATA_SOURCES);
-    memcpy(correctly_ordered+(MAX_BUF_SIZE * _NUM_DATA_SOURCES-pos * _NUM_DATA_SOURCES), raw_data_buf, pos * sizeof(double) * _NUM_DATA_SOURCES);
+    memcpy(correctly_ordered, raw_data_buf+pos * _DATA_ACQ_SIZE, (MAX_BUF_SIZE-pos) * sizeof(double) * _DATA_ACQ_SIZE);
+    memcpy(correctly_ordered+(MAX_BUF_SIZE * _DATA_ACQ_SIZE-pos * _DATA_ACQ_SIZE), raw_data_buf, pos * sizeof(double) * _DATA_ACQ_SIZE);
 }
 
 void* data_pro(void* ptr)
