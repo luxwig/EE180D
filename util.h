@@ -37,6 +37,8 @@ typedef struct TrainingData_struct TrainingData;
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles);
 MoType test_for_walking_speed(double *segment,int length);
+MoType * classify_segments(double* correct_data_buf, int pos, int size);
+void rotate(const double *rotated_data_buf, double *correctly_ordered, int size, int pos);
 */
 
 #endif

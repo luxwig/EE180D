@@ -192,3 +192,52 @@ MoType test_for_walking_speed(double *segment,int length)
     }
     return (maximum+1);
 }
+
+
+static double copy_data_buf[_BUFFER];
+static int prev_num_segments = 0;
+/*
+    The function returns an array of the latest motions by taking the difference
+    of the new size of the buffer with that of the old size, and accessing the 
+    values in the new segments.
+
+    @param rotated_data_buf : array of metric data
+    @param pos: position earliest data point
+    @param size: size of buff, will reach MAX_BUF_SIZE and increase no more
+*/
+MoType * classify_segments(double* correct_data_buf, int pos, int size) {
+    /*
+    @ data_buf -> actual data containing all metrics, segmentation will handle gyro dirctly
+    @ data_buf_size -> # of data points
+    @ f -> [will be modified], turning to array of features * the number of things
+    @ seg -> [will be modified], actual dividers
+    @ seg_num -> [will be modified], number of dividers
+    @ fntype -> TEST macro
+    */
+
+    double *f;
+    int *f_num;
+    int *div;
+    int *div_num;
+    int fntype = TEST;
+    segmentation(correct_data_buf, size, f, f_num, div, div_num, fntype);
+
+    /* 
+        @param num_segments: number of total segments
+        @param num_new_segments: number of new segments
+        if very first motion, ignore last divider
+            otherwise ignore first and last divider
+    */
+    int num_segments = (prev_num_segments == 0) ? (*div_num - 1) : (*div_num - 2);
+    int num_new_segments = num_segments - prev_num_segments;
+    MoType * latestMotions = malloc(num_new_segments * sizeof(MoType));
+    for(int i = 1+prev_num_segments, j = 0; i < (*div_num-1); i++, j++) {
+        int start_divider = div[i-1];
+        int end_divider = div[i];
+        int length_of_segment = end_divider - start_divider;
+        MoType segment_motion = mo_classfication(&correct_data_buf[start_divider], length_of_segment, TEST);
+        latestMotions[j] = segment_motion;
+    }
+    prev_num_segments = num_segments;
+    return latestMotions
+}

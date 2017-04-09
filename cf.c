@@ -105,13 +105,10 @@ void rotate(const double *raw_data_buf, double *correctly_ordered, int size, int
         correctly_ordered[j] = raw_data_buf[i];
     }
     //if i reaches max_buf_size, copy remaining items from beginning
-    if (remaining_elements > 0) {
-        i = 0;
-        while(remaining_elements-- > 0) {
-            correctly_ordered[j++] = raw_data_buf[i++];
-        }
-    }
-    
+    i = 0;
+    while(remaining_elements-- > 0) {
+        correctly_ordered[j++] = raw_data_buf[i++];
+    }    
 }
 
 void* data_pro(void* ptr)
