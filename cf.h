@@ -7,7 +7,7 @@
 #include <signal.h>
 
 #define _DATA_ACQ_SIZE  8
-#define _MAX_BUF_SIZE   256
+#define _MAX_BUF_SIZE   65536
 #define _WAKE_UP_SPEED	100
 sig_atomic_t volatile r_flag = 1;
 
