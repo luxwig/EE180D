@@ -1,6 +1,9 @@
+#ifndef _DEBUG
 #include <mraa/i2c.h>
-#include <sys/time.h>
 #include "LSM9DS0.h"
+#endif
+
+#include <sys/time.h>
 #define MILLION 1000000.0
 #include <unistd.h>
 
@@ -13,6 +16,13 @@
 
 int main(int argc, const char * const argv[])
 {
+#ifdef _DEBUG
+    if (argc > 1) strcpy(fn, argv[1]);
+    else{
+        fprintf(stderr, "Invalid Argument\n");
+        exit(-1);
+    }
+#endif
     signal(SIGINT, do_signal);
     pthread_t acq, pro;
     buftype* buffer = (buftype*)malloc(sizeof(buftype)*_MAX_BUF_SIZE*8);
@@ -25,9 +35,16 @@ int main(int argc, const char * const argv[])
 
 void* data_acq(void* ptr)
 {
-    // Decleration of 9DOF
-    struct timeval now;
+    // Decleration of data seg
+    buftype* buf_ptr = (buftype*) ptr;
+    int counter;    
+    buftype  current_data[_DATA_ACQ_SIZE];
 
+#ifndef _DEBUG
+    
+    // Decleration of 9DOF
+
+    struct timeval now;
     mraa_i2c_context accel, gyro;
     double a_res, g_res;
     accel_scale_t a_scale;
@@ -35,11 +52,7 @@ void* data_acq(void* ptr)
     data_t ad, gd;
     data_t Go;
 
-    // Decleration of data seg
-    buftype* buf_ptr = (buftype*) ptr;
-    int counter;    
-    buftype  current_data[_DATA_ACQ_SIZE];
-
+    
     // Init of 9DOF
     a_scale = A_SCALE_4G;
     g_scale = G_SCALE_500DPS;
@@ -54,9 +67,22 @@ void* data_acq(void* ptr)
 
     Go = calc_gyro_offset(gyro, g_res);
 
-    counter = 0;
     fprintf(stderr, "Finish init of 9DOF...\n");
+#else
+    FILE* fd = fopen(fn, "r"); 
+    char* line = NULL;
+    size_t read, len;
+         
+    getline(&line, &len, fd);
+    getline(&line, &len, fd);
+
+    fprintf(stderr, "** DEBUG MODE **\n");
+#endif
+
+    counter = 0;
+
     while (r_flag) {
+#ifndef _DEBUG
         gettimeofday(&now, NULL);
         current_data[0] = now.tv_sec + now.tv_usec/MILLION;
 
@@ -71,6 +97,16 @@ void* data_acq(void* ptr)
         current_data[5] = gd.x - Go.x;
         current_data[6] = gd.y - Go.y;
         current_data[7] = gd.z - Go.z; 
+#else
+        read = getline(&line, &len, fd);
+
+        if (read == -1) { r_flag = 0; continue; }
+        
+        sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+                current_data, current_data+1, current_data+2,
+                current_data+3, current_data+4, current_data+5,
+                current_data+6, current_data+7);
+#endif
         pthread_mutex_lock(&slock);
         memcpy(buf_ptr + ((bufpos+bufsize)%_MAX_BUF_SIZE)*_DATA_ACQ_SIZE,
                current_data, sizeof(buftype)*8);
@@ -79,7 +115,7 @@ void* data_acq(void* ptr)
         else
             bufpos = (bufpos+1)%_MAX_BUF_SIZE;
 
-                pthread_mutex_unlock(&slock);
+        pthread_mutex_unlock(&slock);
         counter = (counter+1)%_WAKE_UP_SPEED;
         if (counter == 0){
             pthread_mutex_lock(&cv_lock);
@@ -88,6 +124,9 @@ void* data_acq(void* ptr)
         }
         usleep(100);
     }
+#ifdef _DEBUG
+    fclose(fd);
+#endif
     pthread_mutex_lock(&cv_lock);
     pthread_cond_signal(&cv);
     pthread_mutex_unlock(&cv_lock);
@@ -97,8 +136,8 @@ void* data_acq(void* ptr)
 
 /* rotate array to the left by n elements */
 void rotate(const double raw_data_buf[], double correctly_ordered[], int pos) {
-    memcpy(correctly_ordered, raw_data_buf+pos * _NUM_DATA_SOURCES, (_MAX_BUF_SIZE-pos) * sizeof(double) * _NUM_DATA_SOURCES);
-    memcpy(correctly_ordered+(_MAX_BUF_SIZE * _NUM_DATA_SOURCES-pos * _NUM_DATA_SOURCES), raw_data_buf, pos * sizeof(double) * _NUM_DATA_SOURCES);
+    memcpy(correctly_ordered, raw_data_buf+pos * _DATA_ACQ_SIZE , (_MAX_BUF_SIZE-pos) * sizeof(buftype) * _DATA_ACQ_SIZE );
+    memcpy(correctly_ordered+(_MAX_BUF_SIZE * _DATA_ACQ_SIZE-pos * _DATA_ACQ_SIZE), raw_data_buf, pos * sizeof(buftype) * _DATA_ACQ_SIZE );
 }
 
 void* data_pro(void* ptr)
@@ -108,7 +147,8 @@ void* data_pro(void* ptr)
     int size, pos, i,n;
     n = 0;
     buftype* data_buf = (buftype*) ptr,
-             correct_data_buf[_MAX_BUF_SIZE*8];
+           * correct_data_buf =
+           (buftype*)malloc(_MAX_BUF_SIZE*sizeof(buftype)*_DATA_ACQ_SIZE);
     while (r_flag){ 
         pthread_mutex_lock(&cv_lock);
         pthread_cond_wait(&cv,&cv_lock);

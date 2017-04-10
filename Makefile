@@ -1,12 +1,31 @@
+UNAME=$(shell uname)
 CC=gcc
 CFLAGS=-g -c -Wall -Werror
 INCLUDES=-I/usr/local/include
-LDFLAGS=-lm -lmraa -lfann -L/usr/local/lib -lpthread 
+LDFLAGS=-lm -lfann -L/usr/local/lib -lpthread 
 IMPORTDIR=matlab_import
 FANNDIR=FANN
-SOURCES=cf.c statistics.c LSM9DS0.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
+SOURCES=cf.c statistics.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=main
+MODE=NORMAL
+
+ifeq ($(UNAME), Linux)
+    $(info OS: LINUX)
+    ifeq ($(MODE), DEBUG)
+        $(info MODE: **DEBUG**)
+        CFLAGS += -D _DEBUG
+    else
+        $(info MODE: NORMAL)
+        LDFLAGS += -lmraa
+        SOURCES += LSM9DS0.c
+    endif
+else
+    $(info OS: DARWIN)
+    $(info MODE: **DEBUG**)
+    CFLAGS += -D _DEBUG
+endif
+
 
 all: $(SOURCES) $(EXECUTABLE)
 

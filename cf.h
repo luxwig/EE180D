@@ -7,7 +7,7 @@
 #include <signal.h>
 
 #define _DATA_ACQ_SIZE  8
-#define _MAX_BUF_SIZE   65536
+#define _MAX_BUF_SIZE   256
 #define _WAKE_UP_SPEED	100
 sig_atomic_t volatile r_flag = 1;
 
@@ -32,4 +32,8 @@ void* data_acq(void*);
 void* data_pro(void*);
 
 typedef double buftype;
+
+#ifdef _DEBUG
+char fn[256];
+#endif
 #endif
