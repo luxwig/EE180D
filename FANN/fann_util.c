@@ -56,6 +56,35 @@ void train_from_data_float(
 
 }
 
+void train_from_file_float(fann_type*   input, //contiguous features one array
+        fann_type*   output, //what each contiguous feature should output
+        const unsigned int num_data, //how many intervals
+        const unsigned int num_input, //number of features
+        const unsigned int num_output, //number of options
+        const char* fn)
+{
+    struct fann *ann;
+    train_from_data_float(input, output, num_data, num_input, num_output, &ann);
+    fann_save(ann, fn);
+    fann_destroy(ann);
+}
+
+
+void train_from_file_double(
+        double*   input, //contiguous features one array
+        double*   output, //what each contiguous feature should output
+        const unsigned int num_data, //how many intervals
+        const unsigned int num_input, //number of features
+        const unsigned int num_output, //number of options
+        const char* fn)
+{
+    struct fann* ann;
+    train_from_data_double(input, output, num_data, num_input, num_output, &ann);
+    fann_save(ann, fn);
+    fann_destroy(ann);
+}
+
+
 
 //data one d pointer contiguous feature points
 //n -> number of rows you are passing
@@ -92,4 +121,21 @@ void test_from_data_float(float* data, struct fann* ann, int n, float* predict)
         memcpy(&predict[i*num_output], calc_out, sizeof(fann_type)*num_output); 
     } 
 }
+
+
+void test_from_file_float(float* data, const char* fn, int n, float* predict)
+{
+    struct fann* ann = fann_create_from_file(fn);
+    test_from_data_float(data, ann, n, predict);
+    fann_destroy(ann);
+}
+
+void test_from_file_double(double* data, const char* fn, int n, double* predict)
+{
+    struct fann* ann = fann_create_from_file(fn);
+    test_from_data_double(data, ann, n, predict);
+    fann_destroy(ann);
+}
+
+
 
