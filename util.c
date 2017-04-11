@@ -6,6 +6,7 @@
 #define WALK_PERIOD_INDEX 2
 
 #include "global.h"
+#include "global.h"
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/get_feature.h"
@@ -17,6 +18,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void read_from_file(const char * filename, double * buffer, int* n) {
+    FILE* file = fopen(filename, "r"); 
+    char* line = NULL;
+    size_t read, len;
+    //must skip the first two lines of the code
+    getline(&line, &len, file);
+    getline(&line, &len, file);
+    *n = 0;
+    while((read = getline(&line, &len, file)) != -1) {
+        sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+                buffer + *n * _DATA_ACQ_SIZE + _TIMESTAMP_BEFORE_OFFSET, 
+                buffer + *n * _DATA_ACQ_SIZE + _TIMESTAMP_AFTER_OFFSET, 
+                buffer + *n * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET,
+                buffer + *n * _DATA_ACQ_SIZE + _ACCEL_Y_OFFSET, 
+                buffer + *n * _DATA_ACQ_SIZE + _ACCEL_Z_OFFSET,                
+                buffer + *n * _DATA_ACQ_SIZE + _GYRO_X_OFFSET,
+                buffer + *n * _DATA_ACQ_SIZE + _GYRO_Y_OFFSET,
+                buffer + *n * _DATA_ACQ_SIZE + _GYRO_Z_OFFSET);
+        printf("%lf\n", buffer[*n * _DATA_ACQ_SIZE]);
+        *n = *n + 1;
+    }
+    fclose(file);
+}
 
 /*
     fn: filename
@@ -199,7 +223,7 @@ static int prev_num_segments = 0;
     of the new size of the buffer with that of the old size, and accessing the 
     values in the new segments.
 
-    @param rotated_data_buf : array of metric data
+    @param correct_data_buf : array of metric data
     @param pos: position earliest data point
     @param size: size of buff, will reach MAX_BUF_SIZE and increase no more
 */
