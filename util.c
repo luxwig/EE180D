@@ -27,7 +27,6 @@
     fntype: filename type
 */
 
-static struct fann* ann;
 void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype)
 {
     int j, k;
@@ -107,13 +106,13 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         }
     
   
-        train_from_data_double(input, output, n, 4, 3, &ann);
+        train_from_file_double(input, output, n, 4, 3, _MO_NEURAL_NETWORK);
         return TRAINING;
     }
     else
     {
         double predict[3];
-        test_from_data_double(data_fm, ann, 1, predict);
+        test_from_file_double(data_fm, _MO_NEURAL_NETWORK, 1, predict);
         //1 parameter: 3 features: [max, min, period, .....
         //2 parameter: 
 
@@ -172,7 +171,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             n++;
         }
     }
-    train_from_data_float(input, output, num_data, num_input, num_output, &walk_neural_network);
+    train_from_file_float(input, output, num_data, num_input, num_output, _WALK_NEURAL_NETWORK);
 }
 
 MoType test_for_walking_speed(double *segment,int length) 
