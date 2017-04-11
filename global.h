@@ -5,6 +5,17 @@
 #define _SBUFFER 256
 #define _TRAIN_DATA_SIZE 10
 #define _TEST_DATA_SIZE 10
+#define _DATA_ACQ_SIZE  8
+
+#define _TIMESTAMP_BEFORE_OFFSET 0
+#define _TIMESTAMP_AFTER_OFFSET 1
+#define _ACCEL_X_OFFSET 2
+#define _ACCEL_Y_OFFSET 3
+#define _ACCEL_Z_OFFSET 4
+#define _GYRO_X_OFFSET 5
+#define _GYRO_Y_OFFSET 6
+#define _GYRO_Z_OFFSET 7
+
 const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
 
 const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={"data/WALK/ludwig/1.csv",  
