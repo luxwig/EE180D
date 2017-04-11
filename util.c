@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 void read_from_file(const char * filename, double * buffer, size_t* n) {
     FILE* file = fopen(filename, "r"); 
     char* line = NULL;
@@ -52,7 +51,7 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
 void segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype)
 {
     int j, k, n;
-    double* data_r = (double*)malloc(sizeof(double)*_BUFFER*7);
+    double* data_r = (double*)malloc(sizeof(double)*_BUFFER*2);
 
     emxArray_real_T *r;
     emxArray_real_T *pos;
@@ -60,12 +59,12 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     emxArray_real_T *m;
     *f_num = 0;
 
-    n = data_buf_size;
+    n = data_buf_size-1;
 
     for (k = 0; k < n; k++)
         for (j = 1 ; j < 8; j++)
-            data_r[get_index(k,j-1,n)] = data_buf[k*8+j];
-            
+            data_r[get_index(k,(j-1),n)] = data_buf[k*8+j];
+    
     emxInitArray_real_T(&r, 2);
     emxInitArray_real_T(&features, 2);
     emxInitArray_real_T(&pos, 1);
