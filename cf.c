@@ -147,9 +147,7 @@ void rotate(const double raw_data_buf[], double correctly_ordered[], int pos) {
 
 void* data_pro(void* ptr)
 {
-    FILE* fn;
-    char buffer [33];
-    int size, pos, i,n;
+    int size, pos, n, new_seg_num;
     n = 0;
     buftype* data_buf = (buftype*) ptr,
            * correct_data_buf =
@@ -164,6 +162,7 @@ void* data_pro(void* ptr)
         fprintf(stderr, "pos: %d\tsize: %d",pos, size);
         pthread_mutex_unlock(&slock);
         /* insert here*/
+        /*
         sprintf(buffer, "%d.csv", n);
         fprintf(stderr, "Write to %s\n",buffer);
         fn = fopen(buffer,"w");
@@ -174,6 +173,9 @@ void* data_pro(void* ptr)
                                    correct_data_buf[i*_DATA_ACQ_SIZE+4]);
         n++;
         fclose(fn);
+        */
+        MoType result[_SBUFFER];
+        classify_segments(correct_data_buf, pos, size, result, &new_seg_num);
     }
     return 0;
 }   

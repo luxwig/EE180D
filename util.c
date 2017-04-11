@@ -221,7 +221,7 @@ static int prev_num_segments = 0;
     @param pos: position earliest data point
     @param size: size of buff, will reach MAX_BUF_SIZE and increase no more
 */
-MoType * classify_segments(double* correct_data_buf, int pos, int size) {
+void classify_segments(double* correct_data_buf, int pos, int size, MoType* latestMotions, int* latestMotions_num) {
     /*
     @ data_buf -> actual data containing all metrics, segmentation will handle gyro dirctly
     @ data_buf_size -> # of data points
@@ -246,7 +246,6 @@ MoType * classify_segments(double* correct_data_buf, int pos, int size) {
     */
     int num_segments = (prev_num_segments == 0) ? (div_num - 1) : (div_num - 2);
     int num_new_segments = num_segments - prev_num_segments;
-    MoType * latestMotions = malloc(num_new_segments * sizeof(MoType));
     for(int i = 1+prev_num_segments, j = 0; i < (div_num-1); i++, j++) {
         int start_divider = div[i-1];
         int end_divider = div[i];
@@ -258,5 +257,5 @@ MoType * classify_segments(double* correct_data_buf, int pos, int size) {
         latestMotions[j] = segment_motion;
     }
     prev_num_segments = num_segments;
-    return latestMotions;
+    *latestMotions_num = num_new_segments;
 }
