@@ -194,7 +194,6 @@ MoType test_for_walking_speed(double *segment,int length)
 }
 
 
-static double copy_data_buf[_BUFFER];
 static int prev_num_segments = 0;
 /*
     The function returns an array of the latest motions by taking the difference

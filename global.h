@@ -5,6 +5,7 @@
 #define _SBUFFER 256
 #define _TRAIN_DATA_SIZE 10
 #define _TEST_DATA_SIZE 10
+const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
 
 const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={"data/WALK/ludwig/1.csv",  
                          "data/WALK/ludwig/2.csv",
