@@ -6,7 +6,6 @@
 #define WALK_PERIOD_INDEX 2
 
 #include "global.h"
-#include "global.h"
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/get_feature.h"
@@ -53,7 +52,7 @@ void read_from_file(const char * filename, double * buffer, int* n) {
 
 void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype)
 {
-    int j, k;
+    int j, k, n;
     double* data_r = (double*)malloc(sizeof(double)*data_buf_size*7);
 
     emxArray_real_T *r;
@@ -99,9 +98,6 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, in
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
 
-    for (j = 0; j < n*7; j++)
-        data_val[j] = data[j];
-    *data_len = n;
 }
 
 
@@ -237,12 +233,12 @@ MoType * classify_segments(double* correct_data_buf, int pos, int size) {
     @ fntype -> TEST macro
     */
 
-    double *f;
-    int *f_num;
-    int *div;
-    int *div_num;
+    double* f = (double*)malloc(sizeof(double*)*(_BUFFER));;
+    int f_num;
+    int *div = (int*)malloc(sizeof(int)*_SBUFFER);
+    int div_num;
     int fntype = TEST;
-    segmentation(correct_data_buf, size, f, f_num, div, div_num, fntype);
+    segmentation(correct_data_buf, size, f, &f_num, div, &div_num, fntype);
 
     /* 
         @param num_segments: number of total segments
@@ -250,10 +246,10 @@ MoType * classify_segments(double* correct_data_buf, int pos, int size) {
         if very first motion, ignore last divider
             otherwise ignore first and last divider
     */
-    int num_segments = (prev_num_segments == 0) ? (*div_num - 1) : (*div_num - 2);
+    int num_segments = (prev_num_segments == 0) ? (div_num - 1) : (div_num - 2);
     int num_new_segments = num_segments - prev_num_segments;
     MoType * latestMotions = malloc(num_new_segments * sizeof(MoType));
-    for(int i = 1+prev_num_segments, j = 0; i < (*div_num-1); i++, j++) {
+    for(int i = 1+prev_num_segments, j = 0; i < (div_num-1); i++, j++) {
         int start_divider = div[i-1];
         int end_divider = div[i];
         int length_of_segment = end_divider - start_divider;
@@ -264,5 +260,5 @@ MoType * classify_segments(double* correct_data_buf, int pos, int size) {
         latestMotions[j] = segment_motion;
     }
     prev_num_segments = num_segments;
-    return latestMotions
+    return latestMotions;
 }

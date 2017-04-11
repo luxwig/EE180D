@@ -16,9 +16,9 @@
 #define _GYRO_Y_OFFSET 6
 #define _GYRO_Z_OFFSET 7
 
-const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
-const char * _MO_NEURAL_NETWORK = "mo_neural_network.net";
-const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={"data/WALK/ludwig/1.csv",  
+static const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
+static const char * _MO_NEURAL_NETWORK = "mo_neural_network.net";
+static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={"data/WALK/ludwig/1.csv",  
                          "data/WALK/ludwig/2.csv",
                          "data/WALK/ludwig/3.csv",
                          "data/WALK/ludwig/4.csv",
@@ -29,7 +29,7 @@ const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={"data/WALK/ludwig/1.cs
                          "data/DESCEND/2.csv",
                          "data/DESCEND/3.csv"};
 
-const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
+static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
                          "data/WALK/ludwig/1_t.csv",  
                          "data/WALK/ludwig/2_t.csv",
                          "data/WALK/ludwig/3_t.csv",
@@ -50,5 +50,5 @@ enum MoType_enum { TRAINING = 0x000,
 typedef enum MoType_enum MoType;
 
 
-const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC};
 #endif

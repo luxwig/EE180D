@@ -1,3 +1,4 @@
+#include "global.h"
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/get_feature.h"
 #include "util.h"
@@ -14,11 +15,10 @@ int main()
 {
     get_feature_initialize();
 
-    MoType mt;
     int i,j;
     int*   seg_val; 
-    double data_fm [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
-    double data_val[sizeof(double)*_BUFFER*2];
+    double *data_fm  = (double*)malloc(sizeof(double)*_BUFFER*4);
+    double *data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
     double *data_buf;
     double* f_m=NULL;
     size_t n, train_num, data_num, seg_num;
@@ -30,8 +30,8 @@ int main()
     {
         f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
-        read_data_from_file(TRAINING_DATASET[i], data_val, &data_num);
-        segmentation(data_val, f_m, (int*)&n, seg_val, (int*)&seg_num,  fntype[i]);
+        read_from_file(TRAINING_DATASET[i], data_val, (int*)&data_num);
+        segmentation(data_val, data_num, f_m, (int*)&n, seg_val, (int*)&seg_num,  fntype[i]);
         memcpy(&data_fm[train_num*5],f_m,sizeof(double)*n*5);
         train_num += n;
         data_buf = (double*)malloc(sizeof(double)*_BUFFER*2);

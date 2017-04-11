@@ -5,9 +5,9 @@ INCLUDES=-I/usr/local/include
 LDFLAGS=-lm -lfann -L/usr/local/lib -lpthread 
 IMPORTDIR=matlab_import
 FANNDIR=FANN
-SOURCES=cf.c statistics.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
-OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=main
+SOURCES=statistics.c util.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
+CFEXECUTABLE=cf_main
+TREXECUTABLE=tr_main
 MODE=NORMAL
 
 ifeq ($(UNAME), Linux)
@@ -26,11 +26,22 @@ else
     CFLAGS += -D _DEBUG
 endif
 
+TRSOURCES=$(SOURCES) train.c
+CFSOURCES=$(SOURCES) cf.c
+TROBJECTS=$(TRSOURCES:.c=.o)
+CFOBJECTS=$(CFSOURCES:.c=.o)
 
-all: $(SOURCES) $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+all: $(CFSOURCES) $(CFEXECUTABLE)
+
+train: $(TRSOURCES) $(TREXECUTABLE)
+
+$(CFEXECUTABLE): $(CFOBJECTS)
+	$(CC) $(CFOBJECTS) $(LDFLAGS) -o $@
+
+$(TREXECUTABLE): $(TROBJECTS)
+	$(CC) $(TROBJECTS) $(LDFLAGS) -o $@
+
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
