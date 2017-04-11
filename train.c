@@ -30,13 +30,13 @@ int main()
     {
         f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
-        read_from_file(TRAINING_DATASET[i], data_val, (int*)&data_num);
-        segmentation(data_val, data_num, f_m, (int*)&n, seg_val, (int*)&seg_num,  fntype[i]);
+        read_from_file(TRAINING_DATASET[i], data_val, &data_num);
+        segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i]);
         memcpy(&data_fm[train_num*5],f_m,sizeof(double)*n*5);
         train_num += n;
         data_buf = (double*)malloc(sizeof(double)*_BUFFER*2);
         for (j = 0; j < data_num; j++)
-            memcpy(data_buf+j*7, data_val+j*8, sizeof(double)*8);
+            memcpy(data_buf+j*7, data_val+j*8+1, sizeof(double)*8);
         td[i].m_data        = data_buf;
         td[i].m_num_data    = data_num;
         td[i].m_divider     = seg_val;

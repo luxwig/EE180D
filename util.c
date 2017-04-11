@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void read_from_file(const char * filename, double * buffer, int* n) {
+void read_from_file(const char * filename, double * buffer, size_t* n) {
     FILE* file = fopen(filename, "r"); 
     char* line = NULL;
     size_t read, len;
@@ -35,7 +35,6 @@ void read_from_file(const char * filename, double * buffer, int* n) {
                 buffer + *n * _DATA_ACQ_SIZE + _GYRO_X_OFFSET,
                 buffer + *n * _DATA_ACQ_SIZE + _GYRO_Y_OFFSET,
                 buffer + *n * _DATA_ACQ_SIZE + _GYRO_Z_OFFSET);
-        printf("%lf\n", buffer[*n * _DATA_ACQ_SIZE]);
         *n = *n + 1;
     }
     fclose(file);
@@ -50,10 +49,10 @@ void read_from_file(const char * filename, double * buffer, int* n) {
     fntype: filename type
 */
 
-void segmentation(const double* data_buf, const int data_buf_size, double* f, int* f_num, int* seg, int* seg_num, int fntype)
+void segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype)
 {
     int j, k, n;
-    double* data_r = (double*)malloc(sizeof(double)*data_buf_size*7);
+    double* data_r = (double*)malloc(sizeof(double)*_BUFFER*7);
 
     emxArray_real_T *r;
     emxArray_real_T *pos;
@@ -65,7 +64,7 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, in
 
     for (k = 0; k < n; k++)
         for (j = 1 ; j < 8; j++)
-            data_r[get_index(k,j,n)] = data_buf[k*8+j];
+            data_r[get_index(k,j-1,n)] = data_buf[k*8+j];
             
     emxInitArray_real_T(&r, 2);
     emxInitArray_real_T(&features, 2);
@@ -234,9 +233,9 @@ MoType * classify_segments(double* correct_data_buf, int pos, int size) {
     */
 
     double* f = (double*)malloc(sizeof(double*)*(_BUFFER));;
-    int f_num;
+    size_t f_num;
     int *div = (int*)malloc(sizeof(int)*_SBUFFER);
-    int div_num;
+    size_t div_num;
     int fntype = TEST;
     segmentation(correct_data_buf, size, f, &f_num, div, &div_num, fntype);
 

@@ -31,13 +31,18 @@ CFSOURCES=$(SOURCES) cf.c
 TROBJECTS=$(TRSOURCES:.c=.o)
 CFOBJECTS=$(CFSOURCES:.c=.o)
 
+.PHONY: train
+.PHONY: classify
 
-all: $(CFSOURCES) $(CFEXECUTABLE)
+all: $(CFSOURCES) $(CFEXECUTABLE) $(TRSOURCES) $(TREXECUTABLE)
 
-train: $(TRSOURCES) $(TREXECUTABLE)
+classify: $(CFSOURCES) $(CFEXECUTABLE)
 
 $(CFEXECUTABLE): $(CFOBJECTS)
 	$(CC) $(CFOBJECTS) $(LDFLAGS) -o $@
+
+
+train: $(TRSOURCES) $(TREXECUTABLE)
 
 $(TREXECUTABLE): $(TROBJECTS)
 	$(CC) $(TROBJECTS) $(LDFLAGS) -o $@
@@ -46,7 +51,7 @@ $(TREXECUTABLE): $(TROBJECTS)
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	rm -rf main train.txt test.txt feature.net
+	rm -rf *_main
 	rm -rf *.o
 	rm -rf ${IMPORTDIR}/*.o
 	rm -rf ${FANNDIR}/*.o
