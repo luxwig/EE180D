@@ -5,6 +5,7 @@
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
 
+#include "global.h"
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/get_feature.h"
@@ -183,7 +184,7 @@ MoType test_for_walking_speed(double *segment,int length)
     double RMS = w_RMS_seg_double(segment,length);
     double features[] = {maxima, minima, period, mean, RMS};
     double result[4];
-    test_from_data_double(features, walk_neural_network, 1, result);
+    test_from_file_double(features, _WALK_NEURAL_NETWORK, 1, result);
     int maximum = 0;
     for(int i = 0 ; i < WALK_N_OUTPUTS; i++) {
         if (result[i] > result[maximum]) {
