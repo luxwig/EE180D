@@ -11,7 +11,7 @@
 #include <stdlib.h>
 void main_get_feature(void)
 {
-  const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC,
+  const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC};
  
   MoType mt;
   int i,j;
@@ -42,6 +42,11 @@ void main_get_feature(void)
   }
   mo_classfication(data_fm, train_num, TRAINING);
   train_walk_neural_network(td, i);
+
+
+
+
+  
   int k = 0;
   for (;i<_FILENUM;i++)
   {
@@ -96,5 +101,7 @@ int main(int argc, const char * const argv[])
 int main()
 {
     const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC};
+    get_feature_initialize();
+    get_feature_terminate();
 
 }
