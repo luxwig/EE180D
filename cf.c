@@ -14,8 +14,12 @@
 #include <math.h>
 #include <string.h>
 
+#include "matlab_import/get_feature_terminate.h"
+#include "matlab_import/get_feature_initialize.h"
+
 int main(int argc, const char * const argv[])
 {
+    get_feature_initialize();
 #ifdef _DEBUG
     if (argc > 1) strcpy(fn, argv[1]);
     else{
@@ -30,6 +34,7 @@ int main(int argc, const char * const argv[])
     pthread_create(&pro, NULL, data_pro, (void*) buffer);
     pthread_join(acq, NULL);
     pthread_join(pro, NULL);
+    get_feature_terminate();
     return 0;
 }
 

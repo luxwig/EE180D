@@ -127,7 +127,6 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 }
 
 
-static struct fann* walk_neural_network;
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;

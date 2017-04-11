@@ -6,7 +6,7 @@
 #define _TRAIN_DATA_SIZE 10
 #define _TEST_DATA_SIZE 10
 const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
-
+const char * _MO_NEURAL_NETWORK = "mo_neural_network.net";
 const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={"data/WALK/ludwig/1.csv",  
                          "data/WALK/ludwig/2.csv",
                          "data/WALK/ludwig/3.csv",
@@ -39,4 +39,5 @@ enum MoType_enum { TRAINING = 0x000,
 typedef enum MoType_enum MoType;
 
 
+const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC};
 #endif
