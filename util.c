@@ -250,9 +250,9 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     //int num_segments = (prev_num_segments > 0) ? ((int)div_num - 2) : ((int)div_num - 1); 
     int num_segments = (int)div_num - 1;
     int num_new_segments = num_segments - prev_num_segments;
-    for(int i = 1+prev_num_segments, j = 0; i < num_segments; i++, j++) {
-        int start_divider = div[i-1];
-        int end_divider = div[i];
+    for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
+        int start_divider = div[i];
+        int end_divider = div[i+1];
         int length_of_segment = end_divider - start_divider;
         //1 because single pointer
         fprintf(stderr, "%zu\n", f_num);
