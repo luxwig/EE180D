@@ -255,7 +255,8 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         int end_divider = div[i];
         int length_of_segment = end_divider - start_divider;
         //1 because single pointer
-        MoType segment_motion = mo_classfication(&f[i], 1, TEST);
+        fprintf(stderr, "%zu\n", f_num);
+        MoType segment_motion = mo_classfication(&f[5*i], 1, TEST);
         if(segment_motion == TRAINING) {
             segment_motion = test_for_walking_speed(&correct_data_buf[start_divider], length_of_segment);
         }
