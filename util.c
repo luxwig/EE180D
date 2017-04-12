@@ -196,6 +196,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
 
 MoType test_for_walking_speed(double *segment,int length) 
 {
+    int j;
     double maxima = w_maxima_double_seg(segment, 0, length);
     double minima = w_minima_double_seg(segment, 0, length);
     double period = (double)length;
@@ -253,12 +254,16 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
         int start_divider = div[i];
         int end_divider = div[i+1];
-        int length_of_segment = end_divider - start_divider;
+        int length_of_segment = end_divider - start_divider + 1;
         //1 because single pointer
-        fprintf(stderr, "%zu\n", f_num);
         MoType segment_motion = mo_classfication(&f[5*i], 1, TEST);
         if(segment_motion == TRAINING) {
-            segment_motion = test_for_walking_speed(&correct_data_buf[start_divider], length_of_segment);
+           // fprintf(stderr, "START_DIVIDER: %d\n to %d;", start_divider, end_divider);
+            double *dp = (double *)malloc(sizeof(double)*(length_of_segment));
+            for(int k = 0; k < length_of_segment; k++) {
+                dp[k] = correct_data_buf[(start_divider+k) * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
+            }
+            segment_motion = test_for_walking_speed(dp, length_of_segment);
         }
         latestMotions[j] = segment_motion;
     }
