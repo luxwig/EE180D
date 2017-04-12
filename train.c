@@ -42,7 +42,7 @@ int main()
         td[i].m_divider     = seg_val;
         td[i].m_num_divider = seg_num;
         td[i].m_type        = fntype[i];
-        free(f_m);
+        td[i].m_1st_feature = f_m;
         i++;
     }
     mo_classfication(data_fm, train_num, TRAINING);

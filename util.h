@@ -23,6 +23,7 @@ struct TrainingData_struct
     int     m_num_data;
     int*    m_divider;
     int     m_num_divider;
+    double* m_1st_feature;
     MoType  m_type;
 };
 

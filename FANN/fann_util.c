@@ -7,7 +7,7 @@
 #include "fann_train.h"
 
 void train_from_data_double(
-        double*   input, //contiguous features one array
+        double*   input, //CONTIGUOus features one array
         double*   output, //what each contiguous feature should output
         const unsigned int num_data, //how many intervals
         const unsigned int num_input, //number of features
@@ -53,6 +53,19 @@ void train_from_data_float(
     fann_set_activation_function_output(*ann, FANN_SIGMOID_SYMMETRIC);
 
     fann_train_on_data(*ann, t_data, max_epochs, epochs_between_reports, desired_error);
+/*
+    printf("inputs: \n");
+    for(int i = 0; i < num_data; i++) {
+        for (int j = 0; j < num_input; j++) {
+            printf("%f\t", input[i*num_input+j]);
+        }
+        printf("\n");
+        for (int j = 0; j <num_output;j++) {
+            printf("%f\t", output[i*num_output+j]);
+        }
+        printf("\n");
+    }
+*/
 
 }
 

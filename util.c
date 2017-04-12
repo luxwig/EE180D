@@ -1,6 +1,7 @@
 #define get_index(X,Y,N) X+N*Y
-#define WALK_N_FEATURES 5
-#define WALK_N_OUTPUTS 4
+#define MOTION_N_FEATURES 4
+#define WALK_N_FEATURES (5+4) //second level + first level
+#define WALK_N_OUTPUTS (4) 
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
@@ -127,7 +128,7 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         }
     
   
-        train_from_file_double(input, output, n, 4, 3, _MO_NEURAL_NETWORK);
+        train_from_file_double(input, output, n, MOTION_N_FEATURES, 3, _MO_NEURAL_NETWORK);
         return TRAINING;
     }
     else
@@ -184,6 +185,12 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             input[n*WALK_N_FEATURES+2] = period;
             input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
             input[n*WALK_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
+
+            input[n*WALK_N_FEATURES+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*WALK_N_FEATURES+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*WALK_N_FEATURES+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*WALK_N_FEATURES+8] = all_file_data[i].m_1st_feature[3+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            
             output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)*2-1;
             output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)*2-1;
             output[n*WALK_N_OUTPUTS+2] = (all_file_data[i].m_type == WALK3)*2-1;
@@ -194,15 +201,26 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     train_from_file_float(input, output, num_data, num_input, num_output, _WALK_NEURAL_NETWORK);
 }
 
-MoType test_for_walking_speed(double *segment,int length) 
+MoType test_for_walking_speed(double *segment,int length, double* first_level_features) 
 {
     int j;
-    double maxima = w_maxima_double_seg(segment, 0, length);
-    double minima = w_minima_double_seg(segment, 0, length);
-    double period = (double)length;
-    double mean = (double)w_mean(segment,length);
-    double RMS = w_RMS_seg_double(segment,length);
-    double features[] = {maxima, minima, period, mean, RMS};
+    double maxima_x_accel = w_maxima_double_seg(segment, 0, length);
+    double minima_x_accel = w_minima_double_seg(segment, 0, length);
+    double period_x_accel = (double)length;
+    double mean_x_accel = (double)w_mean(segment,length);
+    double RMS_x_accel = w_RMS_seg_double(segment,length);
+
+    double features[] = {
+        maxima_x_accel, 
+        minima_x_accel, 
+        period_x_accel, 
+        mean_x_accel, 
+        RMS_x_accel,
+        first_level_features[0],
+        first_level_features[1],
+        first_level_features[2],
+        first_level_features[3]
+    };
     double result[4];
     test_from_file_double(features, _WALK_NEURAL_NETWORK, 1, result);
     int maximum = 0;
@@ -263,7 +281,7 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
             for(int k = 0; k < length_of_segment; k++) {
                 dp[k] = correct_data_buf[(start_divider+k) * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
             }
-            segment_motion = test_for_walking_speed(dp, length_of_segment);
+            segment_motion = test_for_walking_speed(dp, length_of_segment, &f[5*i]);
         }
         latestMotions[j] = segment_motion;
     }
