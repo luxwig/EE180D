@@ -147,7 +147,7 @@ void rotate(const double raw_data_buf[], double correctly_ordered[], int pos) {
 
 void* data_pro(void* ptr)
 {
-    int size, pos, n, new_seg_num;
+    int size, pos, n, new_seg_num, i;
     n = 0;
     buftype* data_buf = (buftype*) ptr,
            * correct_data_buf =
@@ -159,7 +159,7 @@ void* data_pro(void* ptr)
         pthread_mutex_lock(&slock);
         pos = bufpos; size = bufsize;
         rotate(data_buf, correct_data_buf, pos);
-        fprintf(stderr, "pos: %d\tsize: %d",pos, size);
+        fprintf(stderr, "pos: %d\tsize: %d\n", pos, size);
         pthread_mutex_unlock(&slock);
         /* insert here*/
         /*
@@ -176,6 +176,8 @@ void* data_pro(void* ptr)
         */
         MoType result[_SBUFFER];
         classify_segments(correct_data_buf, pos, size, result, &new_seg_num);
+        for (i = 0; i < new_seg_num; i++)
+            printf("%x\n", result[i]);
     }
     return 0;
 }   

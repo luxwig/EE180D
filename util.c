@@ -46,6 +46,9 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
     seg: indexes of dividers
     segm_num: number of segments
     fntype: filename type
+
+    places features contiguously into f for the first level classification
+
 */
 
 void segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype)
@@ -244,18 +247,20 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         if very first motion, ignore last divider
             otherwise ignore first and last divider
     */
-    int num_segments = (prev_num_segments == 0) ? (div_num - 1) : (div_num - 2);
+    //int num_segments = (prev_num_segments > 0) ? ((int)div_num - 2) : ((int)div_num - 1); 
+    int num_segments = (int)div_num - 1;
     int num_new_segments = num_segments - prev_num_segments;
-    for(int i = 1+prev_num_segments, j = 0; i < (div_num-1); i++, j++) {
+    for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
         int start_divider = div[i-1];
         int end_divider = div[i];
         int length_of_segment = end_divider - start_divider;
-        MoType segment_motion = mo_classfication(&correct_data_buf[start_divider], length_of_segment, TEST);
+        //1 because single pointer
+        MoType segment_motion = mo_classfication(&f[i], 1, TEST);
         if(segment_motion == TRAINING) {
             segment_motion = test_for_walking_speed(&correct_data_buf[start_divider], length_of_segment);
         }
         latestMotions[j] = segment_motion;
     }
-    prev_num_segments = num_segments;
+    prev_num_segments = num_segments > 0 ? num_segments : prev_num_segments;
     *latestMotions_num = num_new_segments;
 }
