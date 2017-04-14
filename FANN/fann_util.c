@@ -53,7 +53,9 @@ void train_from_data_float(
     fann_set_activation_function_output(*ann, FANN_SIGMOID_SYMMETRIC);
 
     fann_train_on_data(*ann, t_data, max_epochs, epochs_between_reports, desired_error);
-
+    char fn[120];
+    sprintf(fn,"%d", num_input);
+    fann_save(*ann,fn);
 }
 
 
