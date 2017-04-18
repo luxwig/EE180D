@@ -108,9 +108,9 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 
 		const double output_type[4][4] = { {1,-1,-1,-1},{-1,1,-1,-1},{-1,-1,1,-1},{-1,-1,-1,1} };	//added -1,-1,-1,1 output for run 
         for (j = 0; j < n; j++) {
-            memcpy(input+4*j,data_fm+5*j, sizeof(double)*4);
+            memcpy(input+4*j,data_fm+5*j, sizeof(double)*4);										
             if (((int)data_fm[j*5+4]&0xF0) != 0xF0)
-                memcpy(&output[j*3], output_type[0], sizeof(double)*3);
+                memcpy(&output[j*3], output_type[0], sizeof(double)*3);									
             else
                 memcpy(&output[j*3], output_type[(int)data_fm[j*5+4]&0x00F], sizeof(double)*3);
            
@@ -123,12 +123,12 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         }
     
   
-        train_from_data_double(input, output, n, 4, 3, &ann);		//change
+        train_from_data_double(input, output, n, 5, 4, &ann);		//changed
         return TRAINING;
     }
     else
     {
-        double predict[3];
+        double predict[4];										//changed to 4
         test_from_data_double(data_fm, ann, 1, predict);
         //1 parameter: 3 features: [max, min, period, .....
         //2 parameter: 
