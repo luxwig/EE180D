@@ -103,18 +103,17 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
     int j, k;
     if (fntype == TRAINING) 
     {
-        input  = (double*)malloc(sizeof(double)*n*5);			//added input for interval 
-        output  = (double*)malloc(sizeof(double)*n*4);			//added output for run 
+        input  = (double*)malloc(sizeof(double)*n*4);
+        output  = (double*)malloc(sizeof(double)*n*3);
 
-		const double output_type[4][4] = { {1,-1,-1,-1},{-1,1,-1,-1},{-1,-1,1,-1},{-1,-1,-1,1} };	//added -1,-1,-1,1 output for run 
+        const double output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
         for (j = 0; j < n; j++) {
             memcpy(input+4*j,data_fm+5*j, sizeof(double)*4);										
             if (((int)data_fm[j*5+4]&0xF0) != 0xF0)
                 memcpy(&output[j*3], output_type[0], sizeof(double)*3);									
             else
                 memcpy(&output[j*3], output_type[(int)data_fm[j*5+4]&0x00F], sizeof(double)*3);
-           
-			for (k = 0; k < 4; k++)
+            for (k = 0; k < 4; k++)
                 fprintf(stderr,"%f ", input[j*4+k]);
             fprintf(stderr,"\n");
             for (k = 0; k < 3; k++)
@@ -123,7 +122,11 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         }
     
   
+<<<<<<< HEAD
         train_from_data_double(input, output, n, 5, 4, &ann);		//changed
+=======
+        train_from_data_double(input, output, n, 4, 3, &ann);
+>>>>>>> parent of 08438e4... adding interval feature into training data set
         return TRAINING;
     }
     else
@@ -208,11 +211,4 @@ MoType test_for_walking_speed(double *segment,int length)
         }
     }
     return (maximum+1);
-}
-
-int findinterval(TrainingData file) {
-	int i = 0;
-	int j;
-	j = file.m_divider[i] - file.m_divider[i + 1];
-	return j; 
 }

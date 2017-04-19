@@ -13,9 +13,9 @@
 
 void main_get_feature(void);
 
-#define _FILENUM 26										//changed to 26
-#define RANDOM_BUFFER_MULTIPLIER 5						//should this be changed??
-void main_get_feature(void)											//added the RUN data
+#define _FILENUM 20
+#define RANDOM_BUFFER_MULTIPLIER 4
+void main_get_feature(void)
 {
   const char fn[_FILENUM][256] = {"data/WALK/ludwig/1.csv",  
                          "data/WALK/ludwig/2.csv",
@@ -27,9 +27,6 @@ void main_get_feature(void)											//added the RUN data
                          "data/DESCEND/1.csv",
                          "data/DESCEND/2.csv",
                          "data/DESCEND/3.csv",
-						 "data/RUN/6.csv",
-						 "data/RUN/8.csv",
-					     "data/RUN/10.csv",
                          "data/WALK/ludwig/1_t.csv",  
                          "data/WALK/ludwig/2_t.csv",
                          "data/WALK/ludwig/3_t.csv",
@@ -39,13 +36,9 @@ void main_get_feature(void)											//added the RUN data
                          "data/ASCEND/6.csv",
                          "data/DESCEND/4.csv",
                          "data/DESCEND/5.csv",
-                         "data/DESCEND/6.csv",
-						 "data/RUN/6_t.csv",
-						 "data/RUN/8_t.csv",
-						 "data/RUN/10_t.csv"
-							};   
-  const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC, RUN, RUN, RUN,		//needs to be added to enum
-                  TEST, TEST,TEST, TEST, TEST, TEST, TEST,TEST, TEST, TEST, TEST, TEST, TEST};
+                         "data/DESCEND/6.csv" };   
+  const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC,
+                  TEST, TEST,TEST, TEST, TEST, TEST, TEST,TEST, TEST, TEST};
  
   MoType mt;
   int i,j;
@@ -74,38 +67,6 @@ void main_get_feature(void)											//added the RUN data
       free(f_m);
       i++;
   }
-  //code for inserting interval 
-
-  //shift in the right direction data fm to make space for interval 
-  int c,d; 
-  for (c = train_num -1; c > 4; c -=5) //at end of each segment 
-  {
-	  for (d = train_num; d > c;d--)
-	  {
-		  data_fm[d] = data_fm[d-1]; 
-	  }
-	  train_num += 1;
-  }
-  //fill with correct value of segment 
-  int* intervals;
-  int position = 0;
-  for (int i = 0; i < _FILENUM && fntype[i] != TEST; ) //fill array with intervals 
-  {
-	  for (int j = 0; j < td[i].m_num_divider; j++)
-	  {
-		  intervals[position + j] = td[i].m_divider[j+1] - td[i].m_divider[j];
-	  }
-	  position += td[i].m_num_divider; 
-  }
-  int j = 0;
-  //insert interval to array of features
-  for (int i = 4; i < train_num; i += 6)
-  {
-	  data_fm[i] = intervals[j]; 
-  }
-  //end code for interval insertion 
-
-
   mo_classfication(data_fm, train_num, TRAINING);
   train_walk_neural_network(td, i);
   int k = 0;

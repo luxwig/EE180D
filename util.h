@@ -22,12 +22,12 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, in
 
 enum MoType_enum { TRAINING = 0x000,
                    WALK1 = 0x001, WALK2 = 0x002, WALK3 = 0x003, WALK4 = 0x004,
-                   ASC = 0x0F1, DSC = 0x0F2, RUN = 0xF01,						//added Run... 
+                   ASC = 0x0F1, DSC = 0x0F2,
                    TEST = 0xF00};
 
 typedef enum MoType_enum MoType;
 
-MoType mo_classfication(double* data_fm, size_t n, MoType fntype);
+MoType mo_classfication(double*, size_t, MoType);
 
 struct TrainingData_struct
 {
@@ -42,8 +42,6 @@ typedef struct TrainingData_struct TrainingData;
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles);
 MoType test_for_walking_speed(double *segment,int length);
-
-int findinterval(TrainingData file);
 
 #endif
 
