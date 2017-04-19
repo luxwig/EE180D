@@ -203,7 +203,6 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
 
 MoType test_for_walking_speed(double *segment,int length, double* first_level_features) 
 {
-    int j;
     double maxima_x_accel = w_maxima_double_seg(segment, 0, length);
     double minima_x_accel = w_minima_double_seg(segment, 0, length);
     double period_x_accel = (double)length;
