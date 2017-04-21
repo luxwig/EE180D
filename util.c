@@ -103,16 +103,79 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
 }
 
 
+
+MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, const char* filename)
+{
+    int i, max;
+    double* predict = (double*)malloc(sizeof(double)*(mo_status_num + 1));
+    test_from_file_double(features, filename, 1, predict);
+    max = 0;
+    for (i = 1; i < mo_status_num+1; i++)
+        if (predict[i] > predict[max])
+            max = i;
+    if (max < mo_status_num)
+        return mo_status[max];
+    else 
+        return 0;
+}
+
+void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, const char* filename)
+{
+    // create output array
+    int i, j;
+    double* output = (double*)malloc(sizeof(double)*(seg_num*(mo_status_num+1)));
+    for (i = 0; i < seg_num; i++)
+    {
+        short flag = 0;
+        for (j = 0; j < mo_status_num; j++)
+            if(
+                (output[i*(mo_status_num+1)+j] = 
+                 mo_status[j]==(mo_types[i]&0xFFFFF0)?1:-1)==1) 
+                flag = 1;
+        output[i*(mo_status_num+1)+mo_status_num] = (flag==0)?1:-1;
+        for (j = 0; j < features_num; j++)
+            fprintf(stderr, "%lf\t", features[i*features_num+j]);
+        fprintf(stderr, "\n");
+        for (j = 0; j < mo_status_num+1; j++)
+            fprintf(stderr,"%lf\t", output[i*(mo_status_num+1)+j]);
+        fprintf(stderr, "\n");
+    }
+    train_from_file_double(features, output, seg_num, features_num, mo_status_num+1, filename);
+    free(output);
+} 
+
+
+
+void mo_training (double* data_fm, size_t n)
+{
+    double *features = (double*)malloc(sizeof(double)*n*4);
+    MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
+    int i;
+    
+    //preprocess features and output
+    for (i = 0; i < n; i++)
+    {
+        memcpy(features+_FIRST_LEVEL_FEATURES*i, 
+                data_fm+_MATLAB_OFFSET_FIRST_LEVEL*i, 
+                sizeof(double)*_FIRST_LEVEL_FEATURES);
+        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+4];
+    }
+
+    // train ASC_DSC
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, ASC_DSC_FN);
+    // train WALK
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_MODEL, _WALK_SIZE, WALK_FN); 
+}
+
+
 MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 {
-    double* input, *output;
-    int j, k;
+    
     if (fntype == TRAINING) 
     {
+    /*
         input  = (double*)malloc(sizeof(double)*n*4);
-        output  = (double*)malloc(sizeof(double)*n*3);
 
-        const double output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
         for (j = 0; j < n; j++) {
             memcpy(input+4*j,data_fm+5*j, sizeof(double)*4);
             if (((int)data_fm[j*5+4]&0xF0) != 0xF0)
@@ -129,10 +192,12 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
     
   
         train_from_file_double(input, output, n, MOTION_N_FEATURES, 3, _MO_NEURAL_NETWORK);
+        */
         return TRAINING;
     }
     else
     {
+        int k;
         double predict[3];
         test_from_file_double(data_fm, _MO_NEURAL_NETWORK, 1, predict);
         //1 parameter: 3 features: [max, min, period, .....
@@ -147,8 +212,6 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         return (k|0xF0);
     }    
 }
-
-
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
