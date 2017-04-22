@@ -104,13 +104,13 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
 
 
 
-MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, const char* filename)
+MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
 {
     int i, max;
     double* predict = (double*)malloc(sizeof(double)*(mo_status_num + 1));
     test_from_file_double(features, filename, 1, predict);
     max = 0;
-    for (i = 1; i < mo_status_num+1; i++)
+    for (i = 1; i < mo_status_num+flag_ind; i++)
         if (predict[i] > predict[max])
             max = i;
     if (max < mo_status_num)
@@ -172,11 +172,24 @@ void mo_training (double* data_fm, size_t n)
 
 void mo_classfication(double* data_fm, size_t n, MoType* result)
 {
-    result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, ASC_DSC_FN);
-    result[_WALK_OFFSET] = test_cl(data_fm, WALK_MODEL, _WALK_SIZE, WALK_FN);
-    result[_1ST_LV_ALL_OFFSET] =
-        test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,
+    int flag = _FALSE;
+    flag |= 
+        ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN));
+    
+    flag |= 
+        ( result[_WALK_OFFSET] = test_cl(data_fm, WALK_MODEL, _WALK_SIZE, _TRUE, WALK_FN));
+    
+    if (!flag) {
+        result[_1ST_LV_ALL_OFFSET] =
+            test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE,
                 FIRST_LV_ALL_FN);
+        switch ( (result[_1ST_LV_ALL_OFFSET] & 0xFF00)>>8) {
+            case 1 : 
+                result[_WALK_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
+            case 2 :
+                result[_ASC_DSC_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
+        }
+    }
     fprintf(stderr, "\t%d\t%d\t%d\n",result[0], result[1], result[2]);
 }
 
