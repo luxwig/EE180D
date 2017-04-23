@@ -56,9 +56,11 @@ void main_get_feature(void)											//added the RUN data
   size_t n, train_num, data_num, seg_num;
   train_num = 0;
 
+  float sd_each_segment[_SBUFFER];           //for sd feature 
+  int segment_count = 0; 
   TrainingData td[_SBUFFER];
   i = 0;
-  while (i<13 && fntype[i] != TEST)     //changed from filenum for testing 
+  while (i<_FILENUM && fntype[i] != TEST)     //changed from filenum for testing 
   {
       f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
       seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
@@ -72,31 +74,64 @@ void main_get_feature(void)											//added the RUN data
       td[i].m_num_divider = seg_num;
       td[i].m_type        = fntype[i];
       free(f_m);
-      
+  
+   //grab SD and put it in array to swap with interval 
+  float segment_array[_BUFFER*3];
+  for(int x = 0; x < td[i].m_num_divider - 1 ; x++)
+  {
+    for(int y = td[i].m_divider[x]; y < td[i].m_divider[x+1]; y++)
+    {
+     segment_array[y] = (float)td[i].m_data[y];              //assign values into segment array 
+    }
+                                       //testing
+    
+   sd_each_segment[x + segment_count] = w_calculateSD(segment_array, td[i].m_divider[x+1]-td[i].m_divider[x]); 
+   
+   fprintf(stderr, "sd %d of set %d: %f \n", x, i, sd_each_segment[x+segment_count]);
+   
+  }
+    segment_count += n;
+   
+   
+   /* for(int z = 0; z < td[i].m_num_divider - 1; z++)
+      fprintf(stderr,  "sd: %f \n", sd_each_segment[z]);  //testing */
+    
+     
   //get z gyro and y gyro data
   //fft segment sets (declare some variable above to hold) insert later down where insert_interval_training is 
   //multiply
   //reverse fft
   //get rms mean and standard deviation   or normal mean, try both 
       i++;
-  }
-     
-  fprintf(stderr,  "number of segments total: %d \n", train_num);  //testing 
+  }  
   
-  insert_interval_training(train_num, data_fm, td, fntype);
+  for(int z = 0; z < segment_count; z++)
+  {
+  fprintf(stderr,  "sd_%d: %f \n", z, sd_each_segment[z]);  //testing 
+  }
+  
+     
+  
+  insert_interval_training(train_num, data_fm, td, fntype, sd_each_segment);
+  
   
   for(int z = 0; z < train_num ;z++)
   {
-  fprintf(stderr, "%f \t", data_fm[z*6 + 4]); //testing but intervals seem off
+  fprintf(stderr, "%f \t", data_fm[z*6 + 4]); //testing for sd in right spot  
   }
+  
    //testing 
    fprintf(stderr, "\n");
-  
+  //exit(1); 
+
   mo_classfication(data_fm, train_num, TRAINING);
   train_walk_neural_network(td, i);
+
+
   int k = 0;
-   free(seg_val);      //free data
+  /* free(seg_val);      //free data
    free(data_val); 
+   */
   double data_fm2 [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
   
   for (;i<_FILENUM;i++)
@@ -113,21 +148,36 @@ void main_get_feature(void)											//added the RUN data
   fprintf(stderr, "%f \t", data_fm2[z*5 + 4]); //should be all tests
   }
 */
-   
-	  insert_interval_testing(n, data_fm2, seg_val); //insert tao 
-     
-     for(int z = 0; z < n ;z++)
+ float segment_array[_BUFFER*2];
+  for(int x = 0; x < seg_num - 1 ; x++)
   {
-  fprintf(stderr, "%f \t", data_fm2[z*6 + 4]); //should be all tests
+    for(int y = seg_val[x]; y < seg_val[x+1]; y++)
+    {
+     segment_array[y] = (float)data_val[y];              //assign values into segment array 
+    }
+   sd_each_segment[x] = w_calculateSD(segment_array, seg_val[x+1]-seg_val[x]); 
   }
+  
+    /*for(int z = 0; z < seg_num - 1; z++)
+      fprintf(stderr,  "sd: %f \n", sd_each_segment[z]);  //testing 
+                        exit(1);     */                                                    //when i exit here, neural network is a boss... idk why ???
+   
+	  insert_interval_testing(n, data_fm2, sd_each_segment); //insert tao 
+     
+  /*   for(int z = 0; z < n ;z++)
+  {
+  fprintf(stderr, "%f \t", data_fm2[z*6 + 5  ]); //should be all tests
+  }
+  exit(1); */
 
 	  for (j = 0; j < n; j++) {
-            fprintf(stderr, "%lf %lf %lf %lf %lf\n", 
-                 f_m[j*5], 
-                 f_m[j*5+1], 
-                 f_m[j*5+2], 
-                 f_m[j*5+3],
-				 f_m[j*5+4]);
+            fprintf(stderr, "%lf %lf %lf %lf %lf %lf\n", 
+                 data_fm2[j*5], 
+                 data_fm2[j*5+1], 
+                 data_fm2[j*5+2], 
+                 data_fm2[j*5+3],
+				         data_fm2[j*5+4],
+                 data_fm2[j*6+4]);
 
             mt = mo_classfication(&data_fm2[j*6], n, TEST);		//this is giving me trouble
             printf("%x",mt); 

@@ -244,7 +244,7 @@ int findinterval(TrainingData file) {
 	return j; 
 }
 
-void insert_interval_training(size_t train_num, double* data_fm, TrainingData td[], const MoType fntype[]) //train num is the number of segments..
+void insert_interval_training(size_t train_num, double* data_fm, TrainingData td[], const MoType fntype[], float sd_each_segment[] ) //train num is the number of segments..
 {
 	//shift in the right direction data fm to make space for interval 
 	int total = train_num * 5; 
@@ -257,7 +257,8 @@ void insert_interval_training(size_t train_num, double* data_fm, TrainingData td
 		}
 		total += 1;
 	}
-	//fill with correct value of segment 
+ 
+	/*//fill with correct value of segment 
 	int intervals[2000]; //provide sufficient room for excess data sets later 
 	int position = 0;
 	int i;
@@ -269,16 +270,18 @@ void insert_interval_training(size_t train_num, double* data_fm, TrainingData td
 		}
 		position += (td[i].m_num_divider -1);
 	}
+ */
+ 
 	int x = 0;
 	//insert interval to array of features
 	for (int i = 4; i < total; i += 6)
 	{
-		data_fm[i] = intervals[x];
+		data_fm[i] = (double)sd_each_segment[x];
 		x++;
 	}
 }
 
-void insert_interval_testing(size_t n, double* f_m, int* seg_val) {
+void insert_interval_testing(size_t n, double* f_m, float sd_each_segment[]) {
 		//code for inserting interval 
 			//shift in the right direction data fm to make space for interval 
 		int total = n * 5;
@@ -291,17 +294,18 @@ void insert_interval_testing(size_t n, double* f_m, int* seg_val) {
 				}
 			total += 1;
 			}
-				//fill with correct value of segment intervals
+			/*	//fill with correct value of segment intervals
 			int intervals[1000];										//sufficient size for test cases 
 		for (int j = 0; j < n; j++)											//if there are 2 segments there are 3 dividers right?
 			 {
 			intervals[j] = seg_val[j + 1] - seg_val[j];
 			}
-		
+		*/
+   
 			int x = 0; 		//insert interval to array of features
 			for (int i = 4; i < total; i += 6)
 			 {
-				f_m[i] = intervals[x];
+				f_m[i] = (double)sd_each_segment[x];
         x++;
 			}
 				//end code for interval insertion 
