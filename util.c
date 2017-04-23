@@ -4,7 +4,9 @@
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
-
+#define _GNU_SOURCE
+#define _FILENUM 26
+	
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/get_feature.h"
@@ -108,17 +110,28 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 
 		const double output_type[4][4] = { {1,-1,-1,-1},{-1,1,-1,-1},{-1,-1,1,-1},{-1,-1,-1,1} };	//added -1,-1,-1,1 output for run 
         for (j = 0; j < n; j++) {
-            memcpy(input+4*j,data_fm+5*j, sizeof(double)*4);										
-            if (((int)data_fm[j*5+4]&0xF0) != 0xF0)
-                memcpy(&output[j*3], output_type[0], sizeof(double)*3);									
-            else
-                memcpy(&output[j*3], output_type[(int)data_fm[j*5+4]&0x00F], sizeof(double)*3);
-           
-			for (k = 0; k < 4; k++)
-                fprintf(stderr,"%f ", input[j*4+k]);
+            memcpy(input+5*j,data_fm+6*j, sizeof(double)*5);	//changed to copy 5 input features 	
+			switch ((int)data_fm[j * 6 + 5]) {
+			case WALK1:
+			case WALK2:
+			case WALK3:
+			case WALK4:
+				memcpy(&output[j * 4], output_type[0], sizeof(double) * 4);
+			case ASC:
+				memcpy(&output[j * 4], output_type[1], sizeof(double) * 4);
+			case DSC:
+				memcpy(&output[j * 4], output_type[2], sizeof(double) * 4);
+			case RUN:
+				memcpy(&output[j * 4], output_type[3], sizeof(double) * 4);
+			default: 
+				fprintf(stderr, "data_fm passed wrong type");
+				exit(1);
+			}
+			for (k = 0; k < 5; k++)
+                fprintf(stderr,"%f ", input[j*5+k]);
             fprintf(stderr,"\n");
-            for (k = 0; k < 3; k++)
-                fprintf(stderr,"%f ", output[j*3+k]);
+            for (k = 0; k < 4; k++)
+                fprintf(stderr,"%f ", output[j*4+k]);
             fprintf(stderr,"\n");
         }
     
@@ -135,11 +148,19 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 
 
         fprintf(stderr, "\t%f\t%f\t%f\n",predict[0], predict[1], predict[2]);
-        k = predict[0]>predict[1]?0:1;
-        k = predict[k]>predict[2]?k:2;
-        fprintf(stderr,"\t%d\n", k+1);
-        if (k == 0) return 0;
-        return (k|0xF0);
+		if (predict[0] > predict[1] && predict[0] > predict[2] && predict[0] > predict[3])
+			return TRAINING;						// is this the right return for walk???
+		else if (predict[1] > predict[0] && predict[1] > predict[2] && predict[1] > predict[3])
+			return ASC;
+		else if (predict[2] > predict[0] && predict[2] > predict[1] && predict[2] > predict[3])
+			return DSC;
+		else if (predict[3] > predict[0] && predict[3] > predict[1] && predict[3] > predict[2])
+			return RUN; 
+		else
+		{
+			frpintf(stderr, "\t%d %d %d %d\n", predict[0], predict[1], predict[2], predict[3]);
+			exit(1);
+		}
     }    
 }
 
@@ -216,3 +237,69 @@ int findinterval(TrainingData file) {
 	j = file.m_divider[i] - file.m_divider[i + 1];
 	return j; 
 }
+
+void insert_interval_training(size_t train_num, double* data_fm, TrainingData td[], const MoType fntype[]) //train num is the number of segments..
+{
+	//shift in the right direction data fm to make space for interval 
+	int total = train_num * 5; 
+	int c, d;
+	for (c = total - 1; c > 3; c -= 5) //at end of each segment 
+	{
+		for (d = total; d > c; d--)
+		{
+			data_fm[d] = data_fm[d - 1];
+		}
+		total += 1;
+	}
+	//fill with correct value of segment 
+	int intervals[2000]; //provide sufficient room for excess data sets later 
+	int position = 0;
+	int i;
+	for  (i = 0; i < _FILENUM && fntype[i] != TEST; i++) //fill array with intervals 
+	{
+		for (int j = 0; j < td[i].m_num_divider; j++)
+		{
+			intervals[position + j] = td[i].m_divider[j + 1] - td[i].m_divider[j];
+		}
+		position += (td[i].m_num_divider -1);
+	}
+	int x = 0;
+	//insert interval to array of features
+	for (int i = 4; i < total; i += 6)
+	{
+		data_fm[i] = intervals[x];
+		x++;
+	}
+}
+
+void insert_interval_testing(size_t n, double* f_m, int* seg_val) {
+		//code for inserting interval 
+			//shift in the right direction data fm to make space for interval 
+		int total = n * 5;
+		int c, d; 
+		for (c = total - 1; c > 3; c -= 5) //at end of each segment 
+			 {
+			for (d = total; d > c; d--)
+				 {
+					f_m[d] = f_m[d - 1];
+				}
+			total += 1;
+			}
+				//fill with correct value of segment intervals
+			int intervals[1000];										//sufficient size for test cases 
+		for (int j = 0; j < n; j++)											//if there are 2 segments there are 3 dividers right?
+			 {
+			intervals[j] = seg_val[j + 1] - seg_val[j];
+			}
+		
+			int x = 0; 		//insert interval to array of features
+			for (int i = 4; i < total; i += 6)
+			 {
+				f_m[i] = intervals[x];
+			}
+				//end code for interval insertion 
+			return;
+			}
+		
+	
+

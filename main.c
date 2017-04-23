@@ -14,7 +14,7 @@
 void main_get_feature(void);
 
 #define _FILENUM 26										//changed to 26
-#define RANDOM_BUFFER_MULTIPLIER 5						//should this be changed??
+#define RANDOM_BUFFER_MULTIPLIER 5						//should this be changed?? //this could be causing seg fault 
 void main_get_feature(void)											//added the RUN data
 {
   const char fn[_FILENUM][256] = {"data/WALK/ludwig/1.csv",  
@@ -44,7 +44,7 @@ void main_get_feature(void)											//added the RUN data
 						 "data/RUN/8_t.csv",
 						 "data/RUN/10_t.csv"
 							};   
-  const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC, RUN, RUN, RUN,		//needs to be added to enum
+  const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC, RUN, RUN, RUN,		
                   TEST, TEST,TEST, TEST, TEST, TEST, TEST,TEST, TEST, TEST, TEST, TEST, TEST};
  
   MoType mt;
@@ -74,54 +74,32 @@ void main_get_feature(void)											//added the RUN data
       free(f_m);
       i++;
   }
-  //code for inserting interval 
-
-  //shift in the right direction data fm to make space for interval 
-  int c,d; 
-  for (c = train_num -1; c > 4; c -=5) //at end of each segment 
-  {
-	  for (d = train_num; d > c;d--)
-	  {
-		  data_fm[d] = data_fm[d-1]; 
-	  }
-	  train_num += 1;
-  }
-  //fill with correct value of segment 
-  int* intervals;
-  int position = 0;
-  for (int i = 0; i < _FILENUM && fntype[i] != TEST; ) //fill array with intervals 
-  {
-	  for (int j = 0; j < td[i].m_num_divider; j++)
-	  {
-		  intervals[position + j] = td[i].m_divider[j+1] - td[i].m_divider[j];
-	  }
-	  position += td[i].m_num_divider; 
-  }
-  int j = 0;
-  //insert interval to array of features
-  for (int i = 4; i < train_num; i += 6)
-  {
-	  data_fm[i] = intervals[j]; 
-  }
-  //end code for interval insertion 
-
-
+ 
+  insert_interval_training(train_num, data_fm, td, fntype);
+  
   mo_classfication(data_fm, train_num, TRAINING);
   train_walk_neural_network(td, i);
   int k = 0;
+  double data_fm2 [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
   for (;i<_FILENUM;i++)
   {
-      f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
+      f_m = (double*)malloc(sizeof(double*)*(_BUFFER)); 
       seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
       data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
-      segmentation(fn[i], f_m, (int*)&n, seg_val, (int*)&seg_num,  fntype[i], data_val, (int*)&data_num);
-      for (j = 0; j < n; j++) {
-            fprintf(stderr, "%lf %lf %lf %lf\n", 
+      segmentation(fn[i], f_m, (int*)&n, seg_val, (int*)&seg_num, fntype[i], data_val, (int*)&data_num);
+	  
+	  memcpy(&data_fm2[n * 5], f_m, sizeof(double)*n * 5); //copy into array for each file 
+	  insert_interval_testing(n, data_fm2, seg_val); //insert tao 
+
+	  for (j = 0; j < n; j++) {
+            fprintf(stderr, "%lf %lf %lf %lf %lf\n", 
                  f_m[j*5], 
                  f_m[j*5+1], 
                  f_m[j*5+2], 
-                 f_m[j*5+3]);
-            mt = mo_classfication(&f_m[j*5], n, TEST);
+                 f_m[j*5+3],
+				 f_m[j*5+4]);
+
+            mt = mo_classfication(&data_fm2[j*6], n, TEST);		//this is giving me trouble
             printf("%x",mt); 
             if (mt == TRAINING){
                 int begin = seg_val[j];

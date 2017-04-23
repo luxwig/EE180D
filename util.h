@@ -45,6 +45,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles);
 MoType test_for_walking_speed(double *segment,int length);
 
 int findinterval(TrainingData file);
-
+void insert_interval_training(size_t train_num, double* data_fm, TrainingData td[], const MoType fntype[]);
+void insert_interval_testing(size_t n, double* f_m, int* seg_val);
 #endif
 

@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\FANN"
   ],
-  "SelectedNode": "\\util.h",
+  "SelectedNode": "\\FANN\\fann_util.c",
   "PreviewInSolutionExplorer": false
 }

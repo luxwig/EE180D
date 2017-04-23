@@ -30,8 +30,8 @@ void train_from_data_double(
 
 
 void train_from_data_float(
-        fann_type*   input, //contiguous features one array
-        fann_type*   output, //what each contiguous feature should output
+        float*   input, //contiguous features one array
+        float*   output, //what each contiguous feature should output
         const unsigned int num_data, //how many intervals
         const unsigned int num_input, //number of features
         const unsigned int num_output, //number of options
@@ -69,9 +69,9 @@ void test_from_data_double(double* data, struct fann* ann, int n, double* predic
     int i,j,
     num_input  = fann_get_num_input(ann),
     num_output = fann_get_num_output(ann);
-    fann_type *f_predict, *f_data;
-    f_data = (fann_type*)malloc(sizeof(fann_type) * num_input);
-    f_predict = (fann_type*)malloc(sizeof(fann_type) * num_output);
+    float *f_predict, *f_data;
+    f_data = (float*)malloc(sizeof(float) * num_input);
+    f_predict = (float*)malloc(sizeof(float) * num_output);
 
     for(i = 0; i < n; i++)
         for (j = 0; j < num_input; j++)

@@ -4,8 +4,8 @@
 #include "fann.h"
 
 void train_from_data_float(
-        fann_type*   input,
-        fann_type*   output,
+        float*   input,
+        float*   output,
         const unsigned int num_data,
         const unsigned int num_input, 
         const unsigned int num_output,
@@ -21,7 +21,7 @@ void train_from_data_double(
 
 void test_from_data_double(double* data, struct fann*, int n, double* predict);
 
-void test_from_data_float(fann_type* data, struct fann*, int n, fann_type* predict);
+void test_from_data_float(float* data, struct fann*, int n, float* predict);
 
 
 #endif
