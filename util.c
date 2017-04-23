@@ -125,7 +125,8 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 				memcpy(&output[j * 4], output_type[3], sizeof(double) * 4);
 			default: 
 				fprintf(stderr, "data_fm passed wrong type %d", (int)data_fm[j*6+5]);
-				exit(1);
+				//exit(1);
+        return TRAINING; 
 			}
 			for (k = 0; k < 5; k++)
                 fprintf(stderr,"%f ", input[j*5+k]);
