@@ -112,19 +112,23 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         for (j = 0; j < n; j++) {
             memcpy(input+5*j,data_fm+6*j, sizeof(double)*5);	//changed to copy 5 input features 	
 			switch ((int)data_fm[j * 6 + 5]) {
-			case WALK1:
-			case WALK2:
-			case WALK3:
-			case WALK4:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
 				memcpy(&output[j * 4], output_type[0], sizeof(double) * 4);
-			case ASC:
+        break;
+			case 241:
 				memcpy(&output[j * 4], output_type[1], sizeof(double) * 4);
-			case DSC:
+        break;
+			case 242:
 				memcpy(&output[j * 4], output_type[2], sizeof(double) * 4);
-			case RUN:
+        break;
+			case 5:
 				memcpy(&output[j * 4], output_type[3], sizeof(double) * 4);
+        break;
 			default: 
-				fprintf(stderr, "data_fm passed wrong type %d", (int)data_fm[j*6+5]);
+				fprintf(stderr, "data_fm passed wrong type %d \n", (int)data_fm[j*6+5]);
 				//exit(1);
         //return TRAINING; 
         break; 

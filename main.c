@@ -75,8 +75,16 @@ void main_get_feature(void)											//added the RUN data
       i++;
   }
      
+  fprintf(stderr,  "number of segments total: %d \n", train_num);  //testing 
   
   insert_interval_training(train_num, data_fm, td, fntype);
+  
+  for(int z = 0; z < train_num ;z++)
+  {
+  fprintf(stderr, "%f \t", data_fm[z*6 + 4]); //testing but intervals seem off
+  }
+   //testing 
+   fprintf(stderr, "\n");
   
   mo_classfication(data_fm, train_num, TRAINING);
   train_walk_neural_network(td, i);
