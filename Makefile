@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc -std=
 CFLAGS=-g -c -Wall -Werror
 INCLUDES=-I/usr/local/include
 LDFLAGS=-lm -lfann -L/usr/local/lib 
