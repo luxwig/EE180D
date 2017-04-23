@@ -72,6 +72,12 @@ void main_get_feature(void)											//added the RUN data
       td[i].m_num_divider = seg_num;
       td[i].m_type        = fntype[i];
       free(f_m);
+      
+  //get z gyro and y gyro data
+  //fft segment sets (declare some variable above to hold) insert later down where insert_interval_training is 
+  //multiply
+  //reverse fft
+  //get rms mean and standard deviation   or normal mean, try both 
       i++;
   }
      
@@ -92,6 +98,7 @@ void main_get_feature(void)											//added the RUN data
    free(seg_val);      //free data
    free(data_val); 
   double data_fm2 [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
+  
   for (;i<_FILENUM;i++)
   {
       f_m = (double*)malloc(sizeof(double*)*(_BUFFER)); 
@@ -99,8 +106,20 @@ void main_get_feature(void)											//added the RUN data
       data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
       segmentation(fn[i], f_m, (int*)&n, seg_val, (int*)&seg_num, fntype[i], data_val, (int*)&data_num);
 	  
-	  memcpy(&data_fm2[n * 5], f_m, sizeof(double)*n * 5); //copy into array for each file 
+	  memcpy(&data_fm2[0], f_m, sizeof(double)*n * 5); //copy into array for each file 
+     
+ /*   for(int z = 0; z < n ;z++)
+  {
+  fprintf(stderr, "%f \t", data_fm2[z*5 + 4]); //should be all tests
+  }
+*/
+   
 	  insert_interval_testing(n, data_fm2, seg_val); //insert tao 
+     
+     for(int z = 0; z < n ;z++)
+  {
+  fprintf(stderr, "%f \t", data_fm2[z*6 + 4]); //should be all tests
+  }
 
 	  for (j = 0; j < n; j++) {
             fprintf(stderr, "%lf %lf %lf %lf %lf\n", 

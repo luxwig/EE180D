@@ -302,6 +302,7 @@ void insert_interval_testing(size_t n, double* f_m, int* seg_val) {
 			for (int i = 4; i < total; i += 6)
 			 {
 				f_m[i] = intervals[x];
+        x++;
 			}
 				//end code for interval insertion 
 			return;
