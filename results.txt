@@ -1,0 +1,310 @@
+Max epochs    10000. Desired error: 0.0001000000.
+Epochs            1. Current error: 0.2593975961. Bit fail 764.
+Epochs            6. Current error: 0.0000032418. Bit fail 0.
+Max epochs    10000. Desired error: 0.0001000000.
+Epochs            1. Current error: 0.2530412972. Bit fail 572.
+Epochs          100. Current error: 0.0030733359. Bit fail 2.
+Epochs          200. Current error: 0.0007984309. Bit fail 0.
+Epochs          300. Current error: 0.0025121241. Bit fail 1.
+Epochs          400. Current error: 0.0011691671. Bit fail 0.
+Epochs          500. Current error: 0.0044122529. Bit fail 2.
+Epochs          600. Current error: 0.0087872129. Bit fail 10.
+Epochs          700. Current error: 0.0086905835. Bit fail 13.
+Epochs          800. Current error: 0.0088302745. Bit fail 10.
+Epochs          900. Current error: 0.0090778666. Bit fail 14.
+Epochs         1000. Current error: 0.0103077637. Bit fail 13.
+Epochs         1100. Current error: 0.0102343522. Bit fail 14.
+Epochs         1200. Current error: 0.0099713793. Bit fail 9.
+Epochs         1300. Current error: 0.0133230323. Bit fail 21.
+Epochs         1400. Current error: 0.0118419863. Bit fail 21.
+Epochs         1500. Current error: 0.0117109986. Bit fail 22.
+Epochs         1600. Current error: 0.0102057103. Bit fail 15.
+Epochs         1700. Current error: 0.0115086650. Bit fail 21.
+Epochs         1800. Current error: 0.0126372501. Bit fail 21.
+Epochs         1900. Current error: 0.0148840565. Bit fail 22.
+Epochs         2000. Current error: 0.0153844040. Bit fail 26.
+Epochs         2100. Current error: 0.0162943453. Bit fail 30.
+Epochs         2200. Current error: 0.0168766733. Bit fail 33.
+Epochs         2300. Current error: 0.0177520216. Bit fail 35.
+Epochs         2400. Current error: 0.0221289601. Bit fail 49.
+Epochs         2500. Current error: 0.0212551001. Bit fail 45.
+Epochs         2600. Current error: 0.0181710701. Bit fail 34.
+Epochs         2700. Current error: 0.0165343042. Bit fail 27.
+Epochs         2800. Current error: 0.0144802192. Bit fail 24.
+Epochs         2900. Current error: 0.0142979687. Bit fail 30.
+Epochs         3000. Current error: 0.0144932419. Bit fail 32.
+Epochs         3100. Current error: 0.0143555626. Bit fail 27.
+Epochs         3200. Current error: 0.0154120708. Bit fail 27.
+Epochs         3300. Current error: 0.0171107017. Bit fail 25.
+Epochs         3400. Current error: 0.0151511990. Bit fail 27.
+Epochs         3500. Current error: 0.0164469257. Bit fail 31.
+Epochs         3600. Current error: 0.0167367216. Bit fail 32.
+Epochs         3700. Current error: 0.0162700154. Bit fail 30.
+Epochs         3800. Current error: 0.0155863427. Bit fail 33.
+Epochs         3900. Current error: 0.0144230602. Bit fail 24.
+Epochs         4000. Current error: 0.0170476269. Bit fail 28.
+Epochs         4100. Current error: 0.0147614842. Bit fail 20.
+Epochs         4200. Current error: 0.0146809304. Bit fail 24.
+Epochs         4300. Current error: 0.0146872466. Bit fail 23.
+Epochs         4400. Current error: 0.0212838165. Bit fail 24.
+Epochs         4500. Current error: 0.0155925266. Bit fail 20.
+Epochs         4600. Current error: 0.0125804804. Bit fail 14.
+Epochs         4700. Current error: 0.0083577596. Bit fail 12.
+Epochs         4800. Current error: 0.0088773612. Bit fail 9.
+Epochs         4900. Current error: 0.0069166888. Bit fail 7.
+Epochs         5000. Current error: 0.0063011940. Bit fail 9.
+Epochs         5100. Current error: 0.0061372500. Bit fail 8.
+Epochs         5200. Current error: 0.0094942749. Bit fail 8.
+Epochs         5300. Current error: 0.0059715752. Bit fail 5.
+Epochs         5400. Current error: 0.0058871475. Bit fail 7.
+Epochs         5500. Current error: 0.0058068358. Bit fail 10.
+Epochs         5600. Current error: 0.0054487968. Bit fail 7.
+Epochs         5700. Current error: 0.0050713667. Bit fail 5.
+Epochs         5800. Current error: 0.0074137230. Bit fail 10.
+Epochs         5900. Current error: 0.0049694781. Bit fail 6.
+Epochs         6000. Current error: 0.0068506068. Bit fail 9.
+Epochs         6100. Current error: 0.0059935274. Bit fail 10.
+Epochs         6200. Current error: 0.0065200310. Bit fail 8.
+Epochs         6300. Current error: 0.0049558464. Bit fail 6.
+Epochs         6400. Current error: 0.0051277429. Bit fail 7.
+Epochs         6500. Current error: 0.0054466636. Bit fail 6.
+Epochs         6600. Current error: 0.0053541423. Bit fail 7.
+Epochs         6700. Current error: 0.0066771884. Bit fail 7.
+Epochs         6800. Current error: 0.0067034876. Bit fail 8.
+Epochs         6900. Current error: 0.0068670386. Bit fail 9.
+Epochs         7000. Current error: 0.0049801501. Bit fail 6.
+Epochs         7100. Current error: 0.0051484057. Bit fail 7.
+Epochs         7200. Current error: 0.0054651392. Bit fail 6.
+Epochs         7300. Current error: 0.0055025653. Bit fail 6.
+Epochs         7400. Current error: 0.0050821649. Bit fail 7.
+Epochs         7500. Current error: 0.0048912629. Bit fail 8.
+Epochs         7600. Current error: 0.0051127933. Bit fail 8.
+Epochs         7700. Current error: 0.0051933657. Bit fail 7.
+Epochs         7800. Current error: 0.0059916154. Bit fail 8.
+Epochs         7900. Current error: 0.0070126131. Bit fail 9.
+Epochs         8000. Current error: 0.0053748116. Bit fail 6.
+Epochs         8100. Current error: 0.0063975360. Bit fail 7.
+Epochs         8200. Current error: 0.0065624020. Bit fail 6.
+Epochs         8300. Current error: 0.0046787434. Bit fail 4.
+Epochs         8400. Current error: 0.0020416044. Bit fail 1.
+Epochs         8500. Current error: 0.0039003824. Bit fail 2.
+Epochs         8600. Current error: 0.0019977547. Bit fail 2.
+Epochs         8700. Current error: 0.0017089002. Bit fail 1.
+Epochs         8800. Current error: 0.0025523417. Bit fail 1.
+Epochs         8900. Current error: 0.0010641767. Bit fail 1.
+Epochs         9000. Current error: 0.0014056836. Bit fail 1.
+Epochs         9100. Current error: 0.0012732490. Bit fail 1.
+Epochs         9200. Current error: 0.0017035700. Bit fail 1.
+Epochs         9300. Current error: 0.0021726971. Bit fail 1.
+Epochs         9400. Current error: 0.0007315147. Bit fail 0.
+Epochs         9500. Current error: 0.0005593757. Bit fail 0.
+Epochs         9600. Current error: 0.0006846943. Bit fail 0.
+Epochs         9700. Current error: 0.0031788908. Bit fail 3.
+Epochs         9800. Current error: 0.0019114764. Bit fail 2.
+Epochs         9900. Current error: 0.0015522701. Bit fail 1.
+Epochs        10000. Current error: 0.0006432556. Bit fail 1.
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+f2
+f2
+5
+5
+5
+5
+f2
+f2
+5
+5
+5
+5
+f2
+f2
+5
+5
+5
+5
+f2
+5
+f2
+5
+f2
+5
+5
+5
+5
+f2
+5
+5
+5
+5
+5
+f2
+5
+5
+5
+f2
+5
+f2
+5
+f2
+5
+5
+5
+5
+f2
+5
+5
+5
+5
+f2
+f2
+5
+5
+5
+5
+5
+f2
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+f2
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+f2
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+f2
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+f2
+f2
+5
+5
+f2
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+f2
+f2
+5
+5
+5
+5
+f2
+f2
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+5
+f2
+5
+5
+f2
+5
+5

@@ -58,7 +58,7 @@ void main_get_feature(void)											//added the RUN data
 
   TrainingData td[_SBUFFER];
   i = 0;
-  while (i<_FILENUM && fntype[i] != TEST)
+  while (i<13 && fntype[i] != TEST)     //changed from filenum for testing 
   {
       f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
       seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
@@ -74,12 +74,15 @@ void main_get_feature(void)											//added the RUN data
       free(f_m);
       i++;
   }
- 
+     
+  
   insert_interval_training(train_num, data_fm, td, fntype);
   
   mo_classfication(data_fm, train_num, TRAINING);
   train_walk_neural_network(td, i);
   int k = 0;
+   free(seg_val);      //free data
+   free(data_val); 
   double data_fm2 [_BUFFER*RANDOM_BUFFER_MULTIPLIER];
   for (;i<_FILENUM;i++)
   {

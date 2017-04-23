@@ -109,7 +109,7 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
         output  = (double*)malloc(sizeof(double)*n*4);			//added output for run 
 
 		const double output_type[4][4] = { {1,-1,-1,-1},{-1,1,-1,-1},{-1,-1,1,-1},{-1,-1,-1,1} };	//added -1,-1,-1,1 output for run 
-        for (j = 0; j < n-1; j++) {
+        for (j = 0; j < n; j++) {
             memcpy(input+5*j,data_fm+6*j, sizeof(double)*5);	//changed to copy 5 input features 	
 			switch ((int)data_fm[j * 6 + 5]) {
 			case WALK1:
@@ -126,7 +126,8 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 			default: 
 				fprintf(stderr, "data_fm passed wrong type %d", (int)data_fm[j*6+5]);
 				//exit(1);
-        return TRAINING; 
+        //return TRAINING; 
+        break; 
 			}
 			for (k = 0; k < 5; k++)
                 fprintf(stderr,"%f ", input[j*5+k]);
