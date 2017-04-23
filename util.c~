@@ -158,7 +158,7 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 			return RUN; 
 		else
 		{
-			fprintf(stderr, "\t%f %f %f %f\n", predict[0], predict[1], predict[2], predict[3]);
+			fprintf(stderr, "\t%d %d %d %d\n", predict[0], predict[1], predict[2], predict[3]);
 			exit(1);
 		}
     }    
