@@ -45,7 +45,8 @@ int main()
         td[i].m_1st_feature = f_m;
         i++;
     }
-    mo_classfication(data_fm, train_num, TRAINING);
+    mo_training(data_fm, train_num);
+    //mo_classfication(data_fm, train_num, TRAINING);
     train_walk_neural_network(td, i);
 
     get_feature_terminate();

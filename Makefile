@@ -50,6 +50,9 @@ $(TREXECUTABLE): $(TROBJECTS)
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
+clean_all: clean
+	rm -rf *.net
+		   
 clean:
 	rm -rf *_main
 	rm -rf *.o

@@ -147,7 +147,7 @@ void rotate(const double raw_data_buf[], double correctly_ordered[], int pos) {
 
 void* data_pro(void* ptr)
 {
-    int size, pos, n, new_seg_num, i;
+    int size, pos, n, new_seg_num, i, j;
     n = 0;
     buftype* data_buf = (buftype*) ptr,
            * correct_data_buf =
@@ -177,7 +177,13 @@ void* data_pro(void* ptr)
         MoType result[_SBUFFER];
         classify_segments(correct_data_buf, pos, size, result, &new_seg_num);
         for (i = 0; i < new_seg_num; i++)
-            printf("%x\n", result[i]);
+        {
+            for (j = 0; j < _FIRST_LEVEL_MOD_COUNT; j++)
+                printf("%x\t", result[i*_TOTAL_MOD_COUNT+j]);
+            if (result[i*_TOTAL_MOD_COUNT+_WALK_OFFSET] == WALK)
+               printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_WALK_MOD_OFFSET]);
+            printf("\n"); 
+        }
     }
     return 0;
 }   

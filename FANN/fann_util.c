@@ -25,6 +25,8 @@ void train_from_data_double(
             f_output[i*num_output + j] = (float)output[i*num_output + j];
     }
     train_from_data_float(f_input, f_output, num_data, num_input, num_output, ann);
+    free(f_input);
+    free(f_output);
 }
 
 

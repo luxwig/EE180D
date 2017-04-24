@@ -103,52 +103,95 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
 }
 
 
-MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
+
+MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
 {
-    double* input, *output;
-    int j, k;
-    if (fntype == TRAINING) 
-    {
-        input  = (double*)malloc(sizeof(double)*n*4);
-        output  = (double*)malloc(sizeof(double)*n*3);
+    int i, max;
+    double* predict = (double*)malloc(sizeof(double)*(mo_status_num + 1));
+    test_from_file_double(features, filename, 1, predict);
+    max = 0;
+    for (i = 1; i < mo_status_num+flag_ind; i++)
+        if (predict[i] > predict[max])
+            max = i;
+    if (max < mo_status_num)
+        return mo_status[max];
+    else 
+        return 0;
+}
 
-        const double output_type[3][3]={{1,-1,-1},{-1,1,-1},{-1,-1,1}};
-        for (j = 0; j < n; j++) {
-            memcpy(input+4*j,data_fm+5*j, sizeof(double)*4);
-            if (((int)data_fm[j*5+4]&0xF0) != 0xF0)
-                memcpy(&output[j*3], output_type[0], sizeof(double)*3);
-            else
-                memcpy(&output[j*3], output_type[(int)data_fm[j*5+4]&0x00F], sizeof(double)*3);
-            for (k = 0; k < 4; k++)
-                fprintf(stderr,"%f ", input[j*4+k]);
-            fprintf(stderr,"\n");
-            for (k = 0; k < 3; k++)
-                fprintf(stderr,"%f ", output[j*3+k]);
-            fprintf(stderr,"\n");
-        }
-    
-  
-        train_from_file_double(input, output, n, MOTION_N_FEATURES, 3, _MO_NEURAL_NETWORK);
-        return TRAINING;
+void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
+{
+    // create output array
+    int i, j;
+    double* output = (double*)malloc(sizeof(double)*(seg_num*(mo_status_num+1)));
+    for (i = 0; i < seg_num; i++)
+    {
+        short flag = 0;
+        for (j = 0; j < mo_status_num; j++)
+            if(
+                (output[i*(mo_status_num+flag_ind)+j] = 
+                 mo_status[j]==(mo_types[i]&0xFFFFF0)?1:-1)==1) 
+                flag = 1;
+        if (flag_ind) output[i*(mo_status_num+1)+mo_status_num] = (flag==0)?1:-1;
+        for (j = 0; j < features_num; j++)
+            fprintf(stderr, "%lf\t", features[i*features_num+j]);
+        fprintf(stderr, "\n");
+        for (j = 0; j < mo_status_num+flag_ind; j++)
+            fprintf(stderr,"%lf\t", output[i*(mo_status_num+flag_ind)+j]);
+        fprintf(stderr, "\n");
     }
-    else
+    train_from_file_double(features, output, seg_num, features_num, mo_status_num+flag_ind, filename);
+    free(output);
+} 
+
+
+
+void mo_training (double* data_fm, size_t n)
+{
+    double *features = (double*)malloc(sizeof(double)*n*4);
+    MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
+    int i;
+    
+    //preprocess features and output
+    for (i = 0; i < n; i++)
     {
-        double predict[3];
-        test_from_file_double(data_fm, _MO_NEURAL_NETWORK, 1, predict);
-        //1 parameter: 3 features: [max, min, period, .....
-        //2 parameter: 
+        memcpy(features+_FIRST_LEVEL_FEATURES*i, 
+                data_fm+_MATLAB_OFFSET_FIRST_LEVEL*i, 
+                sizeof(double)*_FIRST_LEVEL_FEATURES);
+        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+4];
+    }
 
-
-        fprintf(stderr, "\t%f\t%f\t%f\n",predict[0], predict[1], predict[2]);
-        k = predict[0]>predict[1]?0:1;
-        k = predict[k]>predict[2]?k:2;
-        fprintf(stderr,"\t%d\n", k+1);
-        if (k == 0) return 0;
-        return (k|0xF0);
-    }    
+    // train ASC_DSC
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN);
+    // train WALK
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_MODEL, _WALK_SIZE, _TRUE, WALK_FN); 
+    // train FIRST_LV_ALL
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, FIRST_LV_ALL_FN);
 }
 
 
+void mo_classfication(double* data_fm, size_t n, MoType* result)
+{
+    int flag = _FALSE;
+    flag |= 
+        ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN));
+    
+    flag |= 
+        ( result[_WALK_OFFSET] = test_cl(data_fm, WALK_MODEL, _WALK_SIZE, _TRUE, WALK_FN));
+    
+    if (!flag) {
+        result[_1ST_LV_ALL_OFFSET] =
+            test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE,
+                FIRST_LV_ALL_FN);
+        switch ( (result[_1ST_LV_ALL_OFFSET] & 0xFF00)>>8) {
+            case 1 : 
+                result[_WALK_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
+            case 2 :
+                result[_ASC_DSC_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
+        }
+    }
+    fprintf(stderr, "\t%d\t%d\t%d\n",result[0], result[1], result[2]);
+}
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
@@ -266,6 +309,7 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
             otherwise ignore first and last divider
     */
     //int num_segments = (prev_num_segments > 0) ? ((int)div_num - 2) : ((int)div_num - 1); 
+    MoType segment_motion[_TOTAL_MOD_COUNT];
     int num_segments = (int)div_num - 1;
     int num_new_segments = num_segments - prev_num_segments;
     for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
@@ -273,16 +317,19 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         int end_divider = div[i+1];
         int length_of_segment = end_divider - start_divider + 1;
         //1 because single pointer
-        MoType segment_motion = mo_classfication(&f[5*i], 1, TEST);
-        if(segment_motion == TRAINING) {
+        mo_classfication(&f[5*i], 1, segment_motion);
+
+        // check _WALK_OFFSET
+        if(segment_motion[_WALK_OFFSET] == WALK) {
            // fprintf(stderr, "START_DIVIDER: %d\n to %d;", start_divider, end_divider);
+            // if it is walk
             double *dp = (double *)malloc(sizeof(double)*(length_of_segment));
             for(int k = 0; k < length_of_segment; k++) {
                 dp[k] = correct_data_buf[(start_divider+k) * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
             }
-            segment_motion = test_for_walking_speed(dp, length_of_segment, &f[5*i]);
+            segment_motion[_WALK_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[5*i]);
         }
-        latestMotions[j] = segment_motion;
+        memcpy(latestMotions+j*_TOTAL_MOD_COUNT, segment_motion, sizeof(MoType)*_TOTAL_MOD_COUNT);
     }
     prev_num_segments = num_segments > 0 ? num_segments : prev_num_segments;
     *latestMotions_num = num_new_segments;
