@@ -78,15 +78,6 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     get_feature(m, pos, r, features);
     
     fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
-    
-    for (j = 0; j < features->size[0]; j++) {
-        for (k = 0; k < 4; k++) 
-            f[*f_num*5+k] = features->data[get_index(j,k,features->size[0])];
-        f[*f_num*5+4] = fntype;
-        fprintf(stderr, "\t%lf %lf %lf %lf\n", 
-            f[*f_num*5], f[*f_num*5+1], f[*f_num*5+2], f[*f_num*5+3]);
-        (*f_num)++;
-    }
 
     if (seg!=NULL && seg_num!=NULL)
     {
@@ -94,6 +85,27 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
         for (j = 0; j < pos->size[0];j++)
                 seg[j] = (int)(pos->data[j]);
     }
+    //iterate through f
+    int seg_iterator = 0;
+
+    for (j = 0; j < features->size[0]; j++) {
+        for (k = 0; k < 4; k++) 
+            f[*f_num*5+k] = features->data[get_index(j,k,features->size[0])];
+        //use seg array to get length of interval //can we make this the interval length? 
+        f[*f_num*5+4] = seg[seg_iterator + 1] - seg[seg_iterator++];
+        f[*f_num*5+5] = fntype;
+        fprintf(stderr, "\t%lf %lf %lf %lf %lf\n", 
+            f[*f_num*5], f[*f_num*5+1], f[*f_num*5+2], f[*f_num*5+3], f[*f_num*5+4], f[*f_num*5+5]);
+        (*f_num)++;
+    }
+/*
+    if (seg!=NULL && seg_num!=NULL)
+    {
+        *seg_num = pos->size[0];
+        for (j = 0; j < pos->size[0];j++)
+                seg[j] = (int)(pos->data[j]);
+    }
+*/
 
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
@@ -317,7 +329,7 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         int end_divider = div[i+1];
         int length_of_segment = end_divider - start_divider + 1;
         //1 because single pointer
-        mo_classfication(&f[5*i], 1, segment_motion);
+        mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
 
         // check _WALK_OFFSET
         if(segment_motion[_WALK_OFFSET] == WALK) {
