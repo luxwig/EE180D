@@ -23,22 +23,30 @@
 #define _FALSE 0
 static const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
 static const char * _MO_NEURAL_NETWORK = "mo_neural_network.net";
-static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={"data/WALK/ludwig/1.csv",  
+static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
+                        "data/WALK/ludwig/1.csv",  
                          "data/WALK/ludwig/2.csv",
                          "data/WALK/ludwig/3.csv",
                          "data/WALK/ludwig/4.csv",
+                         "data/RUN/6.csv",  
+                         "data/RUN/8.csv",
+                         "data/RUN/10.csv",
                          "data/ASCEND/1.csv",
                          "data/ASCEND/2.csv",
                          "data/ASCEND/3.csv",
                          "data/DESCEND/1.csv",
                          "data/DESCEND/2.csv",
-                         "data/DESCEND/3.csv"};
+                         "data/DESCEND/3.csv",
+                   };
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
                          "data/WALK/ludwig/1_t.csv",  
                          "data/WALK/ludwig/2_t.csv",
                          "data/WALK/ludwig/3_t.csv",
                          "data/WALK/ludwig/4_t.csv",
+                         "data/RUN/6_t.csv",  
+                         "data/RUN/8_t.csv",
+                         "data/RUN/10_t.csv",
                          "data/ASCEND/4.csv",
                          "data/ASCEND/5.csv",
                          "data/ASCEND/6.csv",
@@ -67,29 +75,35 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _WALK_OFFSET            1  // offset for 1lv WALK    mod in result
 #define _1ST_LV_ALL_OFFSET      2  // offset for 1lv combime mod in result
 #define _WALK_MOD_OFFSET        3  // offset for 2lv WALK    mod in result
+#define _RUN_MOD_OFFSET         4
 
-#define _FIRST_LEVEL_MOD_COUNT  3  // total 1   lv mod count
-#define _TOTAL_MOD_COUNT        4  // total 1+2 lv mod count
+#define _FIRST_LEVEL_MOD_COUNT  4  // total 1   lv mod count
+#define _TOTAL_MOD_COUNT        5  // total 1+2 lv mod count
 
 enum MoType_enum { TRAINING = _TRAINING,
                    WALK = _WALK, 
                    WALK1 = _WALK1, WALK2 = _WALK2, WALK3 = _WALK3, WALK4 = _WALK4,
+                   RUN = _RUN,
+                   RUN1 = _RUN1, RUN2 = _RUN2, RUN3 = _RUN3,
                    ASC = _ASC, DSC = _DSC,
                    TEST = _TEST};
 
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC, RUN1, RUN2, RUN3};
 
 #define _ASC_DSC_SIZE 2
 #define _WALK_SIZE 1 
-#define _1ST_LV_ALL_SIZE 3
+#define _RUN_SIZE 1
+#define _1ST_LV_ALL_SIZE 4
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE]={ASC, DSC};
 static const MoType WALK_MODEL[_WALK_SIZE] = {WALK};
-static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] = {ASC, DSC, WALK};
+static const MoType RUN_MODEL[_RUN_SIZE] = {RUN};
+static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] = {ASC, DSC, WALK, RUN};
 
 static const char* ASC_DSC_FN = "ASC_DSC.net";
 static const char* WALK_FN = "WALK.net";
+static const char* RUN_FN = "RUN.net";
 static const char* FIRST_LV_ALL_FN = "FIRST_LV_ALL.net"; 
 #endif

@@ -160,7 +160,7 @@ void create_cl(double* features, int features_num, int seg_num, MoType* mo_types
 
 void mo_training (double* data_fm, size_t n)
 {
-    double *features = (double*)malloc(sizeof(double)*n*4);
+    double *features = (double*)malloc(sizeof(double)*n*_FIRST_LEVEL_FEATURES);
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
     int i;
     
@@ -177,6 +177,8 @@ void mo_training (double* data_fm, size_t n)
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN);
     // train WALK
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_MODEL, _WALK_SIZE, _TRUE, WALK_FN); 
+    // train RUN
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, RUN_MODEL, _RUN_SIZE, _TRUE, RUN_FN);
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, FIRST_LV_ALL_FN);
 }
