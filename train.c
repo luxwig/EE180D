@@ -28,6 +28,7 @@ int main()
     i = 0;
     while (i<_TRAIN_DATA_SIZE)
     {
+        printf("%s\n", TRAINING_DATASET[i]);
         f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);

@@ -13,6 +13,8 @@ function [val pos] = zanalysis(z_a, t_scale)
             p_pos = sort(tp_pos);
             p_val = z_a(i,p_pos);
         end
+        if length(p_val) == 1
+            continue;
         pos = [pos; p_pos];
         val = [val; z_a(i,p_pos)];
     end

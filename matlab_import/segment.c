@@ -14,7 +14,7 @@
 #include "findpeaks.h"
 
 /* Function Definitions */
-void segment(emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T *r)
+void segment(double min_peak_distance, double min_peak_height, emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T *r)
 {
   emxArray_real_T *b_m;
   int nm1d2;
@@ -56,7 +56,7 @@ void segment(emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T *r)
 
   emxInit_real_T(&p_val, 2);
   emxInit_real_T(&p_pos, 2);
-  findpeaks(b_m, p_val, p_pos);
+  findpeaks(min_peak_distance, min_peak_height, b_m, p_val, p_pos);
   emxFree_real_T(&b_m);
   i2 = pos->size[0];
   pos->size[0] = p_pos->size[0];

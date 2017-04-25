@@ -13,7 +13,7 @@
 #include "segment.h"
 
 /* Function Definitions */
-void get_feature(const emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T
+void get_feature(double min_peak_distance, double min_peak_height, const emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T
                  *r, emxArray_real_T *features)
 {
   emxArray_real_T *b_m;
@@ -37,7 +37,7 @@ void get_feature(const emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T
 
   emxInit_real_T(&varargin_1, 2);
   emxInit_real_T(&varargin_2, 2);
-  segment(b_m, pos, r);
+  segment(min_peak_distance, min_peak_height, b_m, pos, r);
   zanalysis(r, varargin_1, varargin_2);
   emxFree_real_T(&b_m);
   if (!((varargin_1->size[0] == 0) || (varargin_1->size[1] == 0))) {

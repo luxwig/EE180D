@@ -47,7 +47,6 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
     seg: indexes of dividers
     segm_num: number of segments
     fntype: filename type
-
     places features contiguously into f for the first level classification
 
 */
@@ -56,7 +55,6 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
 {
     int j, k, n;
     double* data_r = (double*)malloc(sizeof(double)*_BUFFER*2);
-
     emxArray_real_T *r;
     emxArray_real_T *pos;
     emxArray_real_T *features;
@@ -65,17 +63,47 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
 
     n = data_buf_size-1;
 
-    for (k = 0; k < n; k++)
+    double* gyro_z = (double*)malloc(sizeof(double)*n);
+    for (k = 0; k < n; k++){
         for (j = 1 ; j < 8; j++)
             data_r[get_index(k,(j-1),n)] = data_buf[k*8+j];
-    
+        gyro_z[k] = data_buf[k*8+7];
+    }
+    double mean = w_mean(gyro_z, n);
+    double std = w_std(gyro_z,n); 
+    double th = mean + std;
+    double int_count[_SBUFFER]={};
+    int count = -1;
+    for (j = 0; j < n; j++)
+    {
+        // below thold
+        if (abs(gyro_z[j]) <= th)
+        {
+            // first time ignore
+            if (count == -1) {
+                while (abs(gyro_z[j++]) <= th) {}; count++; continue;}
+
+            int_count[count] += 1;
+        }
+        else
+        {
+            if (int_count[count] != 0)
+                count++;
+        }
+    }
+    count--;
+    double interval_mean = w_mean(int_count,count);
+    double interval_std  = w_std(int_count,count);
+    double interval_th = interval_mean + 1* interval_std;
+    printf("interval_th = %lf\n",interval_th);
     emxInitArray_real_T(&r, 2);
     emxInitArray_real_T(&features, 2);
     emxInitArray_real_T(&pos, 1);
     
     m = emxCreateWrapper_real_T(data_r,n,7);
 
-    get_feature(m, pos, r, features);
+    printf("MEAN+STD:%f\n" , mean+std);
+    get_feature(interval_th, mean+std, m, pos, r, features);
     
     fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
 
@@ -86,8 +114,12 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
                 seg[j] = (int)(pos->data[j]);
     }
     //iterate through f
+    for (j = 0; j < pos->size[0]; j++)
+    {
+        printf("%d,",(int)(pos->data[j]));
+    }
+    printf("\n");
     int seg_iterator = 0;
-
     for (j = 0; j < features->size[0]; j++) {
         for (k = 0; k < 4; k++) 
             f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k] = features->data[get_index(j,k,features->size[0])];

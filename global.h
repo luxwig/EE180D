@@ -3,7 +3,7 @@
 
 #define _BUFFER 65536
 #define _SBUFFER 256
-#define _TRAIN_DATA_SIZE 13
+#define _TRAIN_DATA_SIZE 17
 #define _TEST_DATA_SIZE 13
 #define _DATA_ACQ_SIZE  8
 #define _FIRST_LEVEL_FEATURES 5
@@ -34,6 +34,10 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/ASCEND/1.csv",
                          "data/ASCEND/2.csv",
                          "data/ASCEND/3.csv",
+                         "data/ASC_SPEED/asc_1.csv",
+                         "data/ASC_SPEED/asc_1_2.csv",
+                         "data/ASC_SPEED/asc_2_1.csv",
+                         "data/ASC_SPEED/asc_2_2.csv",
                          "data/DESCEND/1.csv",
                          "data/DESCEND/2.csv",
                          "data/DESCEND/3.csv",
@@ -90,7 +94,7 @@ enum MoType_enum { TRAINING = _TRAINING,
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, DSC, DSC, DSC};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC, ASC, ASC, ASC, DSC, DSC, DSC};
 
 
 #define _ASC_DSC_SIZE 2
