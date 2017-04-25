@@ -182,8 +182,8 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 
 
 static struct fann* walk_neural_network;
-static struct fann* asc_neural_network; 
-static struct fann* dsc_neural_network; 
+ 
+
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
@@ -230,6 +230,8 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     train_from_data_float(input, output, num_data, num_input, num_output, &walk_neural_network);
 }
 
+static struct fann* asc_neural_network;
+
 
 void train_asc_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
@@ -274,6 +276,7 @@ void train_asc_neural_network(TrainingData all_file_data[], int nFiles) {
     train_from_data_float(input, output, num_data, num_input, num_output, &asc_neural_network);
 }
 
+static struct fann* dsc_neural_network; 
 
 void train_dsc_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;

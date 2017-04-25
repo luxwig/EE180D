@@ -25,7 +25,7 @@ enum MoType_enum { TRAINING = 0x000,
                    ASC = 0x0F1, DSC = 0x0F2, 
                    ASC1 = 0x0F3, ASC2 = 0x0F4,
                    DSC1 = 0x0F5, DSC2 = 0x0F6,
-				   RUN = 0x005, //, 0x006, 0x007, //added Run... 
+				           RUN = 0x005, //, 0x006, 0x007, //added Run... 
                    TEST = 0xF00};
 
 typedef enum MoType_enum MoType;
