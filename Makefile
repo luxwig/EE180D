@@ -1,6 +1,6 @@
 UNAME=$(shell uname)
 CC=gcc
-CFLAGS=-g -c -Wall 
+CFLAGS=-g -c -Wall -Werror 
 INCLUDES=-I/usr/local/include
 LDFLAGS=-lm -lfann -L/usr/local/lib -lpthread 
 IMPORTDIR=matlab_import

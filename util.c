@@ -94,7 +94,7 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
         //use seg array to get length of interval //can we make this the interval length? 
         f[*f_num*5+4] = seg[seg_iterator + 1] - seg[seg_iterator++];
         f[*f_num*5+5] = fntype;
-        fprintf(stderr, "\t%lf %lf %lf %lf %lf\n", 
+        fprintf(stderr, "\t%lf %lf %lf %lf %lf %lf\n", 
             f[*f_num*5], f[*f_num*5+1], f[*f_num*5+2], f[*f_num*5+3], f[*f_num*5+4], f[*f_num*5+5]);
         (*f_num)++;
     }
@@ -177,8 +177,6 @@ void mo_training (double* data_fm, size_t n)
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN);
     // train WALK
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_MODEL, _WALK_SIZE, _TRUE, WALK_FN); 
-    // train RUN
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, RUN_MODEL, _RUN_SIZE, _TRUE, RUN_FN);
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, FIRST_LV_ALL_FN);
 }

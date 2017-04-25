@@ -3,10 +3,10 @@
 
 #define _BUFFER 65536
 #define _SBUFFER 256
-#define _TRAIN_DATA_SIZE 10
-#define _TEST_DATA_SIZE 10
+#define _TRAIN_DATA_SIZE 13
+#define _TEST_DATA_SIZE 13
 #define _DATA_ACQ_SIZE  8
-#define _FIRST_LEVEL_FEATURES 5
+#define _FIRST_LEVEL_FEATURES 4
 #define _MATLAB_OFFSET_FIRST_LEVEL (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -75,10 +75,9 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _WALK_OFFSET            1  // offset for 1lv WALK    mod in result
 #define _1ST_LV_ALL_OFFSET      2  // offset for 1lv combime mod in result
 #define _WALK_MOD_OFFSET        3  // offset for 2lv WALK    mod in result
-#define _RUN_MOD_OFFSET         4
 
-#define _FIRST_LEVEL_MOD_COUNT  4  // total 1   lv mod count
-#define _TOTAL_MOD_COUNT        5  // total 1+2 lv mod count
+#define _FIRST_LEVEL_MOD_COUNT  3  // total 1   lv mod count
+#define _TOTAL_MOD_COUNT        4  // total 1+2 lv mod count
 
 enum MoType_enum { TRAINING = _TRAINING,
                    WALK = _WALK, 
@@ -95,15 +94,12 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, 
 
 #define _ASC_DSC_SIZE 2
 #define _WALK_SIZE 1 
-#define _RUN_SIZE 1
 #define _1ST_LV_ALL_SIZE 4
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE]={ASC, DSC};
 static const MoType WALK_MODEL[_WALK_SIZE] = {WALK};
-static const MoType RUN_MODEL[_RUN_SIZE] = {RUN};
 static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] = {ASC, DSC, WALK, RUN};
 
 static const char* ASC_DSC_FN = "ASC_DSC.net";
 static const char* WALK_FN = "WALK.net";
-static const char* RUN_FN = "RUN.net";
 static const char* FIRST_LV_ALL_FN = "FIRST_LV_ALL.net"; 
 #endif
