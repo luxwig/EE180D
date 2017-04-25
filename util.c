@@ -217,15 +217,15 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     num_output = WALK_N_OUTPUTS;
 
     for(int i = 0; i < nFiles; i++) {
-        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
-        num_data += (all_file_data[i].m_num_divider - 1);
+        if ((all_file_data[i].m_type & 0xFF0)==0x110)
+            num_data += (all_file_data[i].m_num_divider - 1);
     }
 
     input = (float *)malloc(sizeof(float)*WALK_N_FEATURES*num_data);
     output = (float *)malloc(sizeof(float)*WALK_N_OUTPUTS*num_data);
     int n = 0;
     for(int i = 0; i < nFiles; i++){
-        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
+        if ((all_file_data[i].m_type & 0xFF0)!=0x110) continue;
         int m_num_divider = all_file_data[i].m_num_divider;
         for(int j = 1; j< m_num_divider; j++) {
             int start = all_file_data[i].m_divider[j-1];
