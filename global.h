@@ -6,7 +6,7 @@
 #define _TRAIN_DATA_SIZE 13
 #define _TEST_DATA_SIZE 13
 #define _DATA_ACQ_SIZE  8
-#define _FIRST_LEVEL_FEATURES 4
+#define _FIRST_LEVEL_FEATURES 5
 #define _MATLAB_OFFSET_FIRST_LEVEL (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -90,7 +90,8 @@ enum MoType_enum { TRAINING = _TRAINING,
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC, RUN1, RUN2, RUN3};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, DSC, DSC, DSC};
+
 
 #define _ASC_DSC_SIZE 2
 #define _WALK_RUN_SIZE 2

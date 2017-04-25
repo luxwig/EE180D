@@ -32,7 +32,7 @@ int main()
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);
         segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i]);
-        memcpy(&data_fm[train_num*5],f_m,sizeof(double)*n*5);
+        memcpy(&data_fm[train_num*_MATLAB_OFFSET_FIRST_LEVEL],f_m,sizeof(double)*n*_MATLAB_OFFSET_FIRST_LEVEL);
         train_num += n;
         data_buf = (double*)malloc(sizeof(double)*_BUFFER*2);
         for (j = 0; j < data_num; j++)

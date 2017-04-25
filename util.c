@@ -90,13 +90,14 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
 
     for (j = 0; j < features->size[0]; j++) {
         for (k = 0; k < 4; k++) 
-            f[*f_num*5+k] = features->data[get_index(j,k,features->size[0])];
+            f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k] = features->data[get_index(j,k,features->size[0])];
         //use seg array to get length of interval //can we make this the interval length? 
-        f[*f_num*5+4] = seg[seg_iterator + 1] - seg[seg_iterator];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator];
 	seg_iterator++;
-        f[*f_num*5+5] = fntype;
-        fprintf(stderr, "\t%lf %lf %lf %lf %lf %lf\n", 
-            f[*f_num*5], f[*f_num*5+1], f[*f_num*5+2], f[*f_num*5+3], f[*f_num*5+4], f[*f_num*5+5]);
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = fntype;
+        for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
+            fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
+        fprintf(stderr,"\n"); 
         (*f_num)++;
     }
 /*
@@ -171,7 +172,7 @@ void mo_training (double* data_fm, size_t n)
         memcpy(features+_FIRST_LEVEL_FEATURES*i, 
                 data_fm+_MATLAB_OFFSET_FIRST_LEVEL*i, 
                 sizeof(double)*_FIRST_LEVEL_FEATURES);
-        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+4];
+        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+_MATLAB_OFFSET_FIRST_LEVEL-1];
     }
 
     // train ASC_DSC
