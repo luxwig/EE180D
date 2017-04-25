@@ -78,15 +78,6 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     get_feature(m, pos, r, features);
     
     fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
-    
-    for (j = 0; j < features->size[0]; j++) {
-        for (k = 0; k < 4; k++) 
-            f[*f_num*5+k] = features->data[get_index(j,k,features->size[0])];
-        f[*f_num*5+4] = fntype;
-        fprintf(stderr, "\t%lf %lf %lf %lf\n", 
-            f[*f_num*5], f[*f_num*5+1], f[*f_num*5+2], f[*f_num*5+3]);
-        (*f_num)++;
-    }
 
     if (seg!=NULL && seg_num!=NULL)
     {
@@ -94,6 +85,29 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
         for (j = 0; j < pos->size[0];j++)
                 seg[j] = (int)(pos->data[j]);
     }
+    //iterate through f
+    int seg_iterator = 0;
+
+    for (j = 0; j < features->size[0]; j++) {
+        for (k = 0; k < 4; k++) 
+            f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k] = features->data[get_index(j,k,features->size[0])];
+        //use seg array to get length of interval //can we make this the interval length? 
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator];
+	seg_iterator++;
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = fntype;
+        for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
+            fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
+        fprintf(stderr,"\n"); 
+        (*f_num)++;
+    }
+/*
+    if (seg!=NULL && seg_num!=NULL)
+    {
+        *seg_num = pos->size[0];
+        for (j = 0; j < pos->size[0];j++)
+                seg[j] = (int)(pos->data[j]);
+    }
+*/
 
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
@@ -148,7 +162,7 @@ void create_cl(double* features, int features_num, int seg_num, MoType* mo_types
 
 void mo_training (double* data_fm, size_t n)
 {
-    double *features = (double*)malloc(sizeof(double)*n*4);
+    double *features = (double*)malloc(sizeof(double)*n*_FIRST_LEVEL_FEATURES);
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
     int i;
     
@@ -158,13 +172,13 @@ void mo_training (double* data_fm, size_t n)
         memcpy(features+_FIRST_LEVEL_FEATURES*i, 
                 data_fm+_MATLAB_OFFSET_FIRST_LEVEL*i, 
                 sizeof(double)*_FIRST_LEVEL_FEATURES);
-        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+4];
+        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+_MATLAB_OFFSET_FIRST_LEVEL-1];
     }
 
     // train ASC_DSC
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN);
     // train WALK
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_MODEL, _WALK_SIZE, _TRUE, WALK_FN); 
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, WALK_RUN_FN); 
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, FIRST_LV_ALL_FN);
 }
@@ -177,7 +191,7 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
         ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN));
     
     flag |= 
-        ( result[_WALK_OFFSET] = test_cl(data_fm, WALK_MODEL, _WALK_SIZE, _TRUE, WALK_FN));
+        ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, WALK_RUN_FN));
     
     if (!flag) {
         result[_1ST_LV_ALL_OFFSET] =
@@ -185,7 +199,7 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
                 FIRST_LV_ALL_FN);
         switch ( (result[_1ST_LV_ALL_OFFSET] & 0xFF00)>>8) {
             case 1 : 
-                result[_WALK_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
+                result[_WALK_RUN_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
             case 2 :
                 result[_ASC_DSC_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
         }
@@ -203,15 +217,15 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     num_output = WALK_N_OUTPUTS;
 
     for(int i = 0; i < nFiles; i++) {
-        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
-        num_data += (all_file_data[i].m_num_divider - 1);
+        if ((all_file_data[i].m_type & 0xFF0)==0x110)
+            num_data += (all_file_data[i].m_num_divider - 1);
     }
 
     input = (float *)malloc(sizeof(float)*WALK_N_FEATURES*num_data);
     output = (float *)malloc(sizeof(float)*WALK_N_OUTPUTS*num_data);
     int n = 0;
     for(int i = 0; i < nFiles; i++){
-        if ((all_file_data[i].m_type & 0xF0) >> 4) continue;
+        if ((all_file_data[i].m_type & 0xFF0)!=0x110) continue;
         int m_num_divider = all_file_data[i].m_num_divider;
         for(int j = 1; j< m_num_divider; j++) {
             int start = all_file_data[i].m_divider[j-1];
@@ -317,17 +331,17 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         int end_divider = div[i+1];
         int length_of_segment = end_divider - start_divider + 1;
         //1 because single pointer
-        mo_classfication(&f[5*i], 1, segment_motion);
+        mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
 
         // check _WALK_OFFSET
-        if(segment_motion[_WALK_OFFSET] == WALK) {
+        if(segment_motion[_WALK_RUN_OFFSET] == WALK) {
            // fprintf(stderr, "START_DIVIDER: %d\n to %d;", start_divider, end_divider);
             // if it is walk
             double *dp = (double *)malloc(sizeof(double)*(length_of_segment));
             for(int k = 0; k < length_of_segment; k++) {
                 dp[k] = correct_data_buf[(start_divider+k) * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
             }
-            segment_motion[_WALK_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[5*i]);
+            segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[5*i]);
         }
         memcpy(latestMotions+j*_TOTAL_MOD_COUNT, segment_motion, sizeof(MoType)*_TOTAL_MOD_COUNT);
     }
