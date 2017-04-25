@@ -1,11 +1,17 @@
 #define get_index(X,Y,N) X+N*Y
 #define WALK_N_FEATURES 5
+#define ASC_N_FEATURES 5
+#define DSC_N_FEATURES 5
+
 #define WALK_N_OUTPUTS 4
+#define ASC_N_OUTPUTS 2
+#define DSC_N_OUTPUTS 2
+
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
 #define _GNU_SOURCE
-#define _FILENUM 26
+#define _FILENUM 26 //this is gonna change 
 	
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
@@ -119,9 +125,13 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 				memcpy(&output[j * 4], output_type[0], sizeof(double) * 4);
         break;
 			case 241:
+      case 243:
+      case 244:
 				memcpy(&output[j * 4], output_type[1], sizeof(double) * 4);
         break;
 			case 242:
+      case 245:
+      case 246: 
 				memcpy(&output[j * 4], output_type[2], sizeof(double) * 4);
         break;
 			case 5:
@@ -172,6 +182,8 @@ MoType mo_classfication(double* data_fm, size_t n, MoType fntype)
 
 
 static struct fann* walk_neural_network;
+static struct fann* asc_neural_network; 
+static struct fann* dsc_neural_network; 
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
@@ -218,6 +230,96 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     train_from_data_float(input, output, num_data, num_input, num_output, &walk_neural_network);
 }
 
+
+void train_asc_neural_network(TrainingData all_file_data[], int nFiles) {
+    float *input;
+    float *output;
+    unsigned int num_data, num_input, num_output;
+    input = output = NULL;
+    num_data = 0;
+    num_input = ASC_N_FEATURES;
+    num_output = ASC_N_OUTPUTS;
+
+    for(int i = 0; i < nFiles; i++) {
+        if (all_file_data[i].m_type == ASC1 || all_file_data[i].m_type == ASC2)
+          num_data += (all_file_data[i].m_num_divider - 1);
+    }
+
+    input = (float *)malloc(sizeof(float)*ASC_N_FEATURES*num_data);
+    output = (float *)malloc(sizeof(float)*ASC_N_OUTPUTS*num_data);
+    int n = 0;
+    for(int i = 0; i < nFiles; i++){
+        if (all_file_data[i].m_type != ASC1 || all_file_data[i].m_type != ASC2) continue;
+        int m_num_divider = all_file_data[i].m_num_divider;
+        for(int j = 1; j< m_num_divider; j++) {
+            int start = all_file_data[i].m_divider[j-1];
+            int end = all_file_data[i].m_divider[j];
+            float* convert_m_data = (float*)malloc(sizeof(float)*all_file_data[i].m_num_data);
+            for (int k = 0; k < all_file_data[i].m_num_data; k++){
+                convert_m_data[k] = all_file_data[i].m_data[k*7+1];
+            }
+            float maxima = w_maxima_seg(convert_m_data, start, end);
+            float minima = w_minima_seg(convert_m_data, start, end);
+            float period = end - start + 1;
+            input[n*ASC_N_FEATURES] = maxima;
+            input[n*ASC_N_FEATURES+1] = minima;
+            input[n*ASC_N_FEATURES+2] = period;
+            input[n*ASC_N_FEATURES+3] = w_mean_float(convert_m_data, period);
+            input[n*ASC_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
+            output[n*ASC_N_OUTPUTS] = (all_file_data[i].m_type == ASC1)*2-1;                //ASC 1 is [1,-1] ASC 2 is [-1,1]
+            output[n*ASC_N_OUTPUTS+1] = (all_file_data[i].m_type == ASC2)*2-1;
+            n++;
+        }
+    }
+    train_from_data_float(input, output, num_data, num_input, num_output, &asc_neural_network);
+}
+
+
+void train_dsc_neural_network(TrainingData all_file_data[], int nFiles) {
+    float *input;
+    float *output;
+    unsigned int num_data, num_input, num_output;
+    input = output = NULL;
+    num_data = 0;
+    num_input = DSC_N_FEATURES;
+    num_output = DSC_N_OUTPUTS;
+
+    for(int i = 0; i < nFiles; i++) {
+        if (all_file_data[i].m_type == DSC1 || all_file_data[i].m_type == DSC2) 
+        num_data += (all_file_data[i].m_num_divider - 1);
+    }
+
+    input = (float *)malloc(sizeof(float)*WALK_N_FEATURES*num_data);
+    output = (float *)malloc(sizeof(float)*WALK_N_OUTPUTS*num_data);
+    int n = 0;
+    for(int i = 0; i < nFiles; i++){
+        if (all_file_data[i].m_type != DSC1 || all_file_data[i].m_type != DSC2) continue;
+        int m_num_divider = all_file_data[i].m_num_divider;
+        for(int j = 1; j< m_num_divider; j++) {
+            int start = all_file_data[i].m_divider[j-1];
+            int end = all_file_data[i].m_divider[j];
+            float* convert_m_data = (float*)malloc(sizeof(float)*all_file_data[i].m_num_data);
+            for (int k = 0; k < all_file_data[i].m_num_data; k++){
+                convert_m_data[k] = all_file_data[i].m_data[k*7+1];
+            }
+            float maxima = w_maxima_seg(convert_m_data, start, end);
+            float minima = w_minima_seg(convert_m_data, start, end);
+            float period = end - start + 1;
+            input[n*DSC_N_FEATURES] = maxima;
+            input[n*DSC_N_FEATURES+1] = minima;
+            input[n*DSC_N_FEATURES+2] = period;
+            input[n*DSC_N_FEATURES+3] = w_mean_float(convert_m_data, period);
+            input[n*DSC_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
+            output[n*DSC_N_OUTPUTS] = (all_file_data[i].m_type == DSC1)*2-1;
+            output[n*DSC_N_OUTPUTS+1] = (all_file_data[i].m_type == DSC2)*2-1; //ASC 1 is [1,-1] ASC 2 is [-1,1]
+            n++;
+        }
+    }
+    train_from_data_float(input, output, num_data, num_input, num_output, &dsc_neural_network);
+}
+
+
+
 MoType test_for_walking_speed(double *segment,int length) 
 {
     double maxima = w_maxima_double_seg(segment, 0, length);
@@ -236,6 +338,47 @@ MoType test_for_walking_speed(double *segment,int length)
     }
     return (maximum+1);
 }
+
+
+MoType test_for_asc_speed(double *segment,int length) 
+{
+    double maxima = w_maxima_double_seg(segment, 0, length);
+    double minima = w_minima_double_seg(segment, 0, length);
+    double period = (double)length;
+    double mean = (double)w_mean(segment,length);
+    double RMS = w_RMS_seg_double(segment,length);
+    double features[] = {maxima, minima, period, mean, RMS};
+    double result[2];
+    test_from_data_double(features, asc_neural_network, 1, result);
+    if(result[0] > result[1])
+      return ASC1;
+    else
+      return ASC2;
+}
+
+
+MoType test_for_dsc_speed(double *segment,int length) 
+{
+    double maxima = w_maxima_double_seg(segment, 0, length);
+    double minima = w_minima_double_seg(segment, 0, length);
+    double period = (double)length;
+    double mean = (double)w_mean(segment,length);
+    double RMS = w_RMS_seg_double(segment,length);
+    double features[] = {maxima, minima, period, mean, RMS};
+    double result[2];
+    test_from_data_double(features, dsc_neural_network, 1, result);
+   if(result[0] > result[1])
+     return DSC1; 
+   else
+     return DSC2; 
+}
+
+
+
+
+
+
+
 
 int findinterval(TrainingData file) {
 	int i = 0;
