@@ -51,7 +51,7 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
 
 */
 
-void segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype)
+int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype)
 {
     int j, k, n;
     double* data_r = (double*)malloc(sizeof(double)*_BUFFER*2);
@@ -126,6 +126,8 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     }
     fprintf(stderr,"\n");
     int seg_iterator = 0;
+    if (features->size[0] == 0 || features->size[1] == 0)
+        return _FALSE;
     for (j = 0; j < features->size[0]; j++) {
         for (k = 0; k < 4; k++) 
             f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k] = features->data[get_index(j,k,features->size[0])];
@@ -151,7 +153,7 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
-
+    return _TRUE;
 }
 
 
