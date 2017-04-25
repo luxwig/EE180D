@@ -361,7 +361,12 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     int *div = (int*)malloc(sizeof(int)*_SBUFFER);
     size_t div_num;
     int fntype = TEST;
-    segmentation(correct_data_buf, size, f, &f_num, div, &div_num, fntype);
+
+    if(segmentation(correct_data_buf, size, f, &f_num, div, &div_num, fntype) == _FALSE) 
+    {
+        *latestMotions = 0;
+        return;
+    };
 
     /* 
         @param num_segments: number of total segments
