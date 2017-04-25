@@ -72,9 +72,9 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
                0xFFF
 
 #define _ASC_DSC_OFFSET         0  // offset for 1lv ASC_DSC mod in result 
-#define _WALK_OFFSET            1  // offset for 1lv WALK    mod in result
+#define _WALK_RUN_OFFSET            1  // offset for 1lv WALK    mod in result
 #define _1ST_LV_ALL_OFFSET      2  // offset for 1lv combime mod in result
-#define _WALK_MOD_OFFSET        3  // offset for 2lv WALK    mod in result
+#define _WALK_RUN_MOD_OFFSET        3  // offset for 2lv WALK    mod in result
 
 #define _FIRST_LEVEL_MOD_COUNT  3  // total 1   lv mod count
 #define _TOTAL_MOD_COUNT        4  // total 1+2 lv mod count
@@ -93,13 +93,13 @@ typedef enum MoType_enum MoType;
 static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, ASC, ASC, ASC, DSC, DSC, DSC, RUN1, RUN2, RUN3};
 
 #define _ASC_DSC_SIZE 2
-#define _WALK_SIZE 1 
+#define _WALK_RUN_SIZE 2
 #define _1ST_LV_ALL_SIZE 4
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE]={ASC, DSC};
-static const MoType WALK_MODEL[_WALK_SIZE] = {WALK};
+static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] = {WALK, RUN};
 static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] = {ASC, DSC, WALK, RUN};
 
 static const char* ASC_DSC_FN = "ASC_DSC.net";
-static const char* WALK_FN = "WALK.net";
+static const char* WALK_RUN_FN = "WALK_RUN.net";
 static const char* FIRST_LV_ALL_FN = "FIRST_LV_ALL.net"; 
 #endif

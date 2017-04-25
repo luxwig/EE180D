@@ -326,7 +326,7 @@ static void findLocalMaxima(emxArray_real_T *yTemp, emxArray_real_T *iPk,
   apnd = ndbl + 1;
   cdiff = (ndbl - yTemp->size[0]) + 1;
   absb = yTemp->size[0];
-  if (fabs(cdiff) < 4.4408920985006262E-16 * (double)absb) {
+  if (abs(cdiff) < 4.4408920985006262E-16 * (double)absb) {
     ndbl++;
     apnd = yTemp->size[0];
   } else if (cdiff > 0) {
@@ -656,7 +656,7 @@ static void parse_inputs(const emxArray_real_T *Yin, emxArray_real_T *y,
       nm1d2 = 1;
     }
 
-    if (fabs(cdiff) < 4.4408920985006262E-16 * (double)nm1d2) {
+    if (abs(cdiff) < 4.4408920985006262E-16 * (double)nm1d2) {
       ndbl++;
       apnd = Yin->size[0];
     } else if (cdiff > 0) {
