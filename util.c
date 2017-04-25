@@ -217,7 +217,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     num_output = WALK_N_OUTPUTS;
 
     for(int i = 0; i < nFiles; i++) {
-        if ((all_file_data[i].m_type & 0xFF0)==0x110)
+        if ((all_file_data[i].m_type & 0xFF0)==WALK)
             num_data += (all_file_data[i].m_num_divider - 1);
     }
 
@@ -225,7 +225,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     output = (float *)malloc(sizeof(float)*WALK_N_OUTPUTS*num_data);
     int n = 0;
     for(int i = 0; i < nFiles; i++){
-        if ((all_file_data[i].m_type & 0xFF0)!=0x110) continue;
+        if ((all_file_data[i].m_type & 0xFF0)!=WALK) continue;
         int m_num_divider = all_file_data[i].m_num_divider;
         for(int j = 1; j< m_num_divider; j++) {
             int start = all_file_data[i].m_divider[j-1];
@@ -237,21 +237,25 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             float maxima = w_maxima_seg(convert_m_data, start, end);
             float minima = w_minima_seg(convert_m_data, start, end);
             float period = end - start + 1;
+
             input[n*WALK_N_FEATURES] = maxima;
             input[n*WALK_N_FEATURES+1] = minima;
             input[n*WALK_N_FEATURES+2] = period;
             input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
             input[n*WALK_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
 
-            input[n*WALK_N_FEATURES+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
-            input[n*WALK_N_FEATURES+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
-            input[n*WALK_N_FEATURES+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
-            input[n*WALK_N_FEATURES+8] = all_file_data[i].m_1st_feature[3+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            float a,b,c,d,e,f,g,h;
+
+            a=input[n*WALK_N_FEATURES+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            b=input[n*WALK_N_FEATURES+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            c=input[n*WALK_N_FEATURES+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            d=input[n*WALK_N_FEATURES+8] = all_file_data[i].m_1st_feature[3+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
             
-            output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)*2-1;
-            output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)*2-1;
-            output[n*WALK_N_OUTPUTS+2] = (all_file_data[i].m_type == WALK3)*2-1;
-            output[n*WALK_N_OUTPUTS+3] = (all_file_data[i].m_type == WALK4)*2-1;
+            e=output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)?1:-1;
+            f=output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)?1:-1;
+            g=output[n*WALK_N_OUTPUTS+2] = (all_file_data[i].m_type == WALK3)?1:-1;
+            h=output[n*WALK_N_OUTPUTS+3] = (all_file_data[i].m_type == WALK4)?1:-1;
+            fprintf(stderr, "%f, %f, %f, %f, %f, %f, %f, %f\n",a,b,c,d,e,f,g,h);
             n++;
         }
     }
@@ -279,13 +283,16 @@ MoType test_for_walking_speed(double *segment,int length, double* first_level_fe
     };
     double result[4];
     test_from_file_double(features, _WALK_NEURAL_NETWORK, 1, result);
-    int maximum = 0;
+    int walk_type = 0;
     for(int i = 0 ; i < WALK_N_OUTPUTS; i++) {
-        if (result[i] > result[maximum]) {
-            maximum = i;
+        if (result[i] > result[walk_type]) {
+            walk_type = i;
         }
     }
-    return (maximum+1);
+    //need to 
+    return (WALK+walk_type+1);
+
+
 }
 
 
@@ -341,7 +348,7 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
             for(int k = 0; k < length_of_segment; k++) {
                 dp[k] = correct_data_buf[(start_divider+k) * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
             }
-            segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[5*i]);
+            segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
         }
         memcpy(latestMotions+j*_TOTAL_MOD_COUNT, segment_motion, sizeof(MoType)*_TOTAL_MOD_COUNT);
     }
