@@ -77,11 +77,15 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     for (j = 0; j < n; j++)
     {
         // below thold
-        if (abs(gyro_z[j]) <= th)
+        if ((gyro_z[j]) <= th && gyro_z[j] >= mean-std)
         {
             // first time ignore
             if (count == -1) {
-                while (abs(gyro_z[j++]) <= th) {}; count++; continue;}
+                while ((gyro_z[j]) <= th && gyro_z[j] >= mean-std) 
+                    j++; 
+                count++; 
+                continue;
+            }
 
             int_count[count] += 1;
         }
@@ -95,15 +99,17 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     double interval_mean = w_mean(int_count,count);
     double interval_std  = w_std(int_count,count);
     double interval_th = interval_mean + 1* interval_std;
-    printf("interval_th = %lf\n",interval_th);
+    if (count==0)
+        interval_th = 90;
+    fprintf(stderr,"interval_th = %lf\n", interval_th);
     emxInitArray_real_T(&r, 2);
     emxInitArray_real_T(&features, 2);
     emxInitArray_real_T(&pos, 1);
     
     m = emxCreateWrapper_real_T(data_r,n,7);
 
-    printf("MEAN+STD:%f\n" , mean+std);
-    get_feature(interval_th, mean+std, m, pos, r, features);
+    fprintf(stderr, "MEAN+STD:%f\n" , mean+std);
+    get_feature(abs(interval_th), mean+std, m, pos, r, features);
     
     fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
 
@@ -116,9 +122,9 @@ void segmentation(const double* data_buf, const int data_buf_size, double* f, si
     //iterate through f
     for (j = 0; j < pos->size[0]; j++)
     {
-        printf("%d,",(int)(pos->data[j]));
+        fprintf(stderr,"%d,",(int)(pos->data[j]));
     }
-    printf("\n");
+    fprintf(stderr,"\n");
     int seg_iterator = 0;
     for (j = 0; j < features->size[0]; j++) {
         for (k = 0; k < 4; k++) 
