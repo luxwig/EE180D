@@ -469,14 +469,22 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
 
         // check _WALK_OFFSET
-        if(segment_motion[_WALK_RUN_OFFSET] == WALK) {
-           // fprintf(stderr, "START_DIVIDER: %d\n to %d;", start_divider, end_divider);
+        if(segment_motion[_WALK_RUN_OFFSET] != 0) {
             // if it is walk
             double *dp = (double *)malloc(sizeof(double)*(length_of_segment));
             for(int k = 0; k < length_of_segment; k++) {
                 dp[k] = correct_data_buf[(start_divider+k) * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
             }
-            segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
+            
+            if (segment_motion[_WALK_RUN_OFFSET] == WALK)
+            {
+                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
+            }
+            else if(segment_motion[_WALK_RUN_OFFSET] == RUN)
+            {
+                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_running_speed(dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
+            }
+
         }
         memcpy(latestMotions+j*_TOTAL_MOD_COUNT, segment_motion, sizeof(MoType)*_TOTAL_MOD_COUNT);
     }
