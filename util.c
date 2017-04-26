@@ -386,6 +386,39 @@ MoType test_for_walking_speed(double *segment,int length, double* first_level_fe
 }
 
 
+MoType test_for_running_speed(double *segment,int length, double* first_level_features) 
+{
+    double maxima_x_accel = w_maxima_double_seg(segment, 0, length);
+    double minima_x_accel = w_minima_double_seg(segment, 0, length);
+    double period_x_accel = (double)length;
+    double mean_x_accel = (double)w_mean(segment,length);
+    double RMS_x_accel = w_RMS_seg_double(segment,length);
+
+    double features[] = {
+        maxima_x_accel, 
+        minima_x_accel, 
+        period_x_accel, 
+        mean_x_accel, 
+        RMS_x_accel,
+        first_level_features[0],
+        first_level_features[1],
+        first_level_features[2],
+        first_level_features[3]
+    };
+    double result[4];
+    test_from_file_double(features, _RUN_NEURAL_NETWORK, 1, result);
+    int run_type = 0;
+    for(int i = 0 ; i < RUN_N_FEATURES; i++) {
+        if (result[i] > result[run_type]) {
+            run_type = i;
+        }
+    }
+    //need to 
+    return (RUN+run_type+1);
+}
+
+
+
 static int prev_num_segments = 0;
 /*
     The function returns an array of the latest motions by taking the difference

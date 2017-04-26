@@ -158,8 +158,8 @@ float w_maxima_seg(float* a, int begin, int end)
     return a[index];
 }
 
-
 double w_RMS_seg (float arr[], int size)
+
 {
     int i;
     double sumsq;
@@ -173,7 +173,7 @@ double w_RMS_seg (float arr[], int size)
         
     }
 
-    RMS = (1/size)*(sqrt(sumsq));
+    RMS = (1.0/size)*(sqrt(sumsq));
     return RMS;
 }
 
@@ -192,7 +192,7 @@ double w_RMS_seg_double (double arr[], int size)
         
     } 
     
-    RMS = (1.0/(double)size)*(sqrt(sumsq));
+    RMS = (1.0/size)*(sqrt(sumsq));
     return RMS;
 }
 

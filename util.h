@@ -54,6 +54,7 @@ void read_from_file(const char * filename, double * buffer, size_t* n);
 
 
 
+MoType test_for_running_speed(double *segment,int length, double* first_level_features);
 void train_run_neural_network(TrainingData all_file_data[], int nFiles);
 #endif
 
