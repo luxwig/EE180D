@@ -1,11 +1,17 @@
 #define get_index(X,Y,N) X+N*Y
 #define MOTION_N_FEATURES 4
+//walk neural network and run neural network use same number of features
 #define WALK_N_FEATURES (5+4) //second level + first level
-#define RUN_N_FEATURES 9
+#define RUN_N_FEATURES (5+4) //second level +  first level 
+#define ASCEND_N_FEATURES (4) //second level
+#define DESCEND_N_FEATURES (4) //second level
+
 #define WALK_N_OUTPUTS (4) 
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
+
+#define RUN_N_OUTPUTS (3)
 
 #include "global.h"
 #include "util.h"
@@ -18,6 +24,31 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+//returns title of neural network associated with the specific motion 
+static const char * get_neural_network_name(MoType motion) {
+    switch(motion) {
+        case RUN:
+            return _RUN_NEURAL_NETWORK;
+        case WALK:
+            return _WALK_NEURAL_NETWORK;
+        default: //in case bad motion specified, return most generalized neural network.
+            return _MO_NEURAL_NETWORK;
+    }
+}
+
+//returns the number of outputs of a neural network associated with the specified motion
+static int get_n_neural_network_outputs(MoType motion) {
+    switch(motion) {
+        case RUN:
+            return WALK_N_OUTPUTS;
+        case WALK:
+            return RUN_N_OUTPUTS;
+        default: //make sure to check for failures.
+            return -1;
+    }
+}
+
 void read_from_file(const char * filename, double * buffer, size_t* n) {
     FILE* file = fopen(filename, "r"); 
     char* line = NULL;
@@ -197,8 +228,7 @@ void create_cl(double* features, int features_num, int seg_num, MoType* mo_types
     }
     train_from_file_double(features, output, seg_num, features_num, mo_status_num+flag_ind, filename);
     free(output);
-} 
-
+}
 
 
 void mo_training (double* data_fm, size_t n)
@@ -257,7 +287,7 @@ void train_run_neural_network(TrainingData all_file_data[], int nFiles)
     for (i = 0; i < nFiles; i++) 
         if (_GET_MO_TYPE(all_file_data[i].m_type) == RUN)
             num_data += (all_file_data[i].m_num_divider - 1);
-    double* input = (double *)malloc(sizeof(double)*RUN_N_FEATURES*num_data);
+    double* input = (double *)malloc(sizeof(double)*WALK_N_OUTPUTS*num_data);
     int n = 0; 
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*num_data);
     for(int i = 0; i < nFiles; i++){
@@ -295,7 +325,6 @@ void train_run_neural_network(TrainingData all_file_data[], int nFiles)
     }
     create_cl(input, RUN_N_FEATURES, n, mo_types, RUN_LV2_MODEL, _RUN_LV2_SIZE, _FALSE, RUN_LV2_FN);
 }
-
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
@@ -335,7 +364,6 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             c = input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
             d = input[n*WALK_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
 
-
             input[n*WALK_N_FEATURES+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
             input[n*WALK_N_FEATURES+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
             input[n*WALK_N_FEATURES+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
@@ -352,7 +380,7 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     train_from_file_float(input, output, num_data, num_input, num_output, _WALK_NEURAL_NETWORK);
 }
 
-MoType test_for_walking_speed(double *segment,int length, double* first_level_features) 
+MoType test_for_motion(MoType motion, double *segment, int length, double* first_level_features)
 {
     double maxima_x_accel = w_maxima_double_seg(segment, 0, length);
     double minima_x_accel = w_minima_double_seg(segment, 0, length);
@@ -371,52 +399,19 @@ MoType test_for_walking_speed(double *segment,int length, double* first_level_fe
         first_level_features[2],
         first_level_features[3]
     };
+
     double result[4];
-    test_from_file_double(features, _WALK_NEURAL_NETWORK, 1, result);
-    int walk_type = 0;
-    for(int i = 0 ; i < WALK_N_OUTPUTS; i++) {
-        if (result[i] > result[walk_type]) {
-            walk_type = i;
+    test_from_file_double(features, get_neural_network_name(motion), 1, result);
+    int n_outputs = get_n_neural_network_outputs(motion);
+    int motion_subtype;
+    motion_subtype = 0;
+    for(int i = 0 ; i < n_outputs; i++) {
+        if (result[i] > result[motion_subtype]) {
+            motion_subtype = i;
         }
     }
-    //need to 
-    return (WALK+walk_type+1);
-
-
+    return(motion + motion_subtype + 1);
 }
-
-
-MoType test_for_running_speed(double *segment,int length, double* first_level_features) 
-{
-    double maxima_x_accel = w_maxima_double_seg(segment, 0, length);
-    double minima_x_accel = w_minima_double_seg(segment, 0, length);
-    double period_x_accel = (double)length;
-    double mean_x_accel = (double)w_mean(segment,length);
-    double RMS_x_accel = w_RMS_seg_double(segment,length);
-
-    double features[] = {
-        maxima_x_accel, 
-        minima_x_accel, 
-        period_x_accel, 
-        mean_x_accel, 
-        RMS_x_accel,
-        first_level_features[0],
-        first_level_features[1],
-        first_level_features[2],
-        first_level_features[3]
-    };
-    double result[4];
-    test_from_file_double(features, _RUN_NEURAL_NETWORK, 1, result);
-    int run_type = 0;
-    for(int i = 0 ; i < RUN_N_FEATURES; i++) {
-        if (result[i] > result[run_type]) {
-            run_type = i;
-        }
-    }
-    //need to 
-    return (RUN+run_type+1);
-}
-
 
 
 static int prev_num_segments = 0;
@@ -478,11 +473,11 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
             
             if (segment_motion[_WALK_RUN_OFFSET] == WALK)
             {
-                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_walking_speed(dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
+                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_motion(WALK, dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
             }
             else if(segment_motion[_WALK_RUN_OFFSET] == RUN)
             {
-                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_running_speed(dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
+                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_motion(RUN, dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
             }
 
         }
