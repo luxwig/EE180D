@@ -11,7 +11,7 @@
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
 
-#define RUN_N_OUTPUTS (3)
+#define RUN_N_OUTPUTS _RUN_LV2_SIZE
 
 #include "global.h"
 #include "util.h"
@@ -31,7 +31,7 @@ static const char * get_neural_network_name(MoType motion) {
         case RUN:
             return _RUN_NEURAL_NETWORK;
         case WALK:
-            return _WALK_NEURAL_NETWORK;
+            return RUN_LV2_FN;
         default: //in case bad motion specified, return most generalized neural network.
             return _MO_NEURAL_NETWORK;
     }
@@ -172,23 +172,12 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"\n"); 
         (*f_num)++;
     }
-/*
-    if (seg!=NULL && seg_num!=NULL)
-    {
-        *seg_num = pos->size[0];
-        for (j = 0; j < pos->size[0];j++)
-                seg[j] = (int)(pos->data[j]);
-    }
-*/
-
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
     return _TRUE;
 }
-
-
 
 MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
 {
@@ -231,7 +220,7 @@ void create_cl(double* features, int features_num, int seg_num, MoType* mo_types
 }
 
 
-void mo_training (double* data_fm, size_t n)
+void mo_training(double* data_fm, size_t n)
 {
     double *features = (double*)malloc(sizeof(double)*n*_FIRST_LEVEL_FEATURES);
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
@@ -287,7 +276,7 @@ void train_run_neural_network(TrainingData all_file_data[], int nFiles)
     for (i = 0; i < nFiles; i++) 
         if (_GET_MO_TYPE(all_file_data[i].m_type) == RUN)
             num_data += (all_file_data[i].m_num_divider - 1);
-    double* input = (double *)malloc(sizeof(double)*WALK_N_OUTPUTS*num_data);
+    double* input = (double *)malloc(sizeof(double)*RUN_N_OUTPUTS*num_data);
     int n = 0; 
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*num_data);
     for(int i = 0; i < nFiles; i++){
