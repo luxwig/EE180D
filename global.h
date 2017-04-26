@@ -21,7 +21,6 @@
 
 #define _TRUE 1
 #define _FALSE 0
-static const char * _RUN_NEURAL_NETWORK = "./run_neural_network.net";
 static const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
 static const char * _MO_NEURAL_NETWORK = "mo_neural_network.net";
 static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
@@ -103,6 +102,10 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 #define _1ST_LV_ALL_SIZE 4
 #define _RUN_LV2_SIZE 3
 
+#define _MASK_LV1 0xFFFF0
+#define _MASK_LV2 0XFFFFF
+
+
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE]={ASC, DSC};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] = {WALK, RUN};
 static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] = {ASC, DSC, WALK, RUN};
@@ -112,4 +115,5 @@ static const char* ASC_DSC_FN = "ASC_DSC.net";
 static const char* WALK_RUN_FN = "WALK_RUN.net";
 static const char* FIRST_LV_ALL_FN = "FIRST_LV_ALL.net"; 
 static const char* RUN_LV2_FN = "RUN_LV2_FN.net";
+
 #endif
