@@ -405,10 +405,10 @@ MoType test_for_running_speed(double *segment,int length, double* first_level_fe
         first_level_features[2],
         first_level_features[3]
     };
-    double result[4];
-    test_from_file_double(features, _RUN_NEURAL_NETWORK, 1, result);
+    double result[_RUN_LV2_SIZE];
+    test_from_file_double(features, RUN_LV2_FN, 1, result);
     int run_type = 0;
-    for(int i = 0 ; i < RUN_N_FEATURES; i++) {
+    for(int i = 0 ; i < _RUN_LV2_SIZE; i++) {
         if (result[i] > result[run_type]) {
             run_type = i;
         }

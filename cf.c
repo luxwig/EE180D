@@ -182,6 +182,8 @@ void* data_pro(void* ptr)
                 printf("%x\t", result[i*_TOTAL_MOD_COUNT+j]);
             if (result[i*_TOTAL_MOD_COUNT+_WALK_RUN_OFFSET] == WALK)
                printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_WALK_RUN_MOD_OFFSET]);
+            if (result[i*_TOTAL_MOD_COUNT+_WALK_RUN_OFFSET] == RUN)
+                printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_WALK_RUN_MOD_OFFSET]);
             printf("\n"); 
         }
     }
