@@ -1,6 +1,7 @@
 #define get_index(X,Y,N) X+N*Y
 #define MOTION_N_FEATURES 4
 #define WALK_N_FEATURES (5+4) //second level + first level
+#define RUN_N_FEATURES 9
 #define WALK_N_OUTPUTS (4) 
 #define WALK_MAXIMA_INDEX 0
 #define WALK_MINIMA_INDEX 1
@@ -247,6 +248,55 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
     fprintf(stderr, "\t%d\t%d\t%d\n",result[0], result[1], result[2]);
 }
 
+
+void train_run_neural_network(TrainingData all_file_data[], int nFiles)
+{
+
+    int i;
+    int num_data = 0;
+    for (i = 0; i < nFiles; i++) 
+        if (_GET_MO_TYPE(all_file_data[i].m_type) == RUN)
+            num_data += (all_file_data[i].m_num_divider - 1);
+    double* input = (double *)malloc(sizeof(double)*RUN_N_FEATURES*num_data);
+    int n = 0; 
+    MoType* mo_types = (MoType*)malloc(sizeof(MoType)*num_data);
+    for(int i = 0; i < nFiles; i++){
+        if (_GET_MO_TYPE(all_file_data[i].m_type) != RUN) continue;
+        int m_num_divider = all_file_data[i].m_num_divider;
+        for(int j = 1; j< m_num_divider; j++) {
+            int start = all_file_data[i].m_divider[j-1];
+            int end = all_file_data[i].m_divider[j];
+            
+            double* convert_m_data = (double*)malloc(sizeof(double)*all_file_data[i].m_num_data);
+            
+            for (int k = 0; k < all_file_data[i].m_num_data; k++){
+                convert_m_data[k] = all_file_data[i].m_data[k*7+1];
+            }
+            
+            double maxima = w_maxima_double_seg(convert_m_data, start, end);
+            float minima = w_minima_double_seg(convert_m_data, start, end);
+            float period = end - start + 1;
+
+            input[n*RUN_N_FEATURES] = maxima;
+            input[n*RUN_N_FEATURES+1] = minima;
+            input[n*RUN_N_FEATURES+2] = period;
+            input[n*RUN_N_FEATURES+3] = w_mean(convert_m_data + start , period);
+            input[n*RUN_N_FEATURES+4] = w_RMS_seg_double(convert_m_data + start, period);
+
+
+            input[n*RUN_N_FEATURES+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*RUN_N_FEATURES+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*RUN_N_FEATURES+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*RUN_N_FEATURES+8] = all_file_data[i].m_1st_feature[3+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            
+            mo_types[n] = all_file_data[i].m_type; 
+            n++;
+        }
+    }
+    create_cl(input, RUN_N_FEATURES, n, mo_types, RUN_LV2_MODEL, _RUN_LV2_SIZE, _FALSE, RUN_LV2_FN);
+}
+
+
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
     float *input;
     float *output;
@@ -278,18 +328,18 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
             float minima = w_minima_seg(convert_m_data, start, end);
             float period = end - start + 1;
 
-            input[n*WALK_N_FEATURES] = maxima;
-            input[n*WALK_N_FEATURES+1] = minima;
-            input[n*WALK_N_FEATURES+2] = period;
-            input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
-            input[n*WALK_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
-
             float a,b,c,d,e,f,g,h;
+            input[n*WALK_N_FEATURES] = maxima;
+            a = input[n*WALK_N_FEATURES+1] = minima;
+            b = input[n*WALK_N_FEATURES+2] = period;
+            c = input[n*WALK_N_FEATURES+3] = w_mean_float(convert_m_data, period);
+            d = input[n*WALK_N_FEATURES+4] = w_RMS_seg(convert_m_data, period);
 
-            a=input[n*WALK_N_FEATURES+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
-            b=input[n*WALK_N_FEATURES+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
-            c=input[n*WALK_N_FEATURES+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
-            d=input[n*WALK_N_FEATURES+8] = all_file_data[i].m_1st_feature[3+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+
+            input[n*WALK_N_FEATURES+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*WALK_N_FEATURES+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*WALK_N_FEATURES+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            input[n*WALK_N_FEATURES+8] = all_file_data[i].m_1st_feature[3+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
             
             e=output[n*WALK_N_OUTPUTS] = (all_file_data[i].m_type == WALK1)?1:-1;
             f=output[n*WALK_N_OUTPUTS+1] = (all_file_data[i].m_type == WALK2)?1:-1;

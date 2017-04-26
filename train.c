@@ -47,8 +47,7 @@ int main()
         i++;
     }
     mo_training(data_fm, train_num);
-    //mo_classfication(data_fm, train_num, TRAINING);
     train_walk_neural_network(td, i);
-
+    train_run_neural_network(td, i);
     get_feature_terminate();
 }

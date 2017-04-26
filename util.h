@@ -14,6 +14,8 @@
 #define _BUFFER 65536
 #define _SBUFFER 256
 #define RANDOM_BUFFER_MULTIPLIER 8
+#define _GET_MO_TYPE(X) ((X) & 0xFF0)
+
 /* Function Declarations */
 
 extern int main(int argc, const char * const argv[]);
@@ -50,5 +52,8 @@ void train_walk_neural_network(TrainingData all_file_data[], int nFiles);
 void read_from_file(const char * filename, double * buffer, size_t* n);
 
 
+
+
+void train_run_neural_network(TrainingData all_file_data[], int nFiles);
 #endif
 
