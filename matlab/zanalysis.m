@@ -5,7 +5,7 @@ function [val pos] = zanalysis(z_a, t_scale)
     for i = 1:len
         [p_val,p_pos]=findpeaks(-z_a(i,:),'MinPeakDistance',50);
     
-        if length(p_val) > 2
+        if length(p_val) >= 2
             qs = sort(p_val,'descend');
             tp_pos = [ 
                 p_pos(find(p_val==qs(1))), p_pos(find(p_val==qs(2)))
@@ -15,6 +15,7 @@ function [val pos] = zanalysis(z_a, t_scale)
         end
         if length(p_val) == 1
             continue;
+        end
         pos = [pos; p_pos];
         val = [val; z_a(i,p_pos)];
     end

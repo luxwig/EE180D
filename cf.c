@@ -130,7 +130,7 @@ void* data_acq(void* ptr)
             pthread_cond_signal(&cv);
             pthread_mutex_unlock(&cv_lock);
         }
-        usleep(SLEEPTIME);
+        usleep(100);
     }
 #ifdef _DEBUG
     fclose(fd);
@@ -183,10 +183,11 @@ void* data_pro(void* ptr)
         {
             for (j = 0; j < _FIRST_LEVEL_MOD_COUNT; j++)
                 printf("%x\t", result[i*_TOTAL_MOD_COUNT+j]);
-            if (result[i*_TOTAL_MOD_COUNT+_WALK_RUN_OFFSET] == WALK)
+            if (result[i*_TOTAL_MOD_COUNT+_WALK_RUN_OFFSET] != 0)
                printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_WALK_RUN_MOD_OFFSET]);
-            if (result[i*_TOTAL_MOD_COUNT+_WALK_RUN_OFFSET] == RUN)
-                printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_WALK_RUN_MOD_OFFSET]);
+            if (result[i*_TOTAL_MOD_COUNT+_ASC_DSC_OFFSET] != 0)
+                printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_ASC_DSC_MOD_OFFSET]);
+
             printf("\n"); 
         }
     }

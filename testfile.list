@@ -18,6 +18,14 @@ data/DESCEND/3.csv
 data/DESCEND/4.csv
 data/DESCEND/5.csv
 data/DESCEND/6.csv
+data/DSC_SPEED/dsc_1.csv
+data/DSC_SPEED/dsc_1_1t.csv
+data/DSC_SPEED/dsc_1_2.csv
+data/DSC_SPEED/dsc_1_2t.csv
+data/DSC_SPEED/dsc_2_1.csv
+data/DSC_SPEED/dsc_2_1t.csv
+data/DSC_SPEED/dsc_2_2.csv
+data/DSC_SPEED/dsc_2_2t.csv
 data/WALK/ludwig/1.csv
 data/WALK/ludwig/1_t.csv
 data/WALK/ludwig/2.csv

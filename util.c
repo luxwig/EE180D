@@ -27,6 +27,10 @@ static const char * get_neural_network_name(MoType motion) {
             return RUN_LV2_FN;
         case WALK:
             return WALK_NEURAL_NETWORK;
+        case ASC:
+            return ASC_LV2_FN;
+        case DSC:
+            return DSC_LV2_FN;
         default: //in case bad motion specified, return most generalized neural network.
             return MO_NEURAL_NETWORK;
     }
@@ -39,6 +43,10 @@ static int get_n_neural_network_outputs(MoType motion) {
             return RUN_N_OUTPUTS;
         case WALK:
             return WALK_N_OUTPUTS;
+        case ASC:
+            return _ASC_LV2_SIZE;
+        case DSC:
+            return _DSC_LV2_SIZE;
         default: //make sure to check for failures.
             return -1;
     }
@@ -427,6 +435,7 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     if(segmentation(correct_data_buf, size, f, &f_num, div, &div_num, fntype) == _FALSE) 
     {
         *latestMotions = 0;
+        *latestMotions_num = 0;
         return;
     };
 
@@ -448,25 +457,23 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
 
         // check _WALK_OFFSET
-        if(segment_motion[_WALK_RUN_OFFSET] != 0) {
+        if(segment_motion[_WALK_RUN_OFFSET] != 0 ||
+           segment_motion[_ASC_DSC_OFFSET] != 0) {
             // if it is walk
             double *dp = (double *)malloc(sizeof(double)*(length_of_segment));
             for(int k = 0; k < length_of_segment; k++) {
                 dp[k] = correct_data_buf[(start_divider+k) * _DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
             }
-            
-            if (segment_motion[_WALK_RUN_OFFSET] == WALK)
-            {
-                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_motion(WALK, dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
-            }
-            else if(segment_motion[_WALK_RUN_OFFSET] == RUN)
-            {
-                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_motion(RUN, dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
-            }
+ 
+            if (segment_motion[_WALK_RUN_OFFSET] != 0)
+                segment_motion[_WALK_RUN_MOD_OFFSET] = test_for_motion(segment_motion[_WALK_RUN_OFFSET], dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
 
+            if (segment_motion[_ASC_DSC_OFFSET] != 0)
+                segment_motion[_ASC_DSC_MOD_OFFSET] = test_for_motion(segment_motion[_ASC_DSC_OFFSET], dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
+        
         }
         memcpy(latestMotions+j*_TOTAL_MOD_COUNT, segment_motion, sizeof(MoType)*_TOTAL_MOD_COUNT);
-    }
+  }
     prev_num_segments = num_segments > 0 ? num_segments : prev_num_segments;
     *latestMotions_num = num_new_segments;
 }

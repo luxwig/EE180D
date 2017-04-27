@@ -75,7 +75,12 @@ void zanalysis(const emxArray_real_T *z_a, emxArray_real_T *val, emxArray_real_T
     }
 
     b_findpeaks(50, c_z_a, tp_pos, p_pos);
-    if (tp_pos->size[1] > 2) {
+    if (tp_pos->size[1] < 2) 
+    {
+        i++;
+        continue;
+    }
+    if (tp_pos->size[1] >= 2) {
       i5 = qs->size[0] * qs->size[1];
       qs->size[0] = 1;
       qs->size[1] = tp_pos->size[1];

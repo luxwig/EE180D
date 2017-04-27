@@ -43,7 +43,7 @@ extern emlrtCTX emlrtRootTLSGlobal;
 extern emlrtContext emlrtContextGlobal;
 
 /* Function Declarations */
-extern void get_feature(emxArray_real_T *m, emxArray_real_T *r, emxArray_real_T *
+extern void get_feature(double, double, emxArray_real_T *m, emxArray_real_T *r, emxArray_real_T *
   features);
 extern void get_feature_api(const mxArray *prhs[1], const mxArray *plhs[2]);
 extern void get_feature_atexit(void);
