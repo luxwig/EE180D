@@ -19,10 +19,17 @@
 #define _GYRO_Y_OFFSET 6
 #define _GYRO_Z_OFFSET 7
 
+//walk neural network and run neural network use same number of features
+#define _WALK_N_FEATURES (5+4) //second level + first level
+#define _RUN_N_FEATURES (5+4) //second level +  first level 
+#define _ASCEND_N_FEATURES (4) //second level
+#define _DESCEND_N_FEATURES (4) //second level
+
+
+
 #define _TRUE 1
 #define _FALSE 0
-static const char * _WALK_NEURAL_NETWORK = "./walk_neural_network.net";
-static const char * _MO_NEURAL_NETWORK = "mo_neural_network.net";
+static const char * MO_NEURAL_NETWORK = "mo_neural_network.net";
 static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                         "data/WALK/ludwig/1.csv",  
                          "data/WALK/ludwig/2.csv",
@@ -69,7 +76,11 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _RUN3  0x113
 #define _RUN4  0x114
 #define _ASC   0x210
+#define _ASC1  0x211
+#define _ASC2  0x212
 #define _DSC   0x220
+#define _DSC1  0x221
+#define _DSC2  0x222
 
 #define _TEST  0x000
 #define _TRAINING \
@@ -88,19 +99,25 @@ enum MoType_enum { TRAINING = _TRAINING,
                    WALK1 = _WALK1, WALK2 = _WALK2, WALK3 = _WALK3, WALK4 = _WALK4,
                    RUN = _RUN,
                    RUN1 = _RUN1, RUN2 = _RUN2, RUN3 = _RUN3,
-                   ASC = _ASC, DSC = _DSC,
+                   ASC = _ASC, 
+                   ASC1 = _ASC1, ASC2 = _ASC2,
+                   DSC = _DSC,
+                   DSC1 = _DSC1, DSC2 = _DSC2,
                    TEST = _TEST};
 
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC, ASC, ASC, ASC, DSC, DSC, DSC};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC1, ASC1, ASC2, ASC2, DSC, DSC, DSC};
 
 
 #define _ASC_DSC_SIZE 2
 #define _WALK_RUN_SIZE 2
 #define _1ST_LV_ALL_SIZE 4
+#define _WALK_LV2_SIZE 4
 #define _RUN_LV2_SIZE 3
+#define _ASC_LV2_SIZE 2
+#define _DSC_LV2_SIZE 2
 
 #define _MASK_LV1 0xFFFF0
 #define _MASK_LV2 0XFFFFF
@@ -110,10 +127,15 @@ static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE]={ASC, DSC};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] = {WALK, RUN};
 static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] = {ASC, DSC, WALK, RUN};
 static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] = {RUN1, RUN2, RUN3};
+static const MoType WALK_LV2_MODEL[_WALK_LV2_SIZE] = {WALK1, WALK2, WALK3, WALK4};
+static const MoType ASC_LV2_MODEL[_ASC_LV2_SIZE] = {ASC1, ASC2};
+static const MoType DSC_LV2_MODEL[_DSC_LV2_SIZE] = {DSC1, DSC2};
 
 static const char* ASC_DSC_FN = "ASC_DSC.net";
 static const char* WALK_RUN_FN = "WALK_RUN.net";
 static const char* FIRST_LV_ALL_FN = "FIRST_LV_ALL.net"; 
-static const char* RUN_LV2_FN = "RUN_LV2_FN.net";
-
+static const char* RUN_LV2_FN = "RUN_LV2.net";
+static const char* ASC_LV2_FN = "ASC_LV2.net";
+static const char* DSC_LV2_FN = "DSC_LV2.net";
+static const char* WALK_NEURAL_NETWORK = "./walk_neural_network.net";
 #endif

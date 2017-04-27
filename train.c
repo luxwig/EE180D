@@ -47,7 +47,7 @@ int main()
         i++;
     }
     mo_training(data_fm, train_num);
-    train_walk_neural_network(td, i);
-    train_run_neural_network(td, i);
+    train_lv2_neural_network(td, i, WALK, _WALK_N_FEATURES, _WALK_LV2_SIZE, WALK_LV2_MODEL, WALK_NEURAL_NETWORK);
+    train_lv2_neural_network(td, i, RUN, _RUN_N_FEATURES, _RUN_LV2_SIZE, RUN_LV2_MODEL, RUN_LV2_FN); 
     get_feature_terminate();
 }
