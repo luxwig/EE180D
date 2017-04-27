@@ -11,7 +11,7 @@
 #define WALK_MINIMA_INDEX 1
 #define WALK_PERIOD_INDEX 2
 
-#define RUN_N_OUTPUTS (3)
+#define RUN_N_OUTPUTS _RUN_LV2_SIZE
 
 #include "global.h"
 #include "util.h"
@@ -29,9 +29,9 @@
 static const char * get_neural_network_name(MoType motion) {
     switch(motion) {
         case RUN:
-            return _RUN_NEURAL_NETWORK;
+            return RUN_LV2_FN;
         case WALK:
-            return _WALK_NEURAL_NETWORK;
+            return RUN_LV2_FN;
         default: //in case bad motion specified, return most generalized neural network.
             return _MO_NEURAL_NETWORK;
     }
@@ -172,23 +172,12 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"\n"); 
         (*f_num)++;
     }
-/*
-    if (seg!=NULL && seg_num!=NULL)
-    {
-        *seg_num = pos->size[0];
-        for (j = 0; j < pos->size[0];j++)
-                seg[j] = (int)(pos->data[j]);
-    }
-*/
-
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
     return _TRUE;
 }
-
-
 
 MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
 {
@@ -205,7 +194,7 @@ MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int
         return 0;
 }
 
-void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
+void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int flag_ind, int mask, const char* filename)
 {
     // create output array
     int i, j;
@@ -231,7 +220,7 @@ void create_cl(double* features, int features_num, int seg_num, MoType* mo_types
 }
 
 
-void mo_training (double* data_fm, size_t n)
+void mo_training(double* data_fm, size_t n)
 {
     double *features = (double*)malloc(sizeof(double)*n*_FIRST_LEVEL_FEATURES);
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
@@ -247,11 +236,11 @@ void mo_training (double* data_fm, size_t n)
     }
 
     // train ASC_DSC
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN);
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, _MASK_LV1, ASC_DSC_FN);
     // train WALK
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, WALK_RUN_FN); 
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, _MASK_LV1, WALK_RUN_FN); 
     // train FIRST_LV_ALL
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, FIRST_LV_ALL_FN);
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, _MASK_LV1, FIRST_LV_ALL_FN);
 }
 
 
@@ -287,7 +276,11 @@ void train_run_neural_network(TrainingData all_file_data[], int nFiles)
     for (i = 0; i < nFiles; i++) 
         if (_GET_MO_TYPE(all_file_data[i].m_type) == RUN)
             num_data += (all_file_data[i].m_num_divider - 1);
-    double* input = (double *)malloc(sizeof(double)*WALK_N_OUTPUTS*num_data);
+<<<<<<< HEAD
+    double* input = (double *)malloc(sizeof(double)*RUN_N_FEATURES*num_data);
+=======
+    double* input = (double *)malloc(sizeof(double)*RUN_N_OUTPUTS*num_data);
+>>>>>>> 2f1f703829d6e64a6b1c30383e3f4f6bb04e0759
     int n = 0; 
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*num_data);
     for(int i = 0; i < nFiles; i++){
@@ -323,7 +316,7 @@ void train_run_neural_network(TrainingData all_file_data[], int nFiles)
             n++;
         }
     }
-    create_cl(input, RUN_N_FEATURES, n, mo_types, RUN_LV2_MODEL, _RUN_LV2_SIZE, _FALSE, RUN_LV2_FN);
+    create_cl(input, RUN_N_FEATURES, n, mo_types, RUN_LV2_MODEL, _RUN_LV2_SIZE, _FALSE, _MASK_LV2, RUN_LV2_FN);
 }
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
@@ -400,42 +393,15 @@ MoType test_for_motion(MoType motion, double *segment, int length, double* first
         first_level_features[3]
     };
 
-<<<<<<< HEAD
-MoType test_for_running_speed(double *segment,int length, double* first_level_features) 
-{
-    double maxima_x_accel = w_maxima_double_seg(segment, 0, length);
-    double minima_x_accel = w_minima_double_seg(segment, 0, length);
-    double period_x_accel = (double)length;
-    double mean_x_accel = (double)w_mean(segment,length);
-    double RMS_x_accel = w_RMS_seg_double(segment,length);
 
-    double features[] = {
-        maxima_x_accel, 
-        minima_x_accel, 
-        period_x_accel, 
-        mean_x_accel, 
-        RMS_x_accel,
-        first_level_features[0],
-        first_level_features[1],
-        first_level_features[2],
-        first_level_features[3]
-    };
-    double result[_RUN_LV2_SIZE];
-    test_from_file_double(features, RUN_LV2_FN, 1, result);
-    int run_type = 0;
-    for(int i = 0 ; i < _RUN_LV2_SIZE; i++) {
-        if (result[i] > result[run_type]) {
-            run_type = i;
-=======
-    double result[4];
-    test_from_file_double(features, get_neural_network_name(motion), 1, result);
     int n_outputs = get_n_neural_network_outputs(motion);
+    double* result = (double*)malloc(sizeof(double)*n_outputs);
+    test_from_file_double(features, get_neural_network_name(motion), 1, result);
     int motion_subtype;
     motion_subtype = 0;
     for(int i = 0 ; i < n_outputs; i++) {
         if (result[i] > result[motion_subtype]) {
             motion_subtype = i;
->>>>>>> 34df11c4688b5d3a92ded4cf80d530b19930f6fb
         }
     }
     return(motion + motion_subtype + 1);

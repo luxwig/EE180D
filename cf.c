@@ -5,6 +5,7 @@
 
 #include <sys/time.h>
 #define MILLION 1000000.0
+#define SLEEPTIME 100
 #include <unistd.h>
 
 #include "cf.h"
@@ -21,6 +22,8 @@ int main(int argc, const char * const argv[])
 {
     get_feature_initialize();
 #ifdef _DEBUG
+#undef SLEEPTIME 
+#define SLEEPTIME 0
     if (argc > 1) strcpy(fn, argv[1]);
     else{
         fprintf(stderr, "Invalid Argument\n");
@@ -127,7 +130,7 @@ void* data_acq(void* ptr)
             pthread_cond_signal(&cv);
             pthread_mutex_unlock(&cv_lock);
         }
-        usleep(100);
+        usleep(SLEEPTIME);
     }
 #ifdef _DEBUG
     fclose(fd);

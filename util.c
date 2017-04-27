@@ -31,7 +31,7 @@ static const char * get_neural_network_name(MoType motion) {
         case RUN:
             return RUN_LV2_FN;
         case WALK:
-            return _WALK_NEURAL_NETWORK;
+            return RUN_LV2_FN;
         default: //in case bad motion specified, return most generalized neural network.
             return _MO_NEURAL_NETWORK;
     }
@@ -172,23 +172,12 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"\n"); 
         (*f_num)++;
     }
-/*
-    if (seg!=NULL && seg_num!=NULL)
-    {
-        *seg_num = pos->size[0];
-        for (j = 0; j < pos->size[0];j++)
-                seg[j] = (int)(pos->data[j]);
-    }
-*/
-
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
     return _TRUE;
 }
-
-
 
 MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
 {
@@ -216,7 +205,7 @@ void create_cl(double* features, int features_num, int seg_num, MoType* mo_types
         for (j = 0; j < mo_status_num; j++)
             if(
                 (output[i*(mo_status_num+flag_ind)+j] = 
-                 mo_status[j]==(mo_types[i]&0xFFFFF0)?1:-1)==1) 
+                 mo_status[j]==(mo_types[i]&mask)?1:-1)==1) 
                 flag = 1;
         if (flag_ind) output[i*(mo_status_num+1)+mo_status_num] = (flag==0)?1:-1;
         for (j = 0; j < features_num; j++)
@@ -231,7 +220,7 @@ void create_cl(double* features, int features_num, int seg_num, MoType* mo_types
 }
 
 
-void mo_training (double* data_fm, size_t n)
+void mo_training(double* data_fm, size_t n)
 {
     double *features = (double*)malloc(sizeof(double)*n*_FIRST_LEVEL_FEATURES);
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
