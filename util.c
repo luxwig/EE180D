@@ -31,7 +31,7 @@ static const char * get_neural_network_name(MoType motion) {
         case RUN:
             return RUN_LV2_FN;
         case WALK:
-            return RUN_LV2_FN;
+            return _WALK_NEURAL_NETWORK;
         default: //in case bad motion specified, return most generalized neural network.
             return _MO_NEURAL_NETWORK;
     }
@@ -41,9 +41,9 @@ static const char * get_neural_network_name(MoType motion) {
 static int get_n_neural_network_outputs(MoType motion) {
     switch(motion) {
         case RUN:
-            return WALK_N_OUTPUTS;
-        case WALK:
             return RUN_N_OUTPUTS;
+        case WALK:
+            return WALK_N_OUTPUTS;
         default: //make sure to check for failures.
             return -1;
     }
