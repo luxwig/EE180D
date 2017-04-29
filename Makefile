@@ -1,7 +1,7 @@
 UNAME=$(shell uname)
 CC=gcc
 CXX=g++
-CXXFLAGS=-std=c++11 -c -g
+CXXFLAGS=-c -std=c++11 -g
 CFLAGS=-g -c -Wall -Werror 
 INCLUDES=-I/usr/local/include
 LDFLAGS=-lm -lfann -L/usr/local/lib -lpthread -L./ranger -lRandomForest
@@ -10,7 +10,7 @@ FANNDIR=FANN
 RANGERDIR=ranger
 SOURCES=statistics.c util.c $(wildcard ${IMPORTDIR}/*.c) $(wildcard ${FANNDIR}/*.c)
 CXXSOURCES=$(wildcard ${RANGERDIR}/*.cpp)
-CXXOBJECTS=$(CXXSOURCES:.c=.o)
+CXXOBJECTS=$(CXXSOURCES:.cpp=.o)
 RANGERLIB=${RANGERDIR}/libRandomForest.so
 CFEXECUTABLE=cf_main
 TREXECUTABLE=tr_main
@@ -48,7 +48,6 @@ classify: $(CFSOURCES) $(CFEXECUTABLE)
 $(CFEXECUTABLE): $(CFOBJECTS)
 	$(CC) $(CFOBJECTS) $(LDFLAGS) -o $@
 
-
 train: $(TRSOURCES) $(TREXECUTABLE)
 
 $(TREXECUTABLE): $(TROBJECTS)
@@ -56,8 +55,11 @@ $(TREXECUTABLE): $(TROBJECTS)
 
 ranger: $(CXXSOURCES) $(RANGERLIB)
 
-$(RANGERLIB): $(CXXSOURCES)
-	$(CXX) $(CXXSOURCES) -shared -Wl -std=c++11 -o $@
+$(RANGERLIB): $(CXXOBJECTS)
+	$(CXX) $(CXXOBJECTS) -shared -Wl -o $@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
