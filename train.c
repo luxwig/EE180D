@@ -20,20 +20,24 @@ int main()
     double *data_fm  = (double*)malloc(sizeof(double)*_BUFFER*4);
     double *data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
     double *data_buf;
+    double *r        = (double*)malloc(sizeof(double)*_BUFFER*2);
     double* f_m=NULL;
     size_t n, train_num, data_num, seg_num;
     train_num = 0;
 
+    double *all_r = (double*)malloc(sizeof(double)*_RESAMPLE_SIZE*_SBUFFER);
     TrainingData td[_SBUFFER];
     i = 0;
+    
     while (i<_TRAIN_DATA_SIZE)
     {
         fprintf(stderr, "%s\n", TRAINING_DATASET[i]);
         f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);
-        segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i]);
+        segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i],r);
         memcpy(&data_fm[train_num*_MATLAB_OFFSET_FIRST_LEVEL],f_m,sizeof(double)*n*_MATLAB_OFFSET_FIRST_LEVEL);
+        memcpy(all_r+_RESAMPLE_SIZE*train_num,r, sizeof(double)*n*_RESAMPLE_SIZE);
         train_num += n;
         data_buf = (double*)malloc(sizeof(double)*_BUFFER*2);
         for (j = 0; j < data_num; j++)
@@ -46,7 +50,7 @@ int main()
         td[i].m_1st_feature = f_m;
         i++;
     }
-    mo_training(data_fm, train_num);
+    mo_training(all_r, data_fm, train_num);
     train_lv2_neural_network(td, i, WALK, _WALK_N_FEATURES, _WALK_LV2_SIZE, WALK_LV2_MODEL, WALK_NEURAL_NETWORK);
     train_lv2_neural_network(td, i, RUN, _RUN_N_FEATURES, _RUN_LV2_SIZE, RUN_LV2_MODEL, RUN_LV2_FN);
     train_lv2_neural_network(td, i, ASC, _ASCEND_N_FEATURES, _ASC_LV2_SIZE, ASC_LV2_MODEL, ASC_LV2_FN); 

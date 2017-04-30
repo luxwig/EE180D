@@ -41,13 +41,13 @@ void rotate(const double *rotated_data_buf, double *correctly_ordered, int size,
 */
 
 
-void mo_training (double* data_fm, size_t n);
+void mo_training (double*, double* data_fm, size_t n);
 
 void classify_segments(double* correct_data_buf, int pos, int size, MoType* latestMotions, int* latestMotions_num);
 
 
 void mo_classfication(double*, size_t, MoType*);
-int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype);
+int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype, double* seg_data);
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles);
 void read_from_file(const char * filename, double * buffer, size_t* n);
 

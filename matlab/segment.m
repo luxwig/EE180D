@@ -8,7 +8,7 @@ function [pos, r] = segment(m)
     p_val = [];
     p_pos = [];
     %fprintf('segment Inside - zgyro\n');
-    [p_val,p_pos]=findpeaks(zgyro,'MinPeakDistance',30,'MinPeakHeight',128);
+    [p_val,p_pos]=findpeaks(zgyro,'MinPeakDistance',318,'MinPeakHeight',58);
     pos = p_pos + ones(length(p_pos), 1);
     
     tx = zeros(length(p_val)-1,SAMPLE_RATE);

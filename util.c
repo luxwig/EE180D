@@ -8,6 +8,7 @@
 
 #define RUN_N_OUTPUTS _RUN_LV2_SIZE
 
+#include "ranger/ranger.h"
 #include "global.h"
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
@@ -86,7 +87,7 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
 
 */
 
-int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype)
+int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype, double* seg_data)
 {
     int j, k, n;
     double* data_r = (double*)malloc(sizeof(double)*_BUFFER*2);
@@ -148,6 +149,11 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     
     fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
 
+    if (seg_data != NULL)
+        for (j = 0; j < r->size[0]; j++) 
+            for (k = 0; k < r->size[1]; k++) 
+                seg_data[r->size[1]*j+k] = r->data[get_index(j,k,r->size[0])];
+
     if (seg!=NULL && seg_num!=NULL)
     {
         *seg_num = pos->size[0];
@@ -182,48 +188,79 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     return _TRUE;
 }
 
-MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename)
+MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename, int cl_type)
 {
     int i, max;
-    double* predict = (double*)malloc(sizeof(double)*(mo_status_num + 1));
-    test_from_file_double(features, filename, 1, predict);
-    max = 0;
-    for (i = 1; i < mo_status_num+flag_ind; i++)
-        if (predict[i] > predict[max])
-            max = i;
+    double* predict = NULL;
+    if (cl_type == _NEURAL_NETWORK) {
+       predict = (double*)malloc(sizeof(double)*(mo_status_num + 1));
+    
+        test_from_file_double(features, filename, 1, predict);
+        max = 0;
+        for (i = 1; i < mo_status_num+flag_ind; i++)
+            if (predict[i] > predict[max])
+                max = i;
+    }
+    if (cl_type == _RANDOM_FOREST){
+        predict = (double*)malloc(sizeof(double));
+        exec_random_forest(features, 1, _RESAMPLE_SIZE, filename, predict);
+
+        max = (int)predict[0];
+    }
+    free(predict);
     if (max < mo_status_num)
         return mo_status[max];
     else 
         return 0;
+
 }
 
-void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int flag_ind, int mask, const char* filename)
+void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int flag_ind, int mask, const char* filename, int cl_type)
 {
     // create output array
     int i, j;
-    double* output = (double*)malloc(sizeof(double)*(seg_num*(mo_status_num+1)));
+    double* output = NULL;
+    if (cl_type == _NEURAL_NETWORK)
+        output = (double*)malloc(sizeof(double)*(seg_num*(mo_status_num+1)));
+    if (cl_type == _RANDOM_FOREST)
+       output = (double*)malloc(sizeof(double)*(seg_num*(features_num+1))); 
+    short flag = 0;
     for (i = 0; i < seg_num; i++)
     {
-        short flag = 0;
-        for (j = 0; j < mo_status_num; j++)
-            if(
-                (output[i*(mo_status_num+flag_ind)+j] = 
-                 mo_status[j]==(mo_types[i]&mask)?1:-1)==1) 
-                flag = 1;
-        if (flag_ind) output[i*(mo_status_num+1)+mo_status_num] = (flag==0)?1:-1;
-        for (j = 0; j < features_num; j++)
-            fprintf(stderr, "%lf\t", features[i*features_num+j]);
-        fprintf(stderr, "\n");
-        for (j = 0; j < mo_status_num+flag_ind; j++)
-            fprintf(stderr,"%lf\t", output[i*(mo_status_num+flag_ind)+j]);
-        fprintf(stderr, "\n");
+        flag = 0;
+        if (cl_type == _NEURAL_NETWORK) {
+            for (j = 0; j < mo_status_num; j++)
+                if(
+                    (output[i*(mo_status_num+flag_ind)+j] = 
+                    mo_status[j]==(mo_types[i]&mask)?1:-1)==1) 
+                    flag = 1;
+            if (flag_ind) output[i*(mo_status_num+1)+mo_status_num] = (flag==0)?1:-1;
+            for (j = 0; j < features_num; j++)
+                fprintf(stderr, "%lf\t", features[i*features_num+j]);
+            fprintf(stderr, "\n");
+            for (j = 0; j < mo_status_num+flag_ind; j++)
+                fprintf(stderr,"%lf\t", output[i*(mo_status_num+flag_ind)+j]);
+            fprintf(stderr, "\n");
+        }
+        if (cl_type == _RANDOM_FOREST) {
+            for (j = 0; j < mo_status_num; j++) 
+                if ((mo_types[i]&mask) == mo_status[j]){
+                    flag = 1;
+                    break;
+                }
+            memcpy(output+i*(features_num+1), features + i*features_num, sizeof(double)*features_num);
+            output[i*(features_num+1)+features_num] = flag?j:j+1; 
+        }
     }
-    train_from_file_double(features, output, seg_num, features_num, mo_status_num+flag_ind, filename);
+    if (cl_type == _NEURAL_NETWORK)
+        train_from_file_double(features, output, seg_num, features_num, mo_status_num+flag_ind, filename);
+    if (cl_type == _RANDOM_FOREST)
+        train_random_forest(output, seg_num, features_num, _RANDOM_FOREST_NTREE, filename);
     free(output);
 }
 
 
-void mo_training(double* data_fm, size_t n)
+void mo_training(double* all_r, double* data_fm, size_t n)
 {
     double *features = (double*)malloc(sizeof(double)*n*_FIRST_LEVEL_FEATURES);
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
@@ -239,11 +276,11 @@ void mo_training(double* data_fm, size_t n)
     }
 
     // train ASC_DSC
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, _MASK_LV1, ASC_DSC_FN);
+    create_cl(all_r, _RESAMPLE_SIZE, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, _MASK_LV1, ASC_DSC_FN, _RANDOM_FOREST);
     // train WALK
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, _MASK_LV1, WALK_RUN_FN); 
+    create_cl(all_r, _RESAMPLE_SIZE, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, _MASK_LV1, WALK_RUN_FN, _RANDOM_FOREST); 
     // train FIRST_LV_ALL
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, _MASK_LV1, FIRST_LV_ALL_FN);
+    create_cl(all_r, _RESAMPLE_SIZE, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, _MASK_LV1, FIRST_LV_ALL_FN, _RANDOM_FOREST);
 }
 
 
@@ -251,15 +288,15 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
 {
     int flag = _FALSE;
     flag |= 
-        ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN));
+        ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN, _RANDOM_FOREST));
     
     flag |= 
-        ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, WALK_RUN_FN));
+        ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, WALK_RUN_FN, _RANDOM_FOREST));
     
     if (!flag) {
         result[_1ST_LV_ALL_OFFSET] =
             test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE,
-                FIRST_LV_ALL_FN);
+                FIRST_LV_ALL_FN, _RANDOM_FOREST);
         switch ( (result[_1ST_LV_ALL_OFFSET] & 0xFF00)>>8) {
             case 1 : 
                 result[_WALK_RUN_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
@@ -314,7 +351,7 @@ void train_lv2_neural_network(TrainingData all_file_data[], int nFiles, MoType m
             n++;
         }
     }
-    create_cl(input, input_size, n, mo_types, model, output_size, _FALSE, _MASK_LV2, fn);
+    create_cl(input, input_size, n, mo_types, model, output_size, _FALSE, _MASK_LV2, fn, _NEURAL_NETWORK);
 }
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
@@ -431,8 +468,9 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     int *div = (int*)malloc(sizeof(int)*_SBUFFER);
     size_t div_num;
     int fntype = TEST;
+    double* r = (double*)malloc(sizeof(double)*_BUFFER);
 
-    if(segmentation(correct_data_buf, size, f, &f_num, div, &div_num, fntype) == _FALSE) 
+    if(segmentation(correct_data_buf, size, f, &f_num, div, &div_num, fntype, r) == _FALSE) 
     {
         *latestMotions = 0;
         *latestMotions_num = 0;
@@ -454,7 +492,7 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         int end_divider = div[i+1];
         int length_of_segment = end_divider - start_divider + 1;
         //1 because single pointer
-        mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
+        mo_classfication(r+i*_RESAMPLE_SIZE, 1, segment_motion);
 
         // check _WALK_OFFSET
         if(segment_motion[_WALK_RUN_OFFSET] != 0 ||

@@ -1,9 +1,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#define _LBUFFER    1048576
 #define _BUFFER     65536
 #define _SBUFFER    256
-#define _TRAIN_DATA_SIZE 15
+#define _TRAIN_DATA_SIZE 21
 #define _TEST_DATA_SIZE  13
 #define _DATA_ACQ_SIZE   8
 #define _FIRST_LEVEL_FEATURES       5
@@ -27,6 +28,12 @@
 
 #define _TRUE   1
 #define _FALSE  0
+
+#define _RANDOM_FOREST  0
+#define _NEURAL_NETWORK 1
+
+#define _RESAMPLE_SIZE  200
+
 static const char * MO_NEURAL_NETWORK = "mo_neural_network.net";
 static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                         "data/WALK/ludwig/1.csv",  
@@ -36,16 +43,16 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/RUN/6.csv",  
                          "data/RUN/8.csv",
                          "data/RUN/10.csv",
-                       /*  "data/ASCEND/1.csv",
+                         "data/ASCEND/1.csv",
                          "data/ASCEND/2.csv",
-                         "data/ASCEND/3.csv",*/
+                         "data/ASCEND/3.csv",
                          "data/ASC_SPEED/asc_1.csv",
                          "data/ASC_SPEED/asc_1_2.csv",
                          "data/ASC_SPEED/asc_2_1.csv",
                          "data/ASC_SPEED/asc_2_2.csv",
-                   /*      "data/DESCEND/1.csv",
+                         "data/DESCEND/1.csv",
                          "data/DESCEND/2.csv",
-                         "data/DESCEND/3.csv",*/
+                         "data/DESCEND/3.csv",
                          "data/DSC_SPEED/dsc_1.csv",
                          "data/DSC_SPEED/dsc_1_2.csv",
                          "data/DSC_SPEED/dsc_2_1.csv",
@@ -111,7 +118,7 @@ enum MoType_enum { TRAINING = _TRAINING,
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2,  DSC1, DSC1, DSC2, DSC2};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC1, ASC1, ASC2, ASC2,DSC, DSC, DSC, DSC1, DSC1, DSC2, DSC2};
 
 
 #define _ASC_DSC_SIZE       2
@@ -125,6 +132,8 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 #define _MASK_LV1 0xFFFF0
 #define _MASK_LV2 0XFFFFF
 
+#define _RANDOM_FOREST_NTREE    150
+#define _RANDOM_FOREST_THREAD   5
 
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {WALK, RUN};
@@ -134,9 +143,9 @@ static const MoType WALK_LV2_MODEL[_WALK_LV2_SIZE] =        {WALK1, WALK2, WALK3
 static const MoType ASC_LV2_MODEL[_ASC_LV2_SIZE] =          {ASC1, ASC2};
 static const MoType DSC_LV2_MODEL[_DSC_LV2_SIZE] =          {DSC1, DSC2};
 
-static const char* ASC_DSC_FN =         "ASC_DSC.net";
-static const char* WALK_RUN_FN =        "WALK_RUN.net";
-static const char* FIRST_LV_ALL_FN =    "FIRST_LV_ALL.net"; 
+static const char* ASC_DSC_FN =         "ASC_DSC";
+static const char* WALK_RUN_FN =        "WALK_RUN";
+static const char* FIRST_LV_ALL_FN =    "FIRST_LV_ALL"; 
 static const char* RUN_LV2_FN =         "RUN_LV2.net";
 static const char* ASC_LV2_FN =         "ASC_LV2.net";
 static const char* DSC_LV2_FN =         "DSC_LV2.net";
