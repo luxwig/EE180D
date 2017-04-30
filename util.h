@@ -54,6 +54,8 @@ void read_from_file(const char * filename, double * buffer, size_t* n);
 
 MoType test_for_motion(MoType motion, double *segment, int length, double* first_level_features);
 
+
 void train_lv2_neural_network(TrainingData all_file_data[], int nFiles, MoType mo_type_lv1,int input_size, int output_size, const MoType* model , const char* fn);
+
 #endif
 

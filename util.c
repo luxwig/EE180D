@@ -267,7 +267,7 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
                 result[_ASC_DSC_OFFSET] = result[_1ST_LV_ALL_OFFSET]; break;
         }
     }
-    fprintf(stderr, "\t%d\t%d\t%d\n",result[0], result[1], result[2]);
+    fprintf(stderr, "\t%d\t%d\t%d\n",result[0], result[1], result[2]); 
 }
 
 
@@ -476,4 +476,11 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
   }
     prev_num_segments = num_segments > 0 ? num_segments : prev_num_segments;
     *latestMotions_num = num_new_segments;
+}
+
+int findinterval(TrainingData file) {
+	int i = 0;
+	int j;
+	j = file.m_divider[i] - file.m_divider[i + 1];
+	return j; 
 }
