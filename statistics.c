@@ -32,6 +32,24 @@ double w_mean_float(float *arr, int n)
     return total/((float) n);
 }
 
+double w_std(double* data, int n)
+{
+    double sum = 0.0, mean, standardDeviation = 0.0;
+    
+    int i;
+    
+    for(i=0; i<n; ++i)
+    {
+        sum += data[i];
+    }
+    
+    mean = sum/n;
+    
+    for(i=0; i<n; ++i)
+        standardDeviation += pow(data[i] - mean, 2);
+    
+    return sqrt(standardDeviation/n);
+}
 float w_calculateSD(float* data, int n)
 {
     float sum = 0.0, mean, standardDeviation = 0.0;
@@ -155,7 +173,7 @@ double w_RMS_seg (float arr[], int size)
         
     }
 
-    RMS = (1/size)*(sqrt(sumsq));
+    RMS = (1.0/size)*(sqrt(sumsq));
     return RMS;
 }
 
@@ -174,7 +192,7 @@ double w_RMS_seg_double (double arr[], int size)
         
     } 
     
-    RMS = (1/size)*(sqrt(sumsq));
+    RMS = (1.0/size)*(sqrt(sumsq));
     return RMS;
 }
 

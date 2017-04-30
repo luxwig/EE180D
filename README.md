@@ -5,18 +5,31 @@ Regan Hsu,
 Gary Sullivan, 
 Sichen (Ludwig) Zhao 
 
+## How to Compile
+
+If you are compiling on OS X, the full version would not be complied since OS X does not support 9DOF libaray. Instead, a mock interface has been created for the testing purpose. When running the `main` function, you need to specify what data file to read in the argument
 1. Run `$ make`
+ It should detect OS version as Darwin and ignore all 9DOF code section
+2. Run `$ ./main <data_file.csv> > results.txt`
+
+If you are compiling on Linux/9DOF directly, the full version **WILL BE** complied and no argument is needed to run:
+1. Run `$ make`
+ It should detect OS version as Linux and compile the full version
 2. Run `$ ./main > results.txt`
 
+If you are compiling on Linux/9DOF directly and want to **disable 9DOF functions**, aka. read data from file:
+1. Run `$ make $MODE=DEBUG`
+ It should detect DEBUG flag and ignore all 9DOF code section
+2. Run `$ ./main <data_file.csv> > results.txt`
 
-In `results.txt`:
+## `results.txt`:
 * `0 -> 1`, `0` indicates walking, and `1` indicates speed 1
 * `f1` indicates step up
 * `f2` indicates step down
 * Generally, any discontinuity represents a misclassifcation 
 
 
-`FANN` Interface provided:
+## `FANN` Interface 
 1. `train_from_data_float`: Train the model based on current data (*float* type)
   * `input` - input for the nerual network
   * `output` - output for the nerual network

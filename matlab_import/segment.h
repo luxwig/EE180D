@@ -18,7 +18,7 @@
 #include "get_feature_types.h"
 
 /* Function Declarations */
-extern void segment(emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T *r);
+extern void segment(double, double, emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T *r);
 
 #endif
 

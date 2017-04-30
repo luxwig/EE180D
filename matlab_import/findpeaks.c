@@ -326,7 +326,7 @@ static void findLocalMaxima(emxArray_real_T *yTemp, emxArray_real_T *iPk,
   apnd = ndbl + 1;
   cdiff = (ndbl - yTemp->size[0]) + 1;
   absb = yTemp->size[0];
-  if (fabs(cdiff) < 4.4408920985006262E-16 * (double)absb) {
+  if (abs(cdiff) < 4.4408920985006262E-16 * (double)absb) {
     ndbl++;
     apnd = yTemp->size[0];
   } else if (cdiff > 0) {
@@ -656,7 +656,7 @@ static void parse_inputs(const emxArray_real_T *Yin, emxArray_real_T *y,
       nm1d2 = 1;
     }
 
-    if (fabs(cdiff) < 4.4408920985006262E-16 * (double)nm1d2) {
+    if (abs(cdiff) < 4.4408920985006262E-16 * (double)nm1d2) {
       ndbl++;
       apnd = Yin->size[0];
     } else if (cdiff > 0) {
@@ -710,7 +710,7 @@ static void parse_inputs(const emxArray_real_T *Yin, emxArray_real_T *y,
   *NpOut = nm1d2;
 }
 
-void b_findpeaks(const double Yin[200], emxArray_real_T *Ypk, emxArray_real_T
+void b_findpeaks(double min_peak_height, const double Yin[200], emxArray_real_T *Ypk, emxArray_real_T
                  *Xpk)
 {
   boolean_T x[200];
@@ -918,8 +918,8 @@ void b_findpeaks(const double Yin[200], emxArray_real_T *Ypk, emxArray_real_T
     emxInit_boolean_T(&r4, 1);
     while (i <= c_sortIdx->size[0] - 1) {
       if (!idelete->data[i]) {
-        b_iPk = iPk->data[(int)c_sortIdx->data[i] - 1] - 50.0;
-        d_iPk = iPk->data[(int)c_sortIdx->data[i] - 1] + 50.0;
+        b_iPk = iPk->data[(int)c_sortIdx->data[i] - 1] - min_peak_height;
+        d_iPk = iPk->data[(int)c_sortIdx->data[i] - 1] + min_peak_height;
         i7 = r4->size[0];
         r4->size[0] = base->size[0];
         emxEnsureCapacity((emxArray__common *)r4, i7, (int)sizeof(boolean_T));
@@ -1026,7 +1026,7 @@ void b_findpeaks(const double Yin[200], emxArray_real_T *Ypk, emxArray_real_T
   emxFree_real_T(&iPk);
 }
 
-void findpeaks(const emxArray_real_T *Yin, emxArray_real_T *Ypk, emxArray_real_T
+void findpeaks(double min_peak_distance, double min_peak_height,const emxArray_real_T *Yin, emxArray_real_T *Ypk, emxArray_real_T
                *Xpk)
 {
   emxArray_real_T *y;
@@ -1155,14 +1155,14 @@ void findpeaks(const emxArray_real_T *Yin, emxArray_real_T *Ypk, emxArray_real_T
     nx = iPk->size[0] - 1;
     idx = 0;
     for (i = 0; i <= nx; i++) {
-      if (y->data[(int)iPk->data[i] - 1] > 50.0) {
+      if (y->data[(int)iPk->data[i] - 1] > min_peak_height) {
         idx++;
       }
     }
 
     ii = 0;
     for (i = 0; i <= nx; i++) {
-      if (y->data[(int)iPk->data[i] - 1] > 50.0) {
+      if (y->data[(int)iPk->data[i] - 1] > min_peak_height) {
         iPk->data[ii] = iPk->data[i];
         ii++;
       }
@@ -1274,8 +1274,8 @@ void findpeaks(const emxArray_real_T *Yin, emxArray_real_T *Ypk, emxArray_real_T
     emxInit_boolean_T(&r0, 1);
     while (i <= iInfite->size[0] - 1) {
       if (!idelete->data[i]) {
-        b_locs = locs->data[(int)iInfite->data[i] - 1] - 200.0;
-        c_locs = locs->data[(int)iInfite->data[i] - 1] + 200.0;
+        b_locs = locs->data[(int)iInfite->data[i] - 1] - min_peak_distance;
+        c_locs = locs->data[(int)iInfite->data[i] - 1] + min_peak_distance;
         i3 = r0->size[0];
         r0->size[0] = yTemp->size[0];
         emxEnsureCapacity((emxArray__common *)r0, i3, (int)sizeof(boolean_T));

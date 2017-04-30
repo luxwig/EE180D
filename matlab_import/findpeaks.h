@@ -18,9 +18,9 @@
 #include "get_feature_types.h"
 
 /* Function Declarations */
-extern void b_findpeaks(const double Yin[200], emxArray_real_T *Ypk,
+extern void b_findpeaks(double, const double Yin[200], emxArray_real_T *Ypk,
   emxArray_real_T *Xpk);
-extern void findpeaks(const emxArray_real_T *Yin, emxArray_real_T *Ypk,
+extern void findpeaks(double,double,const emxArray_real_T *Yin, emxArray_real_T *Ypk,
                       emxArray_real_T *Xpk);
 
 #endif

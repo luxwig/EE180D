@@ -8,7 +8,7 @@ function [pos, r] = segment(m)
     p_val = [];
     p_pos = [];
     %fprintf('segment Inside - zgyro\n');
-    [p_val,p_pos]=findpeaks(zgyro,'MinPeakDistance',200,'MinPeakHeight',50);
+    [p_val,p_pos]=findpeaks(zgyro,'MinPeakDistance',30,'MinPeakHeight',128);
     pos = p_pos + ones(length(p_pos), 1);
     
     tx = zeros(length(p_val)-1,SAMPLE_RATE);
@@ -23,7 +23,7 @@ function [pos, r] = segment(m)
     %fprintf('segment Inside - demean\n');
     for i = [1:length(p_pos)-1]
         len = p_pos(i+1)- p_pos(i);
-        downs = interp1([1:len],m([p_pos(i):p_pos(i+1)-1],7),[1:len/SAMPLE_RATE:len]);
+        downs = interp1([1:len],m([p_pos(i):p_pos(i+1)-1],7),linspace(1,len,SAMPLE_RATE));
         tx(i,:) = downs;
     end
     %fprintf('segment Inside - read return\n');
