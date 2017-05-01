@@ -197,28 +197,29 @@ MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int
         return 0;
 }
 
-void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int flag_ind, int mask, const char* filename)
+void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int mask, const char* filename)
 {
     // create output array
     int i, j;
     double* output = (double*)malloc(sizeof(double)*(seg_num*(mo_status_num+1)));
+    short flag;
     for (i = 0; i < seg_num; i++)
     {
-        short flag = 0;
+        flag = _FALSE;
         for (j = 0; j < mo_status_num; j++)
-            if(
-                (output[i*(mo_status_num+flag_ind)+j] = 
-                 mo_status[j]==(mo_types[i]&mask)?1:-1)==1) 
-                flag = 1;
-        if (flag_ind) output[i*(mo_status_num+1)+mo_status_num] = (flag==0)?1:-1;
+            if (
+               (output[i*(mo_status_num)+j] = (mo_status[j]==(mo_types[i]&mask))?1:-1) == 1)
+                flag = _TRUE;
+        if (!flag && mo_status[mo_status_num-1]==_NONE)
+            output[i*(mo_status_num)+mo_status_num-1] = 1;
         for (j = 0; j < features_num; j++)
             fprintf(stderr, "%lf\t", features[i*features_num+j]);
         fprintf(stderr, "\n");
-        for (j = 0; j < mo_status_num+flag_ind; j++)
-            fprintf(stderr,"%lf\t", output[i*(mo_status_num+flag_ind)+j]);
+        for (j = 0; j < mo_status_num; j++)
+            fprintf(stderr,"%lf\t", output[i*(mo_status_num)+j]);
         fprintf(stderr, "\n");
     }
-    train_from_file_double(features, output, seg_num, features_num, mo_status_num+flag_ind, filename);
+    train_from_file_double(features, output, seg_num, features_num, mo_status_num, filename);
     free(output);
 }
 
@@ -239,11 +240,11 @@ void mo_training(double* data_fm, size_t n)
     }
 
     // train ASC_DSC
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, _MASK_LV1, ASC_DSC_FN);
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _MASK_LV1, ASC_DSC_FN);
     // train WALK
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, _MASK_LV1, WALK_RUN_FN); 
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
     // train FIRST_LV_ALL
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, _MASK_LV1, FIRST_LV_ALL_FN);
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,  _MASK_LV1, FIRST_LV_ALL_FN);
 }
 
 
@@ -314,7 +315,7 @@ void train_lv2_neural_network(TrainingData all_file_data[], int nFiles, MoType m
             n++;
         }
     }
-    create_cl(input, input_size, n, mo_types, model, output_size, _FALSE, _MASK_LV2, fn);
+    create_cl(input, input_size, n, mo_types, model, output_size, _MASK_LV2, fn);
 }
 
 void train_walk_neural_network(TrainingData all_file_data[], int nFiles) {
