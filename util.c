@@ -16,6 +16,9 @@
 #include "matlab_import/get_feature_terminate.h"
 #include "matlab_import/get_feature_emxAPI.h"
 #include "matlab_import/get_feature_initialize.h"
+#include "matlab_import/interp_initialize.h"
+#include "matlab_import/interp_terminate.h"
+#include "matlab_import/interp.h"
 #include "FANN/fann_util.h"
 
 #include <stdio.h>
@@ -86,6 +89,24 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
     places features contiguously into f for the first level classification
 
 */
+void interp_wrapper(double* x, double* y, int size, int sample_rate)
+{
+    emxArray_real_T *m_x;
+    emxArray_real_T *m_y;
+    emxArray_real_T *m_result;
+    
+    emxInitArray_real_T(&m_result, 2);
+    
+    m_x = emxCreateWrapper_real_T(x,1,size);
+    m_y = emxCreateWrapper_real_T(y,1,size);
+
+    interp(m_x,m_y,sample_rate,m_result); 
+    
+    emxDestroyArray_real_T(m_x); 
+    emxDestroyArray_real_T(m_y);
+    emxDestroyArray_real_T(m_result);
+}
+
 
 int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype, double* seg_data)
 {
@@ -98,7 +119,15 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     *f_num = 0;
 
     n = data_buf_size-1;
-
+    int i;
+    double x[1000];
+    double y[1000];
+    for (i = 1;i < 1001; i++)
+    {
+        x[i-1]= i;
+        y[i-1] = i;
+    }
+    interp_wrapper(x,y,1000,100);
     double* gyro_z = (double*)malloc(sizeof(double)*n);
     for (k = 0; k < n; k++){
         for (j = 1 ; j < 8; j++)

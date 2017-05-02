@@ -8,6 +8,7 @@
 /* Include files */
 #include "rt_nonfinite.h"
 #include "get_feature.h"
+#include "interp.h"
 #include "get_feature_emxutil.h"
 
 /* Function Definitions */

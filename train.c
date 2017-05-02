@@ -5,6 +5,9 @@
 #include "matlab_import/get_feature_terminate.h"
 #include "matlab_import/get_feature_emxAPI.h"
 #include "matlab_import/get_feature_initialize.h"
+#include "matlab_import/interp_initialize.h"
+#include "matlab_import/interp_terminate.h"
+#include "matlab_import/interp.h"
 
 #include "FANN/fann_util.h"
 
@@ -14,7 +17,7 @@
 int main()
 {
     get_feature_initialize();
-
+    interp_initialize();
     int i,j;
     int*   seg_val; 
     double *data_fm  = (double*)malloc(sizeof(double)*_BUFFER*4);
@@ -56,4 +59,5 @@ int main()
     train_lv2_neural_network(td, i, ASC, _ASCEND_N_FEATURES, _ASC_LV2_SIZE, ASC_LV2_MODEL, ASC_LV2_FN); 
     train_lv2_neural_network(td, i, DSC, _DESCEND_N_FEATURES, _DSC_LV2_SIZE, DSC_LV2_MODEL, DSC_LV2_FN);
     get_feature_terminate();
+    interp_terminate();
 }
