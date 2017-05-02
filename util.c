@@ -191,7 +191,7 @@ MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, con
     for (i = 1; i < mo_status_num; i++)
         if (predict[i] > predict[max])
             max = i;
-    if (max < mo_status_num)
+    if (max < mo_status_num && predict[max] >= 0)
         return mo_status[max];
     else 
         return NONE;
