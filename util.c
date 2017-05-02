@@ -479,9 +479,3 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     *latestMotions_num = num_new_segments;
 }
 
-int findinterval(TrainingData file) {
-	int i = 0;
-	int j;
-	j = file.m_divider[i] - file.m_divider[i + 1];
-	return j; 
-}
