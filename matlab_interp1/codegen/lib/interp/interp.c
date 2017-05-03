@@ -2,7 +2,7 @@
  * File: interp.c
  *
  * MATLAB Coder version            : 2.6
- * C/C++ source code generated on  : 01-May-2017 17:55:34
+ * C/C++ source code generated on  : 02-May-2017 14:48:05
  */
 
 /* Include files */
@@ -28,6 +28,7 @@ void interp(const emxArray_real_T *x, const emxArray_real_T *y, int sample_rate,
   emxArray_real_T *b_y;
   int low_ip1;
   double delta1;
+  double delta2;
   int k;
   emxArray_real_T *c_y;
   emxArray_real_T *b_x;
@@ -46,14 +47,27 @@ void interp(const emxArray_real_T *x, const emxArray_real_T *y, int sample_rate,
   b_y->size[1] = nd2;
   emxEnsureCapacity((emxArray__common *)b_y, low_ip1, (int)sizeof(double));
   if (nd2 >= 1) {
-    b_y->data[nd2 - 1] = x->size[1];
+    b_y->data[nd2 - 1] = x->data[x->size[1] - 1];
     if (b_y->size[1] >= 2) {
-      b_y->data[0] = 1.0;
+      b_y->data[0] = x->data[0];
       if (b_y->size[1] >= 3) {
-        delta1 = ((double)x->size[1] - 1.0) / ((double)b_y->size[1] - 1.0);
-        low_ip1 = b_y->size[1];
-        for (k = 0; k <= low_ip1 - 3; k++) {
-          b_y->data[k + 1] = 1.0 + (1.0 + (double)k) * delta1;
+        if (((x->data[0] < 0.0) != (x->data[x->size[1] - 1] < 0.0)) && ((fabs
+              (x->data[0]) > 8.9884656743115785E+307) || (fabs(x->data[x->size[1]
+               - 1]) > 8.9884656743115785E+307))) {
+          delta1 = x->data[0] / ((double)b_y->size[1] - 1.0);
+          delta2 = x->data[x->size[1] - 1] / ((double)b_y->size[1] - 1.0);
+          low_ip1 = b_y->size[1];
+          for (k = 0; k <= low_ip1 - 3; k++) {
+            b_y->data[k + 1] = (x->data[0] + delta2 * (1.0 + (double)k)) -
+              delta1 * (1.0 + (double)k);
+          }
+        } else {
+          delta1 = (x->data[x->size[1] - 1] - x->data[0]) / ((double)b_y->size[1]
+            - 1.0);
+          low_ip1 = b_y->size[1];
+          for (k = 0; k <= low_ip1 - 3; k++) {
+            b_y->data[k + 1] = x->data[0] + (1.0 + (double)k) * delta1;
+          }
         }
       }
     }
@@ -126,8 +140,10 @@ void interp(const emxArray_real_T *x, const emxArray_real_T *y, int sample_rate,
         }
 
         for (k = 0; k + 1 <= b_y->size[1]; k++) {
-          if ((b_y->data[k] > b_x->data[b_x->size[1] - 1]) || (b_y->data[k] <
-               b_x->data[0])) {
+          if (rtIsNaN(b_y->data[k])) {
+            p->data[k] = rtNaN;
+          } else if ((b_y->data[k] > b_x->data[b_x->size[1] - 1]) || (b_y->
+                      data[k] < b_x->data[0])) {
           } else {
             nd2 = 1;
             low_ip1 = 2;

@@ -89,7 +89,7 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
     places features contiguously into f for the first level classification
 
 */
-void interp_wrapper(double* x, double* y, int size, int sample_rate)
+void interp_wrapper(double* x, double* y, int size, int sample_rate, double* result)
 {
     emxArray_real_T *m_x;
     emxArray_real_T *m_y;
@@ -102,6 +102,8 @@ void interp_wrapper(double* x, double* y, int size, int sample_rate)
 
     interp(m_x,m_y,sample_rate,m_result); 
     
+    if (result)
+        memcpy(result, m_result->data, sizeof(double)*sample_rate);
     emxDestroyArray_real_T(m_x); 
     emxDestroyArray_real_T(m_y);
     emxDestroyArray_real_T(m_result);
@@ -119,15 +121,6 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     *f_num = 0;
 
     n = data_buf_size-1;
-    int i;
-    double x[1000];
-    double y[1000];
-    for (i = 1;i < 1001; i++)
-    {
-        x[i-1]= i;
-        y[i-1] = i;
-    }
-    interp_wrapper(x,y,1000,100);
     double* gyro_z = (double*)malloc(sizeof(double)*n);
     for (k = 0; k < n; k++){
         for (j = 1 ; j < 8; j++)
@@ -217,6 +210,28 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     return _TRUE;
 }
 
+void resample_data(double* raw_data, int* divider, int divider_size, double* resample_data)
+{
+    int i, j, k;
+    double* input_data = (double*)malloc(sizeof(double)*_BUFFER),
+    *t = (double*)malloc(sizeof(double)*_BUFFER);
+    for (i = 0; i < divider_size-1; i++) {
+        for (k = divider[i]; k<=divider[i+1];k++){
+            t[k-divider[i]] = raw_data[k*8+1];
+        }
+        for (j = 2; j < 8; j++) {
+            for (k = divider[i]; k <= divider[i+1]; k++) {
+                input_data[k-divider[i]] = raw_data[k*8+j];
+            }
+            interp_wrapper(t,input_data, divider[i+1]-divider[i]+1, 
+                           _RESAMPLE_SIZE, 
+                           resample_data + (i*6+j-2)*_RESAMPLE_SIZE);
+        }
+    }
+    free(input_data);
+    free(t);
+} 
+
 MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename, int cl_type)
 {
     int i, max;
@@ -232,7 +247,7 @@ MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int
     }
     if (cl_type == _RANDOM_FOREST){
         predict = (double*)malloc(sizeof(double));
-        exec_random_forest(features, 1, _RESAMPLE_SIZE, filename, predict);
+        exec_random_forest(features, 1, 6*_RESAMPLE_SIZE, filename, predict);
 
         max = (int)predict[0];
     }
@@ -305,11 +320,13 @@ void mo_training(double* all_r, double* data_fm, size_t n)
     }
 
     // train ASC_DSC
-    create_cl(all_r, _RESAMPLE_SIZE, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, _MASK_LV1, ASC_DSC_FN, _RANDOM_FOREST);
+    create_cl(all_r, _RESAMPLE_SIZE*6, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, _MASK_LV1, ASC_DSC_FN, _RANDOM_FOREST);
     // train WALK
-    create_cl(all_r, _RESAMPLE_SIZE, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, _MASK_LV1, WALK_RUN_FN, _RANDOM_FOREST); 
+    create_cl(all_r, _RESAMPLE_SIZE*6, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, _MASK_LV1, WALK_RUN_FN, _RANDOM_FOREST); 
     // train FIRST_LV_ALL
-    create_cl(all_r, _RESAMPLE_SIZE, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, _MASK_LV1, FIRST_LV_ALL_FN, _RANDOM_FOREST);
+    create_cl(all_r, _RESAMPLE_SIZE*6, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, _MASK_LV1, FIRST_LV_ALL_FN, _RANDOM_FOREST);
+    free(features);
+    free(mo_types);
 }
 
 
@@ -514,6 +531,7 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     */
     //int num_segments = (prev_num_segments > 0) ? ((int)div_num - 2) : ((int)div_num - 1); 
     MoType segment_motion[_TOTAL_MOD_COUNT];
+    double resample[6*_RESAMPLE_SIZE];
     int num_segments = (int)div_num - 1;
     int num_new_segments = num_segments - prev_num_segments;
     for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
@@ -521,11 +539,11 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
         int end_divider = div[i+1];
         int length_of_segment = end_divider - start_divider + 1;
         //1 because single pointer
-        mo_classfication(r+i*_RESAMPLE_SIZE, 1, segment_motion);
-
+        resample_data(correct_data_buf, div+i, 2, resample); 
+        mo_classfication(resample, 1, segment_motion);
         // check _WALK_OFFSET
-        if(segment_motion[_WALK_RUN_OFFSET] != 0 ||
-           segment_motion[_ASC_DSC_OFFSET] != 0) {
+        if((segment_motion[_WALK_RUN_OFFSET] != 0) ||
+           (segment_motion[_ASC_DSC_OFFSET] != 0)) {
             // if it is walk
             double *dp = (double *)malloc(sizeof(double)*(length_of_segment));
             for(int k = 0; k < length_of_segment; k++) {
@@ -537,10 +555,13 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
 
             if (segment_motion[_ASC_DSC_OFFSET] != 0)
                 segment_motion[_ASC_DSC_MOD_OFFSET] = test_for_motion(segment_motion[_ASC_DSC_OFFSET], dp, length_of_segment, &f[_MATLAB_OFFSET_FIRST_LEVEL*i]);
-        
+            free(dp); 
         }
         memcpy(latestMotions+j*_TOTAL_MOD_COUNT, segment_motion, sizeof(MoType)*_TOTAL_MOD_COUNT);
-  }
+    }
     prev_num_segments = num_segments > 0 ? num_segments : prev_num_segments;
     *latestMotions_num = num_new_segments;
+    free(f);
+    free(div);
+    free(r);
 }

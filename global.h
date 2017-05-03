@@ -11,6 +11,8 @@
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
+#define _RESAMPLE_SIZE 200
+
 #define _TIMESTAMP_BEFORE_OFFSET    0
 #define _TIMESTAMP_AFTER_OFFSET     1
 #define _ACCEL_X_OFFSET 2
@@ -32,7 +34,6 @@
 #define _RANDOM_FOREST  0
 #define _NEURAL_NETWORK 1
 
-#define _RESAMPLE_SIZE  200
 
 static const char * MO_NEURAL_NETWORK = "mo_neural_network.net";
 static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
@@ -132,7 +133,7 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 #define _MASK_LV1 0xFFFF0
 #define _MASK_LV2 0XFFFFF
 
-#define _RANDOM_FOREST_NTREE    150
+#define _RANDOM_FOREST_NTREE    100
 #define _RANDOM_FOREST_THREAD   5
 
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC};

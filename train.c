@@ -31,7 +31,7 @@ int main()
     double *all_r = (double*)malloc(sizeof(double)*_RESAMPLE_SIZE*_SBUFFER);
     TrainingData td[_SBUFFER];
     i = 0;
-    
+    double *resample = (double*)malloc(sizeof(double)*_RESAMPLE_SIZE*6*_BUFFER); 
     while (i<_TRAIN_DATA_SIZE)
     {
         fprintf(stderr, "%s\n", TRAINING_DATASET[i]);
@@ -39,6 +39,7 @@ int main()
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);
         segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i],r);
+        resample_data(data_val, seg_val, seg_num, resample+_RESAMPLE_SIZE*6*train_num); 
         memcpy(&data_fm[train_num*_MATLAB_OFFSET_FIRST_LEVEL],f_m,sizeof(double)*n*_MATLAB_OFFSET_FIRST_LEVEL);
         memcpy(all_r+_RESAMPLE_SIZE*train_num,r, sizeof(double)*n*_RESAMPLE_SIZE);
         train_num += n;
@@ -53,11 +54,21 @@ int main()
         td[i].m_1st_feature = f_m;
         i++;
     }
-    mo_training(all_r, data_fm, train_num);
-    train_lv2_neural_network(td, i, WALK, _WALK_N_FEATURES, _WALK_LV2_SIZE, WALK_LV2_MODEL, WALK_NEURAL_NETWORK);
-    train_lv2_neural_network(td, i, RUN, _RUN_N_FEATURES, _RUN_LV2_SIZE, RUN_LV2_MODEL, RUN_LV2_FN);
-    train_lv2_neural_network(td, i, ASC, _ASCEND_N_FEATURES, _ASC_LV2_SIZE, ASC_LV2_MODEL, ASC_LV2_FN); 
-    train_lv2_neural_network(td, i, DSC, _DESCEND_N_FEATURES, _DSC_LV2_SIZE, DSC_LV2_MODEL, DSC_LV2_FN);
+    int k;
+    for ( i = 0; i < train_num; i++)
+    {
+        fprintf(stderr,"seg %d\n",i);
+        for (j = 0; j <6; j++) {
+            fprintf(stderr,"axis %d-%d\n",i,j);
+            for (k = 0; k < 200; k++)
+                fprintf(stderr,"%lf\n",resample[i*1200+j*200+k]);
+        }
+    }
+    mo_training(resample, data_fm, train_num);
+    train_lv2_neural_network(td, _TRAIN_DATA_SIZE, WALK, _WALK_N_FEATURES, _WALK_LV2_SIZE, WALK_LV2_MODEL, WALK_NEURAL_NETWORK);
+    train_lv2_neural_network(td, _TRAIN_DATA_SIZE, RUN, _RUN_N_FEATURES, _RUN_LV2_SIZE, RUN_LV2_MODEL, RUN_LV2_FN);
+    train_lv2_neural_network(td, _TRAIN_DATA_SIZE, ASC, _ASCEND_N_FEATURES, _ASC_LV2_SIZE, ASC_LV2_MODEL, ASC_LV2_FN); 
+    train_lv2_neural_network(td, _TRAIN_DATA_SIZE, DSC, _DESCEND_N_FEATURES, _DSC_LV2_SIZE, DSC_LV2_MODEL, DSC_LV2_FN);
     get_feature_terminate();
     interp_terminate();
 }
