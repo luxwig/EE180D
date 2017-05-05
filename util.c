@@ -305,11 +305,11 @@ void train_lv2_neural_network(TrainingData all_file_data[], int nFiles, MoType m
             input[n*input_size+3] = w_mean(convert_m_data + start , period);
             input[n*input_size+4] = w_RMS_seg_double(convert_m_data + start, period);
 
-
             input[n*input_size+5] = all_file_data[i].m_1st_feature[0+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
             input[n*input_size+6] = all_file_data[i].m_1st_feature[1+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
             input[n*input_size+7] = all_file_data[i].m_1st_feature[2+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
             input[n*input_size+8] = all_file_data[i].m_1st_feature[3+(j-1)*_MATLAB_OFFSET_FIRST_LEVEL];
+            
             
             mo_types[n] = all_file_data[i].m_type; 
             n++;
@@ -453,8 +453,11 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
         int start_divider = div[i];
         int end_divider = div[i+1];
+        int second_end_divider = div[i+2];
+
         int length_of_segment = end_divider - start_divider + 1;
-        //1 because single pointer
+        int length_of_two_segments = second_end_divider - start_divider + 1;
+
         mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
 
         // check _WALK_OFFSET
