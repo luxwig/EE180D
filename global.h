@@ -19,6 +19,7 @@
 #define _GYRO_Y_OFFSET  6
 #define _GYRO_Z_OFFSET  7
 
+
 //walk neural network and run neural network use same number of features
 #define _WALK_N_FEATURES    (5+4) //second level + first level
 #define _RUN_N_FEATURES     (5+4) //second level +  first level 
