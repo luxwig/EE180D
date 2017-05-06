@@ -10,7 +10,7 @@
 #include "matlab_import/rtwtypes.h"
 #include "matlab_import/get_feature_types.h"
 #include "statistics.h"
-
+#include <liquid/liquid.h>
 #define _BUFFER 65536
 #define _SBUFFER 256
 #define RANDOM_BUFFER_MULTIPLIER 8
@@ -56,6 +56,24 @@ MoType test_for_motion(MoType motion, double *segment, int length, double* first
 
 
 void train_lv2_neural_network(TrainingData all_file_data[], int nFiles, MoType mo_type_lv1,int input_size, int output_size, const MoType* model , const char* fn);
+
+
+
+//xaccel_ygyro function 
+#define GRAVITY_OFFSET 1.085 
+
+
+#define LP_FILTER_ORDER 2 //between 1-5
+#define CUTOFF_FREQ_L 5.0f //Hz
+#define CUTOFF_FREQ_H 0.1f //Hz
+#define SAMPLE_FREQ 10000 //Hz
+
+
+double get_gravity_offset(double x_accel_data[], int iterations);
+void eliminate_offset( double *x_accel_data, int segment_length, double gravity_offset );
+void y_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max);
+double y_gyro_features_1(const double* segment, int begin, int end);
+void get_ygyro(const double* data_buf, const int data_buf_size, double *y_gyro);
 
 #endif
 

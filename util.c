@@ -8,6 +8,7 @@
 
 #define RUN_N_OUTPUTS _RUN_LV2_SIZE
 
+
 #include "global.h"
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
@@ -17,10 +18,11 @@
 #include "matlab_import/get_feature_initialize.h"
 #include "FANN/fann_util.h"
 
+
 #include <stdio.h>
 #include <stdlib.h>
 
-//returns title of neural network associated with the specific motion 
+//returns title of neural network associated with   the specific motion 
 static const char * get_neural_network_name(MoType motion) {
     switch(motion) {
         case RUN:
@@ -160,8 +162,20 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"%d,",(int)(pos->data[j]));
     }
     fprintf(stderr,"\n");
-    
-    
+   
+    //getting y gyro data and extracting features 
+    double* y_gyro = (double*)malloc(sizeof(double)*_BUFFER*2);
+    double* abs_max = (double*)malloc(sizeof(double));
+    double* rel_min = (double*)malloc(sizeof(double));
+    double* rel_max = (double*)malloc(sizeof(double));
+    get_ygyro(data_buf, data_buf_size, y_gyro); //data_val is complete //data num is size
+    int x; 
+    int iterate = *seg_num;
+    for(x=0; x < iterate - 1; x++){
+    int length = seg[x+1] - seg[x];
+     y_gyro_features_2(data_buf, length, seg[x], seg[x+1],abs_max,rel_min, rel_max);
+    }
+    //const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype
     
               //adding features to array 
     int seg_iterator = 0;
@@ -186,7 +200,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
     
-    exit(1); //testing 
+    //exit(1); //testing 
     return _TRUE;
 }
 
@@ -495,3 +509,77 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     *latestMotions_num = num_new_segments;
 }
 
+//////////////////////////////xaccel_ygyro functions ///////////////////////
+
+void get_ygyro(const double* data_val, const int data_buf_size, double *y_gyro) //data_val is complete //data num is size
+{
+	int j;
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+   y_gyro[j] = data_val[j*_DATA_ACQ_SIZE + _GYRO_Y_OFFSET];
+}
+
+
+//individual will need to stand still to eliminate offset of gravity
+//double or float, whatever it is
+double get_gravity_offset( double x_accel_data[], int iterations) {
+int total = 0;
+int x = 0;
+while( x < iterations)
+{
+	total += x_accel_data[x];
+	x++;
+}
+return total/x; 
+}
+
+// takes an xaccel segment and eliminates offset
+void eliminate_offset( double *x_accel_data, int segment_length, double gravity_offset ) {
+	int i, j; 
+	for (i =0; i < segment_length; i++){
+		x_accel_data[i] += gravity_offset;  //should be -= if using real time and not macro 
+	}
+}
+double y_gyro_features_1( const double* segment, int begin, int end){
+	return w_minima_double_seg(segment, begin, end);
+}
+
+void y_gyro_features_2( const double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max)
+{
+	//find absolute max
+    int c, index;
+    double max;
+    max = segment[begin];
+    index = begin;
+    for (c = index; c < end; c++) {
+        if (segment[c] > max) {
+            index = c;
+            max = segment[c];
+        }
+    }
+	*abs_max = segment[index]; 
+	
+	//start at least 20 points away for next maximum, could be 25 or 50 
+	//or find a better way to do this 
+	int index_2 = index +=20; 
+	max = 0;
+	for( c = index_2; c < end; c++) {
+		if(segment[c] > max) {
+			index_2 = c; 
+			max = segment[c]; 
+		}
+	}
+	*rel_max = segment[index_2];
+	
+	//find minimum between them 
+	*rel_min = w_minima_double_seg(segment, index, index_2);
+}
+
+void create_ygyro_feature_array(double* ygyro_data, double* ygyro_features, int* seg_val, size_t seg_num)
+{
+	double y_gyro_abs_min;
+	int i;
+	for (i = 0; i < seg_num; i++)
+	{
+		y_gyro_abs_min = y_gyro_features_1(ygyro_data, seg_val[i], seg_val[i + 1]);
+	}
+}

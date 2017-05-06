@@ -3,8 +3,8 @@
 void get_ygyro(const double* data_val, const int data_buf_size, double *y_gyro) //data_val is complete //data num is size
 {
 	int j;
-	for (j = 0; j < data_buf_size; j++)
-		memcpy(y_gyro + j, data_val + j * _DATA_ACQ_SIZE + _GYRO_Y_OFFSET, sizeof(double));
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+   y_gyro[j] = data_val[j*_DATA_ACQ_SIZE + _GYRO_Y_OFFSET];
 }
 
 
@@ -57,11 +57,11 @@ void execute_highpass_filter( double input[], int segment_length, double* filter
 	iirfilt_crcf_execute(q, input, filtered_data); 
 	iirfilt_crcf_destroy(q); 													
 }
-double y_gyro_features_1( double* segment, int begin, int end){
+double y_gyro_features_1( const double* segment, int begin, int end){
 	return w_minima_double_seg(segment, begin, end);
 }
 
-void y_gyro_features_2( double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max)
+void y_gyro_features_2( const double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max)
 {
 	//find absolute max
     int c, index;

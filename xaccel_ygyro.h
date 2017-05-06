@@ -18,8 +18,8 @@ double get_gravity_offset(double x_accel_data[], int iterations);
 void eliminate_offset( double *x_accel_data, int segment_length, double gravity_offset );
 void execute_lowpass_filter( double x_accel_data[], int segment_length, double* filtered_data);
 void execute_highpass_filter(double input[], int segment_length, double* filtered_data);
-void y_gyro_features_2( double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max);
-double y_gyro_features_1( double* segment, int begin, int end);
+void y_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* rel_min, double* rel_max);
+double y_gyro_features_1(const double* segment, int begin, int end);
 void get_ygyro(const double* data_buf, const int data_buf_size, double *y_gyro);
 
 #endif
