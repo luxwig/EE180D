@@ -244,7 +244,7 @@ void mo_training(double* data_fm, size_t n)
         memcpy(features+_FIRST_LEVEL_FEATURES*i, 
                 data_fm+_MATLAB_OFFSET_FIRST_LEVEL*i, 
                 sizeof(double)*_FIRST_LEVEL_FEATURES);
-        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+_MATLAB_OFFSET_FIRST_LEVEL-1];
+        mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+_MATLAB_OFFSET_FIRST_LEVEL-1]; //not sure if mo_type will be right
     }
 
     // train ASC_DSC
@@ -252,7 +252,9 @@ void mo_training(double* data_fm, size_t n)
     // train WALK
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
     // train TURNR_TURNL
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, _MASK_LV1, TURNR_TURNL_FN);
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, _MASK_LV1, TURNR_TURNL_FN);   //++
+    //train JUMP
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN);  
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,  _MASK_LV1, FIRST_LV_ALL_FN);
     
