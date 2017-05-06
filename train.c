@@ -37,7 +37,7 @@ int main(int argc, const char * const argv[])
         train_num += n;
         data_buf = (double*)malloc(sizeof(double)*_BUFFER*2);
         for (j = 0; j < data_num; j++)
-            memcpy(data_buf+j*7, data_val+j*8+1, sizeof(double)*8);
+            memcpy(data_buf+j*7, data_val+j*8+1, sizeof(double)*7);
         td[i].m_data        = data_buf;
         td[i].m_num_data    = data_num;
         td[i].m_divider     = seg_val;

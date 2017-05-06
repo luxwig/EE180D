@@ -8,6 +8,7 @@
 
 #define RUN_N_OUTPUTS _RUN_LV2_SIZE
 
+#include "assert.h"
 #include "global.h"
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
@@ -175,6 +176,8 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"\n"); 
         (*f_num)++;
     }
+    fprintf(stderr, "%zu\t%zu\n",*f_num,*seg_num);
+    assert(*f_num+1==*seg_num);
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
@@ -453,10 +456,10 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
         int start_divider = div[i];
         int end_divider = div[i+1];
-        int second_end_divider = div[i+2];
+        // int second_end_divider = div[i+2];
 
         int length_of_segment = end_divider - start_divider + 1;
-        int length_of_two_segments = second_end_divider - start_divider + 1;
+        // int length_of_two_segments = second_end_divider - start_divider + 1;
 
         mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
 

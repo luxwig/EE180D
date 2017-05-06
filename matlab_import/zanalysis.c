@@ -14,7 +14,7 @@
 #include "findpeaks.h"
 
 /* Function Definitions */
-void zanalysis(const emxArray_real_T *z_a, emxArray_real_T *val, emxArray_real_T
+void zanalysis(double th, const emxArray_real_T *z_a, emxArray_real_T *val, emxArray_real_T
                *pos)
 {
   int i5;
@@ -74,11 +74,10 @@ void zanalysis(const emxArray_real_T *z_a, emxArray_real_T *val, emxArray_real_T
       c_z_a[i5] = -z_a->data[i + z_a->size[0] * i5];
     }
 
-    b_findpeaks(50, c_z_a, tp_pos, p_pos);
+    b_findpeaks(th, c_z_a, tp_pos, p_pos);
     if (tp_pos->size[1] < 2) 
     {
-        i++;
-        continue;
+        b_findpeaks(1, c_z_a, tp_pos, p_pos);
     }
     if (tp_pos->size[1] >= 2) {
       i5 = qs->size[0] * qs->size[1];
