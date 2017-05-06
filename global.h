@@ -6,7 +6,7 @@
 #define _TRAIN_DATA_SIZE 15
 #define _TEST_DATA_SIZE  13
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       5
+#define _FIRST_LEVEL_FEATURES       6
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -25,6 +25,7 @@
 #define _RUN_N_FEATURES     (5+4) //second level +  first level 
 #define _ASCEND_N_FEATURES  (5+4) //second level
 #define _DESCEND_N_FEATURES (5+4) //second level
+
 
 #define _TRUE   1
 #define _FALSE  0
@@ -119,7 +120,8 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 
 #define _ASC_DSC_SIZE       3
 #define _WALK_RUN_SIZE      3
-#define _1ST_LV_ALL_SIZE    4
+#define _TURNR_TURNL_SIZE   3 //++
+#define _1ST_LV_ALL_SIZE    6
 #define _WALK_LV2_SIZE      4
 #define _RUN_LV2_SIZE       3
 #define _ASC_LV2_SIZE       2

@@ -86,7 +86,7 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
 
 */
 
-int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype)
+int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype) //seg_num is number of dividers, not number of seg
 {
     int j, k, n;
     double* data_r = (double*)malloc(sizeof(double)*_BUFFER*2);
@@ -160,6 +160,10 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"%d,",(int)(pos->data[j]));
     }
     fprintf(stderr,"\n");
+    
+    
+    
+              //adding features to array 
     int seg_iterator = 0;
     if (features->size[0] == 0 || features->size[1] == 0)
         return _FALSE;
@@ -169,7 +173,9 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         //use seg array to get length of interval //can we make this the interval length? 
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator];
 	seg_iterator++;
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = fntype;
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = 4;
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = fntype;
+        
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
         fprintf(stderr,"\n"); 
@@ -179,6 +185,8 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
+    
+    exit(1); //testing 
     return _TRUE;
 }
 
@@ -243,8 +251,11 @@ void mo_training(double* data_fm, size_t n)
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _MASK_LV1, ASC_DSC_FN);
     // train WALK
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
+    // train TURNR_TURNL
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, _MASK_LV1, TURNR_TURNL_FN);
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,  _MASK_LV1, FIRST_LV_ALL_FN);
+    
 }
 
 
