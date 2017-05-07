@@ -4,7 +4,7 @@
 #define _LBUFFER    1048576
 #define _BUFFER     65536
 #define _SBUFFER    256
-#define _TRAIN_DATA_SIZE 22
+#define _TRAIN_DATA_SIZE 23
 #define _TEST_DATA_SIZE  13
 #define _DATA_ACQ_SIZE   8
 #define _FIRST_LEVEL_FEATURES       5
@@ -37,7 +37,8 @@
 
 static const char * MO_NEURAL_NETWORK = "mo_neural_network.net";
 static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
-                        "data/WALK/ludwig/1.csv",  
+                         "data/rest.csv",
+                         "data/WALK/ludwig/1.csv",  
                          "data/WALK/ludwig/2.csv",
                          "data/WALK/ludwig/3.csv",
                          "data/WALK/ludwig/4.csv",
@@ -95,6 +96,7 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _DSC2  0x222
 #define _TL    0x310
 #define _TR    0x320
+#define _REST  0x400
 #define _NONE  0x000
 
 #define _TEST  0xFF0
@@ -104,12 +106,13 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _ASC_DSC_OFFSET         0  // offset for 1lv ASC_DSC     mod in result 
 #define _WALK_RUN_OFFSET        1  // offset for 1lv WALK_RUN    mod in result
 #define _TL_TR_OFFSET           2
-#define _1ST_LV_ALL_OFFSET      3  // offset for 1lv combime     mod in result
-#define _WALK_RUN_MOD_OFFSET    4  // offset for 2lv WALK_RUN    mod in result
-#define _ASC_DSC_MOD_OFFSET     5  // offset for 2lv ASC_DSC     mod in result
+#define _REST_OFFSET            3
+#define _1ST_LV_ALL_OFFSET      4  // offset for 1lv combime     mod in result
+#define _WALK_RUN_MOD_OFFSET    5  // offset for 2lv WALK_RUN    mod in result
+#define _ASC_DSC_MOD_OFFSET     6  // offset for 2lv ASC_DSC     mod in result
 
-#define _FIRST_LEVEL_MOD_COUNT  4  // total 1   lv mod count
-#define _TOTAL_MOD_COUNT        6  // total 1+2 lv mod count
+#define _FIRST_LEVEL_MOD_COUNT  5  // total 1   lv mod count
+#define _TOTAL_MOD_COUNT        7  // total 1+2 lv mod count
 
 enum MoType_enum { TRAINING = _TRAINING,
                    WALK = _WALK, 
@@ -123,18 +126,20 @@ enum MoType_enum { TRAINING = _TRAINING,
                    TL = _TL,
                    TR = _TR,
                    TEST = _TEST,
+                   REST = _REST,
                    NONE = _NONE};
 
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC1, ASC1, ASC2, ASC2,DSC, DSC, DSC, DSC1, DSC1, DSC2, DSC2, TL, TR};
+static const MoType fntype[] = {REST, WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC1, ASC1, ASC2, ASC2,DSC, DSC, DSC, DSC1, DSC1, DSC2, DSC2, TL, TR};
 
 
 #define _ASC_DSC_SIZE       3
 #define _WALK_RUN_SIZE      3
 #define _TL_TR_SIZE         3
-#define _1ST_LV_ALL_SIZE    5
+#define _REST_SIZE          2
+#define _1ST_LV_ALL_SIZE    6
 #define _WALK_LV2_SIZE      4
 #define _RUN_LV2_SIZE       3
 #define _ASC_LV2_SIZE       2
@@ -149,6 +154,7 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC, NONE};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {WALK, RUN, NONE};
 static const MoType TL_TR_MODEL[_TL_TR_SIZE] =              {TL, TR, NONE};
+static const MoType REST_MODEL[_REST_SIZE]=                 {REST, NONE};
 static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN, TL};
 static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] =          {RUN1, RUN2, RUN3};
 static const MoType WALK_LV2_MODEL[_WALK_LV2_SIZE] =        {WALK1, WALK2, WALK3, WALK4};
