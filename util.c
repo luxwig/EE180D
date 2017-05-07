@@ -232,7 +232,7 @@ void resample_data(double* raw_data, int* divider, int divider_size, double* res
     free(t);
 } 
 
-MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int flag_ind, const char* filename, int cl_type)
+MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, const char* filename, int cl_type)
 {
     int i, max;
     double* predict = NULL;
@@ -241,7 +241,7 @@ MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int
     
         test_from_file_double(features, filename, 1, predict);
         max = 0;
-        for (i = 1; i < mo_status_num+flag_ind; i++)
+    for (i = 1; i < mo_status_num; i++)
             if (predict[i] > predict[max])
                 max = i;
     }
@@ -255,8 +255,7 @@ MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, int
     if (max < mo_status_num)
         return mo_status[max];
     else 
-        return 0;
-
+        return NONE;
 }
 
 void create_cl(double* features, int features_num, int seg_num, MoType* mo_types, const MoType* mo_status, int mo_status_num, int flag_ind, int mask, const char* filename, int cl_type)
@@ -323,6 +322,9 @@ void mo_training(double* all_r, double* data_fm, size_t n)
     create_cl(all_r, _RESAMPLE_SIZE*6, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, _MASK_LV1, ASC_DSC_FN, _RANDOM_FOREST);
     // train WALK
     create_cl(all_r, _RESAMPLE_SIZE*6, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, _MASK_LV1, WALK_RUN_FN, _RANDOM_FOREST); 
+    // train TL_TR
+    create_cl(all_r, _RESAMPLE_SIZE*6, n, mo_types, TL_TR_MODEL, _TL_TR_SIZE, _TRUE, _MASK_LV1, TL_TR_FN, _RANDOM_FOREST); 
+
     // train FIRST_LV_ALL
     create_cl(all_r, _RESAMPLE_SIZE*6, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE, _MASK_LV1, FIRST_LV_ALL_FN, _RANDOM_FOREST);
     free(features);
@@ -332,16 +334,23 @@ void mo_training(double* all_r, double* data_fm, size_t n)
 
 void mo_classfication(double* data_fm, size_t n, MoType* result)
 {
+    int i;
+    for (i = 0; i < _TOTAL_MOD_COUNT; i++)
+        result[i] = TRAINING;
     int flag = _FALSE;
     flag |= 
-        ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, _TRUE, ASC_DSC_FN, _RANDOM_FOREST));
+        ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, ASC_DSC_FN, _RANDOM_FOREST));
     
     flag |= 
-        ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, _TRUE, WALK_RUN_FN, _RANDOM_FOREST));
+        ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, WALK_RUN_FN, _RANDOM_FOREST));
     
+    flag |=
+        ( result[_TL_TR_OFFSET] = test_cl(data_fm, TL_TR_MODEL, _TL_TR_SIZE, TL_TR_FN, _RANDOM_FOREST));
+    
+
     if (!flag) {
         result[_1ST_LV_ALL_OFFSET] =
-            test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE, _FALSE,
+            test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,
                 FIRST_LV_ALL_FN, _RANDOM_FOREST);
         switch ( (result[_1ST_LV_ALL_OFFSET] & 0xFF00)>>8) {
             case 1 : 
