@@ -4,7 +4,7 @@
 #define _LBUFFER    1048576
 #define _BUFFER     65536
 #define _SBUFFER    256
-#define _TRAIN_DATA_SIZE 23
+#define _TRAIN_DATA_SIZE 25
 #define _TEST_DATA_SIZE  13
 #define _DATA_ACQ_SIZE   8
 #define _FIRST_LEVEL_FEATURES       5
@@ -60,8 +60,9 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/DSC_SPEED/dsc_2_1.csv",
                          "data/DSC_SPEED/dsc_2_2.csv",
                          "data/TL/turn_left_1.csv" ,
-                         //"data/TR/turn_right_1.csv", 
-                   };
+                         "data/TR/turn_right_2.csv", 
+                         "data/TR/turn_right_4.csv",                   
+};
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
                          "data/WALK/ludwig/1_t.csv",  
@@ -132,7 +133,7 @@ enum MoType_enum { TRAINING = _TRAINING,
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {REST, WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC1, ASC1, ASC2, ASC2,DSC, DSC, DSC, DSC1, DSC1, DSC2, DSC2, TL, TR};
+static const MoType fntype[] = {REST, WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC, ASC, ASC, ASC1, ASC1, ASC2, ASC2,DSC, DSC, DSC, DSC1, DSC1, DSC2, DSC2, TL, TR, TR};
 
 
 #define _ASC_DSC_SIZE       3
