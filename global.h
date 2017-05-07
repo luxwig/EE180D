@@ -9,7 +9,7 @@
 #define _TRAIN_DATA_SIZE 16   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       12
+#define _FIRST_LEVEL_FEATURES       12 //change to 17
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -95,7 +95,7 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _DSC   0x220
 #define _DSC1  0x221
 #define _DSC2  0x222
-#define _TURNL 0x300
+  #define _TURNL 0x300
 #define _TURNR 0x310
 #define _JUMP  0x400
 #define _NONE  0x000

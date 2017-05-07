@@ -86,6 +86,7 @@ void create_zaccel_feature_array(int i, double* zaccel_features, double* abs_max
 //xgyro_functions
 void get_xgyro(const double* data_val, const int data_buf_size, double *x_gyro);
 void x_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt);
+double x_gyro_features_1( const double* segment, int begin, int end);
 void create_xgyro_feature_array(int i, double* xgyro_features, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt);
 #endif
 

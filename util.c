@@ -218,6 +218,24 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     }
     //zaccel features
       
+    double* x_gyro = (double*)malloc(sizeof(double)*data_buf_size);
+    double* abs_max_x = (double*)malloc(sizeof(double));
+    double* x_gyro_at_peak = (double*)malloc(sizeof(double));
+    double* x_gyro_mean = (double*)malloc(sizeof(double));
+    double* x_gyro_rms = (double*)malloc(sizeof(double));
+    double* x_gyro_kurt = (double*)malloc(sizeof(double)); 
+    double* xgyro_features = (double*)malloc(sizeof(double)*_FBUFFER);  
+    get_xgyro(data_buf, data_buf_size, x_gyro);
+    
+    iterate = *seg_num;
+    for(x=0; x < iterate - 1; x++){
+      int length = seg[x+1] - seg[x];
+      x_gyro_features_2(x_gyro, length, seg[x], seg[x+1],abs_max_x,x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
+      create_xgyro_feature_array(x, xgyro_features,abs_max_x, x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
+    }    
+      //x_gyro features 
+    
+    
             
              //adding features to array 
     int seg_iterator = 0;
@@ -236,8 +254,14 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9] = zaccel_features[*f_num*_ZACCEL_N_FEATURES];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+1];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+11] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+2];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = fntype;
-        
+        /*f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = xgyro_features[*f_num*_XGYRO_N_FEATURES];
+        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
+        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
+        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
+        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
+        */
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = fntype;          //change to 17
+         
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
         fprintf(stderr,"\n"); 
@@ -344,6 +368,9 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
     
     flag |= 
         ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, WALK_RUN_FN));
+         
+    flag |=
+        ( result[_TURNR_TURNL_MOD_OFFSET] = test_cl(data_fm, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, TURNR_TURNL_FN));
     
     if (!flag) {
         result[_1ST_LV_ALL_OFFSET] =
@@ -673,6 +700,10 @@ void z_accel_features_2(const double* segment, int segment_length, int begin, in
 
 double z_accel_features_1( const double* segment, int begin, int end){
 	return w_minima_double_seg((double*)segment, begin, end);
+}
+
+double x_gyro_features_1( const double* segment, int begin, int end){
+  return w_minima_double_seg((double*)segment, begin, end);
 }
 
 void create_zaccel_feature_array(int i, double* zaccel_features, double* abs_max, double* z_accel_at_peak, double* abs_min)
