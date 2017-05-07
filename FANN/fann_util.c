@@ -40,8 +40,8 @@ void train_from_data_float(
         struct fann** ann)
 {
     const unsigned int num_layers = 3;
-    //const unsigned int num_neurons_hidden = num_input+num_output+(num_input+num_output);
-    const unsigned int num_neurons_hidden = (num_input+num_output)/2;          //++ testing
+    const unsigned int num_neurons_hidden = num_input+num_output+(num_input+num_output);
+    //const unsigned int num_neurons_hidden = (num_input+num_output)/2;          //++ testing
     const float desired_error = (const float) 0.001;
     const unsigned int max_epochs = 50000;
     const unsigned int epochs_between_reports = 1000;

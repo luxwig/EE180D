@@ -3,7 +3,10 @@
 
 #define _BUFFER     65536
 #define _SBUFFER    256
-#define _TRAIN_DATA_SIZE 17   //change to increment amoutn of data
+#define _FBUFFER    1000
+#define _FMBUFFER   500
+#define _ALLFBUFFER 10000
+#define _TRAIN_DATA_SIZE 16   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
 #define _FIRST_LEVEL_FEATURES       9
@@ -26,6 +29,8 @@
 #define _ASCEND_N_FEATURES  (5+4) //second level
 #define _DESCEND_N_FEATURES (5+4) //second level
 #define _YGYRO_N_FEATURES 4 //first level 
+#define _ZACCEL_N_FEATURES 3 //first level 
+#define _XGYRO_N_FEATURES 5 //first level
 
 #define _TRUE   1
 #define _FALSE  0
@@ -53,7 +58,7 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/DSC_SPEED/dsc_2_1.csv",
                          "data/DSC_SPEED/dsc_2_2.csv",
                          "data/TL/turn_left_1.csv",
-                         "data/TR/turn_right_1.csv"
+                       //  "data/TR/turn_right_1.csv"
                    };
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={

@@ -172,7 +172,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     double* abs_max = (double*)malloc(sizeof(double));
     double* rel_min = (double*)malloc(sizeof(double));
     double* rel_max = (double*)malloc(sizeof(double));
-    double* ygyro_features = (double*)malloc(sizeof(double)*_BUFFER*2);
+    double* ygyro_features = (double*)malloc(sizeof(double)*_FBUFFER);
     
     get_ygyro(data_buf, data_buf_size, y_gyro); //data_val is complete //data num is size
     
@@ -194,13 +194,13 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
       create_ygyro_feature_array(x, ygyro_features,abs_max, rel_min, rel_max);
     }
       
-      fprintf(stderr," TESTING2 \n");
-     for (j = 0; j < *seg_num *_YGYRO_N_FEATURES - 4; j+=4)
+     /*  fprintf(stderr," TESTING2 \n");
+      for (j = 0; j < *seg_num *_YGYRO_N_FEATURES - 4; j+=4)
     {
         fprintf(stderr,"%f, %f, %f, %f",ygyro_features[j], ygyro_features[j+1], ygyro_features[j+2], ygyro_features[j+3]);                          //CORRECT
         fprintf(stderr,"\n");
     }
-    fprintf(stderr,"number of features: %d \n", j);
+    fprintf(stderr,"number of features: %d \n", j); */
         
             
              //adding features to array 
@@ -224,18 +224,21 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"\n"); 
         (*f_num)++;
     }
+      
     fprintf(stderr, "%zu\t%zu\n",*f_num,*seg_num);
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
-<<<<<<< HEAD
+
+    free(y_gyro);
+    free(abs_max);
+    free(rel_min);
+    free(rel_max);
+    free(ygyro_features);
     
-   // exit(1); //testing 
-    return _TRUE;
-=======
     return (*f_num+1==*seg_num);
->>>>>>> 818ecb17db9d11cd8a6dab8e73169d5e0adc6f66
+
 }
 
 MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, const char* filename)
@@ -285,7 +288,10 @@ void mo_training(double* data_fm, size_t n)
     double *features = (double*)malloc(sizeof(double)*n*_FIRST_LEVEL_FEATURES);
     MoType* mo_types = (MoType*)malloc(sizeof(MoType)*n);  
     int i;
-    
+   /*  for( int x = 0; x < n*_FIRST_LEVEL_FEATURES; x++)
+          fprintf(stderr, " %f \n" , data_fm[x]);
+        exit(1); 
+        */
     //preprocess features and output
     for (i = 0; i < n; i++)
     {
@@ -294,15 +300,17 @@ void mo_training(double* data_fm, size_t n)
                 sizeof(double)*_FIRST_LEVEL_FEATURES);
         mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+_MATLAB_OFFSET_FIRST_LEVEL-1]; //not sure if mo_type will be right
     }
-
+     
+        
+        
     // train ASC_DSC
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _MASK_LV1, ASC_DSC_FN);
     // train WALK
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
     // train TURNR_TURNL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, _MASK_LV1, TURNR_TURNL_FN);   //++
-    //train JUMP
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN);  
+    /*//train JUMP
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN); */ //we aren't doing jump yet  
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,  _MASK_LV1, FIRST_LV_ALL_FN);
     
@@ -584,7 +592,7 @@ void y_gyro_features_2( const double* segment, int segment_length, int begin, in
     double max;
     max = segment[begin];
     index = begin;
-    for (c = index; c < (end - (segment_length/4)); c++) {
+    for (c = index; c < (end - (segment_length/2)); c++) {
         if (segment[c] > max) {
             index = c;
             max = segment[c];
@@ -594,7 +602,7 @@ void y_gyro_features_2( const double* segment, int segment_length, int begin, in
 	
 	//start at least 50 points away for next maximum, could be 25 or 50 
 	//or find a better way to do this //what about when 0 is crossed ?
-	int index_2 = index +50; 
+	int index_2 = index + 45; 
 	max = 0;
 	for(c = index_2; c < end; c++) {
 		if(segment[c] > max) {
@@ -620,4 +628,89 @@ void create_ygyro_feature_array(int i, double* ygyro_features, double* abs_max, 
     ygyro_features[i*_YGYRO_N_FEATURES +2] =  feature_3;                                                            
     ygyro_features[i*_YGYRO_N_FEATURES +3] =  feature_4;                                                          
                
+}
+
+void get_zaccel(const double* data_val, const int data_buf_size, double *z_accel) //data_val is complete //data num is size
+{
+	int j;
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+    z_accel[j] = data_val[j*_DATA_ACQ_SIZE + _ACCEL_Z_OFFSET];
+}
+void z_accel_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* z_accel_at_peak)
+{
+    int c, index;
+    double max;
+    max = segment[begin];
+    index = begin;
+    for (c = index; c < end; c++) {
+        if (segment[c] > max) {
+            index = c;
+            max = segment[c];
+        }
+    }
+	*abs_max = segment[index]; 
+	*z_accel_at_peak = segment[begin]; 
+}
+
+double z_accel_features_1( const double* segment, int begin, int end){
+	return w_minima_double_seg((double*)segment, begin, end);
+}
+
+void create_zaccel_feature_array(int i, double* zaccel_features, double* abs_max, double* z_accel_at_peak, double* abs_min)
+{
+   double feature_1 = *z_accel_at_peak;               /* peak z gyro value at z accel min */
+   double feature_2 = *abs_min;               		  /* accel z minimum value*/
+   double feature_3 = *abs_max - *abs_min;            /*accel z min max difference*/
+   
+   
+   zaccel_features[i*_ZACCEL_N_FEATURES] = feature_1; 
+   zaccel_features[i*_ZACCEL_N_FEATURES +1] = feature_2;                                                            
+   zaccel_features[i*_ZACCEL_N_FEATURES +2] =  feature_3;                                                            
+                                                          
+               
+}
+
+
+///// X gyro features/////
+void get_xgyro(const double* data_val, const int data_buf_size, double *x_gyro) //data_val is complete //data num is size
+{
+	int j;
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+    x_gyro[j] = data_val[j*_DATA_ACQ_SIZE + _GYRO_X_OFFSET];
+}
+void x_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, 
+double* x_gyro_rms, 
+double* x_gyro_kurt)
+{
+    int c, index;
+    double max;
+    max = segment[begin];
+    index = begin;
+    for (c = index; c < end; c++) {
+        if (segment[c] > max) {
+            index = c;
+            max = segment[c];
+        }
+    }
+	*abs_max = segment[index]; 
+	*x_gyro_at_peak = segment[begin]; 
+	*x_gyro_mean = w_mean(segment, segment_length); 
+	*x_gyro_rms = w_RMS_seg_double (segment, segment_length);
+	*x_gyro_kurt = calculate_kurtosis_d(segment, segment_length); 
+}
+
+void create_xgyro_feature_array(int i, double* xgyro_features, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt)
+{
+   double feature_1 = *x_gyro_at_peak;               /* peak z gyro value at x gyro peak */  //maybe should be relative to surrounding data 
+   double feature_2 = *x_gyro_mean;           		  /* x gyro mean*/
+   double feature_3 = *x_gyro_rms;          
+   double feature_4 = *x_gyro_kurt;
+   double feature_5 = *abs_max;
+   
+   xgyro_features[i*_XGYRO_N_FEATURES] = feature_1; 
+   xgyro_features[i*_XGYRO_N_FEATURES +1] = feature_2;                                                            
+   xgyro_features[i*_XGYRO_N_FEATURES +2] =  feature_3; 
+   xgyro_features[i*_XGYRO_N_FEATURES+3] = feature_4; 
+   xgyro_features[i*_XGYRO_N_FEATURES+4] = feature_5;    
+                                                                       
 }

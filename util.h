@@ -16,11 +16,6 @@
 #define RANDOM_BUFFER_MULTIPLIER 8
 #define _GET_MO_TYPE(X) ((X) & 0xFF0)
 
-#ifdef _DEBUG
-#include <assert.h>
-#else
-void assert(int a) {};
-#endif
 /* Function Declarations */
 
 extern int main(int argc, const char * const argv[]);
@@ -81,5 +76,17 @@ double y_gyro_features_1(const double* segment, int begin, int end);
 void get_ygyro(const double* data_buf, const int data_buf_size, double *y_gyro);
 void create_ygyro_feature_array(int i, double* ygyro_features, double* abs_max, double* rel_min, double* rel_max);
 
+
+//zaccel_functions 
+void get_zaccel(const double* data_val, const int data_buf_size, double *z_accel);
+void z_accel_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* z_accel_at_peak);
+double z_accel_features_1( const double* segment, int begin, int end);
+void create_zaccel_feature_array(int i, double* zaccel_features, double* abs_max, double* z_accel_at_peak, double* abs_min);
+
+
+//xgyro_functions
+void get_xgyro(const double* data_val, const int data_buf_size, double *x_gyro);
+void x_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt);
+void create_xgyro_feature_array(int i, double* xgyro_features, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt);
 #endif
 

@@ -16,7 +16,7 @@ int main(int argc, const char * const argv[])
 
     int i,j;
     int*   seg_val; 
-    double *data_fm  = (double*)malloc(sizeof(double)*_BUFFER*4);
+    double *data_fm  = (double*)malloc(sizeof(double)*_ALLFBUFFER);
     double *data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
     double *data_buf;
     double* f_m=NULL;
@@ -28,12 +28,22 @@ int main(int argc, const char * const argv[])
     while (i<_TRAIN_DATA_SIZE)
     {
         fprintf(stderr, "%s\n", TRAINING_DATASET[i]);
-        f_m = (double*)malloc(sizeof(double*)*(_BUFFER));
+        f_m = (double*)malloc(sizeof(double*)*(_FBUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);
-        assert(segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i]));
+        segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i]);     //garbage values here for some reason 
+        
+        /*   fprintf(stderr, " \n \n \n segmentation completed: train num = %d , n= %d \n \n \n", train_num, n); 
+         for( int x = 0; x < n*_MATLAB_OFFSET_FIRST_LEVEL; x++)
+            fprintf(stderr, " %f \n" ,f_m[x]); */ //debugging 
+          
         memcpy(&data_fm[train_num*_MATLAB_OFFSET_FIRST_LEVEL],f_m,sizeof(double)*n*_MATLAB_OFFSET_FIRST_LEVEL);
         train_num += n;
+       
+      /* fprintf(stderr, " \n \n \n memcpy completed: train num = %d , n= %d \n \n \n", train_num, n); 
+       for( int x = 0; x < train_num*_MATLAB_OFFSET_FIRST_LEVEL; x++)
+          fprintf(stderr, " %f \n" , data_fm[x]); */ //debugging 
+        
         data_buf = (double*)malloc(sizeof(double)*_BUFFER*2);
         for (j = 0; j < data_num; j++)
             memcpy(data_buf+j*7, data_val+j*8+1, sizeof(double)*7);
@@ -45,8 +55,12 @@ int main(int argc, const char * const argv[])
         td[i].m_1st_feature = f_m;
         i++;
     }
-    exit(1); //testing 
+    
+ 
+    fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %d \n \n \n", train_num);
+    
     mo_training(data_fm, train_num);
+    exit(1); 
     train_lv2_neural_network(td, i, WALK, _WALK_N_FEATURES, _WALK_LV2_SIZE, WALK_LV2_MODEL, WALK_NEURAL_NETWORK);
     train_lv2_neural_network(td, i, RUN, _RUN_N_FEATURES, _RUN_LV2_SIZE, RUN_LV2_MODEL, RUN_LV2_FN);
     train_lv2_neural_network(td, i, ASC, _ASCEND_N_FEATURES, _ASC_LV2_SIZE, ASC_LV2_MODEL, ASC_LV2_FN); 
