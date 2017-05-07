@@ -138,9 +138,9 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 
 #define _ASC_DSC_SIZE       3
 #define _WALK_RUN_SIZE      3
-#define _TURNR_TURNL_SIZE   3 //++
+#define _TURNR_TURNL_SIZE   2 //++
 #define _JUMP_SIZE          2 //++ 
-#define _1ST_LV_ALL_SIZE    6
+#define _1ST_LV_ALL_SIZE    5
 #define _WALK_LV2_SIZE      4
 #define _RUN_LV2_SIZE       3
 #define _ASC_LV2_SIZE       2
@@ -152,7 +152,7 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC, NONE};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {WALK, RUN, NONE};
-static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNR, TURNL, NONE};    //++
+static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNL, NONE};    //++
 static const MoType JUMP_MODEL[_JUMP_SIZE] =  {JUMP, NONE};    //++
 static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN};
 static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] =          {RUN1, RUN2, RUN3};
