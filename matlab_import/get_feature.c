@@ -38,7 +38,7 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
   emxInit_real_T(&varargin_1, 2);
   emxInit_real_T(&varargin_2, 2);
   segment(min_peak_distance, min_peak_height, b_m, pos, r);
-  zanalysis(r, varargin_1, varargin_2);
+  zanalysis(min_peak_height, r, varargin_1, varargin_2);
   emxFree_real_T(&b_m);
   if (!((varargin_1->size[0] == 0) || (varargin_1->size[1] == 0))) {
     loop_ub = varargin_1->size[0];

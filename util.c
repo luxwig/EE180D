@@ -224,13 +224,18 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"\n"); 
         (*f_num)++;
     }
+    fprintf(stderr, "%zu\t%zu\n",*f_num,*seg_num);
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
+<<<<<<< HEAD
     
    // exit(1); //testing 
     return _TRUE;
+=======
+    return (*f_num+1==*seg_num);
+>>>>>>> 818ecb17db9d11cd8a6dab8e73169d5e0adc6f66
 }
 
 MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, const char* filename)
@@ -509,10 +514,10 @@ void classify_segments(double* correct_data_buf, int pos, int size, MoType* late
     for(int i = prev_num_segments, j = 0; i < num_segments; i++, j++) {
         int start_divider = div[i];
         int end_divider = div[i+1];
-        int second_end_divider = div[i+2];
+        // int second_end_divider = div[i+2];
 
         int length_of_segment = end_divider - start_divider + 1;
-        int length_of_two_segments = second_end_divider - start_divider + 1;
+        // int length_of_two_segments = second_end_divider - start_divider + 1;
 
         mo_classfication(&f[_MATLAB_OFFSET_FIRST_LEVEL*i], 1, segment_motion);
 
