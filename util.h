@@ -16,6 +16,11 @@
 #define RANDOM_BUFFER_MULTIPLIER 8
 #define _GET_MO_TYPE(X) ((X) & 0xFF0)
 
+#ifdef _DEBUG
+#include <assert.h>
+#else
+void assert(int a) {};
+#endif
 /* Function Declarations */
 
 extern int main(int argc, const char * const argv[]);

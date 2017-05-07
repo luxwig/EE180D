@@ -18,7 +18,7 @@
 #include "get_feature_types.h"
 
 /* Function Declarations */
-extern void zanalysis(const emxArray_real_T *z_a, emxArray_real_T *val,
+extern void zanalysis(double,const emxArray_real_T *z_a, emxArray_real_T *val,
                       emxArray_real_T *pos);
 
 #endif

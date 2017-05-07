@@ -8,7 +8,6 @@
 
 #define RUN_N_OUTPUTS _RUN_LV2_SIZE
 
-#include "assert.h"
 #include "global.h"
 #include "util.h"
 #include "matlab_import/rt_nonfinite.h"
@@ -177,12 +176,11 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         (*f_num)++;
     }
     fprintf(stderr, "%zu\t%zu\n",*f_num,*seg_num);
-    assert(*f_num+1==*seg_num);
     emxDestroyArray_real_T(pos); 
     emxDestroyArray_real_T(features);
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
-    return _TRUE;
+    return (*f_num+1==*seg_num);
 }
 
 MoType test_cl(double* features, const MoType* mo_status, int mo_status_num, const char* filename)
