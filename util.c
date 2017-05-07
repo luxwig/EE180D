@@ -201,7 +201,23 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         fprintf(stderr,"\n");
     }
     fprintf(stderr,"number of features: %d \n", j); */
-        
+       
+    double* z_accel = (double*)malloc(sizeof(double)*data_buf_size);
+    double* abs_max_z = (double*)malloc(sizeof(double));
+    double* z_accel_at_peak = (double*)malloc(sizeof(double));
+    double* abs_min_z = (double*)malloc(sizeof(double));
+    double* zaccel_features = (double*)malloc(sizeof(double)*_FBUFFER);   
+    get_zaccel(data_buf, data_buf_size, z_accel); 
+   
+    iterate = *seg_num;
+    for(x=0; x < iterate - 1; x++){
+      int length = seg[x+1] - seg[x];
+      z_accel_features_2(z_accel, length, seg[x], seg[x+1],abs_max_z,z_accel_at_peak);
+      *abs_min_z = z_accel_features_1(z_accel, seg[x], seg[x+1]);
+      create_zaccel_feature_array(x, zaccel_features,abs_max_z, z_accel_at_peak, abs_min_z);
+    }
+    //zaccel features
+      
             
              //adding features to array 
     int seg_iterator = 0;
@@ -217,7 +233,10 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = ygyro_features[*f_num*_YGYRO_N_FEATURES+1];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+7] = ygyro_features[*f_num*_YGYRO_N_FEATURES+2];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+8] = ygyro_features[*f_num*_YGYRO_N_FEATURES+3];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9] = fntype;
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9] = zaccel_features[*f_num*_ZACCEL_N_FEATURES];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+1];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+11] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+2];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = fntype;
         
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);

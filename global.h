@@ -9,7 +9,7 @@
 #define _TRAIN_DATA_SIZE 16   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       9
+#define _FIRST_LEVEL_FEATURES       12
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -24,7 +24,7 @@
 
 
 //walk neural network and run neural network use same number of features          //not sure how these things should change 
-#define _WALK_N_FEATURES    (5+4) //second level + first level
+#define _WALK_N_FEATURES    (5+4) //second level + first level                 
 #define _RUN_N_FEATURES     (5+4) //second level +  first level 
 #define _ASCEND_N_FEATURES  (5+4) //second level
 #define _DESCEND_N_FEATURES (5+4) //second level
@@ -154,7 +154,7 @@ static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC, NONE};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {WALK, RUN, NONE};
 static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNL, NONE};    //++
 static const MoType JUMP_MODEL[_JUMP_SIZE] =  {JUMP, NONE};    //++
-static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN};
+static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN, TURNL};
 static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] =          {RUN1, RUN2, RUN3};
 static const MoType WALK_LV2_MODEL[_WALK_LV2_SIZE] =        {WALK1, WALK2, WALK3, WALK4};
 static const MoType ASC_LV2_MODEL[_ASC_LV2_SIZE] =          {ASC1, ASC2};

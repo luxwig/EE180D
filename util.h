@@ -10,7 +10,6 @@
 #include "matlab_import/rtwtypes.h"
 #include "matlab_import/get_feature_types.h"
 #include "statistics.h"
-#include <liquid/liquid.h>
 #define _BUFFER 65536
 #define _SBUFFER 256
 #define RANDOM_BUFFER_MULTIPLIER 8
