@@ -17,14 +17,14 @@ void MoType_to_str(MoType t, char* str, int type)
         case DSC:
             strcpy(str, "DSC");
             break;
-        case TL:
-            strcpy(str, "TL");
+        case TURNL:
+            strcpy(str, "TURNL");
             break;
-        case TR:
-            strcpy(str, "TR");
+        case TURNR:
+            strcpy(str, "TURNR");
             break;
-        case JMP:
-            strcpy(str, "JMP");
+        case JUMP:
+            strcpy(str, "JUMP");
             break;
         case NONE:
             break;
@@ -53,8 +53,8 @@ void get_motion_str_from_array(MoType* result, char* str)
     if (result[_ASC_DSC_OFFSET] != 0)
         MoType_to_str(result[_ASC_DSC_MOD_OFFSET],
                       str+strlen(str), _IO_ALL_SPACE);
-    MoType_to_str(result[_TL_TR_OFFSET], str+strlen(str), _IO_ALL_SPACE);
-    MoType_to_str(result[_JMP_OFFSET], str+strlen(str), _IO_ALL_SPACE);
+    MoType_to_str(result[_TURNR_TURNL_OFFSET], str+strlen(str), _IO_ALL_SPACE);
+    MoType_to_str(result[_JUMP_OFFSET], str+strlen(str), _IO_ALL_SPACE);
 }
 
 

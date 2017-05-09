@@ -172,7 +172,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     double* abs_max = (double*)malloc(sizeof(double));
     double* rel_min = (double*)malloc(sizeof(double));
     double* rel_max = (double*)malloc(sizeof(double));
-    double* ygyro_features = (double*)malloc(sizeof(double)*_FBUFFER);
+    double* ygyro_features = (double*)malloc(sizeof(double)*_MBUFFER);
     
     get_ygyro(data_buf, data_buf_size, y_gyro); //data_val is complete //data num is size
     
@@ -206,7 +206,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     double* abs_max_z = (double*)malloc(sizeof(double));
     double* z_accel_at_peak = (double*)malloc(sizeof(double));
     double* abs_min_z = (double*)malloc(sizeof(double));
-    double* zaccel_features = (double*)malloc(sizeof(double)*_FBUFFER);   
+    double* zaccel_features = (double*)malloc(sizeof(double)*_MBUFFER);   
     get_zaccel(data_buf, data_buf_size, z_accel); 
    
     iterate = *seg_num;
@@ -224,7 +224,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     double* x_gyro_mean = (double*)malloc(sizeof(double));
     double* x_gyro_rms = (double*)malloc(sizeof(double));
     double* x_gyro_kurt = (double*)malloc(sizeof(double)); 
-    double* xgyro_features = (double*)malloc(sizeof(double)*_FBUFFER);  
+    double* xgyro_features = (double*)malloc(sizeof(double)*_MBUFFER);  
     get_xgyro(data_buf, data_buf_size, x_gyro);
     
     iterate = *seg_num;
@@ -254,13 +254,13 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9] = zaccel_features[*f_num*_ZACCEL_N_FEATURES];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+1];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+11] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+2];
-        /*f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = xgyro_features[*f_num*_XGYRO_N_FEATURES];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
-        */
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = fntype;          //change to 17
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = xgyro_features[*f_num*_XGYRO_N_FEATURES];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
+        
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+17] = fntype;          //change to 17
          
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
@@ -279,6 +279,18 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     free(rel_min);
     free(rel_max);
     free(ygyro_features);
+    free(z_accel);
+    free(abs_max_z);
+    free(z_accel_at_peak);
+    free(abs_min_z);
+    free(zaccel_features);
+    free(x_gyro);
+    free(abs_max_x);
+    free(x_gyro_at_peak);	
+    free(x_gyro_mean);
+    free(x_gyro_rms);
+    free(x_gyro_kurt);
+    free(xgyro_features);
     
     return (*f_num+1==*seg_num);
 
@@ -351,7 +363,7 @@ void mo_training(double* data_fm, size_t n)
     // train WALK
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
     // train TL_TR
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TL_TR_MODEL, _TL_TR_SIZE, _MASK_LV1, TL_TR_FN);   //++
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, _MASK_LV1,TURNR_TURNL_FN);   //++
     /*//train JUMP
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN); */ //we aren't doing jump yet  
     // train FIRST_LV_ALL
@@ -370,9 +382,9 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
         ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, WALK_RUN_FN));
          
     flag |=
-        ( result[_TL_TR_OFFSET] = test_cl(data_fm, TL_TR_MODEL, _TL_TR_SIZE, TL_TR_FN));
+        ( result[_TURNR_TURNL_OFFSET ] = test_cl(data_fm,TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, TURNR_TURNL_FN));
 
-    result[_JMP_OFFSET] = 0;    
+    result[_JUMP_OFFSET] = 0;    
     if (!flag) {
         result[_1ST_LV_ALL_OFFSET] =
             test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,
