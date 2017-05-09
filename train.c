@@ -57,7 +57,7 @@ int main(int argc, const char * const argv[])
     }
     
  
-    fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %d \n \n \n", train_num);
+    fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %zu \n \n \n", train_num);
     
     mo_training(data_fm, train_num);
       

@@ -8,6 +8,7 @@
 #define SLEEPTIME 100
 #include <unistd.h>
 
+#include "customio.h"
 #include "cf.h"
 #include <pthread.h>
 #include <stdlib.h>
@@ -150,7 +151,7 @@ void rotate(const double raw_data_buf[], double correctly_ordered[], int pos) {
 
 void* data_pro(void* ptr)
 {
-    int size, pos, n, new_seg_num, i, j;
+    int size, pos, n, new_seg_num, i;
     n = 0;
     buftype* data_buf = (buftype*) ptr,
            * correct_data_buf =
@@ -179,16 +180,13 @@ void* data_pro(void* ptr)
         */
         MoType result[_SBUFFER];
         classify_segments(correct_data_buf, pos, size, result, &new_seg_num);
+        char r_str[_SBUFFER];
         for (i = 0; i < new_seg_num; i++)
         {
-            for (j = 0; j < _FIRST_LEVEL_MOD_COUNT; j++)
-                printf("%x\t", result[i*_TOTAL_MOD_COUNT+j]);
-            if (result[i*_TOTAL_MOD_COUNT+_WALK_RUN_OFFSET] != 0)
-               printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_WALK_RUN_MOD_OFFSET]);
-            if (result[i*_TOTAL_MOD_COUNT+_ASC_DSC_OFFSET] != 0)
-                printf("-> %x\t", result[i*_TOTAL_MOD_COUNT+_ASC_DSC_MOD_OFFSET]);
-
-            printf("\n"); 
+            get_motion_str_from_array(result+i*_TOTAL_MOD_COUNT,r_str);
+            if (strlen(r_str))
+                printf("%s\n",r_str);
+            strcpy(r_str,"");
         }
     }
     return 0;
