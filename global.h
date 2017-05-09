@@ -3,13 +3,13 @@
 
 #define _BUFFER     65536
 #define _SBUFFER    256
-#define _FBUFFER    1000
-#define _FMBUFFER   500
-#define _ALLFBUFFER 10000
-#define _TRAIN_DATA_SIZE 16   //change to increment amoutn of data
+#define _FBUFFER    2000
+#define _FMBUFFER   1000
+#define _ALLFBUFFER 15000
+#define _TRAIN_DATA_SIZE 18   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       12 //change to 17
+#define _FIRST_LEVEL_FEATURES       17 //change to 17
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -58,7 +58,8 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/DSC_SPEED/dsc_2_1.csv",
                          "data/DSC_SPEED/dsc_2_2.csv",
                          "data/TL/turn_left_1.csv",
-                       //  "data/TR/turn_right_1.csv"
+						 "data/TR/turn_right_2.csv",
+						 "data/TR/turn_right_4.csv"
                    };
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
@@ -95,7 +96,7 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _DSC   0x220
 #define _DSC1  0x221
 #define _DSC2  0x222
-  #define _TURNL 0x300
+#define _TURNL 0x300
 #define _TURNR 0x310
 #define _JUMP  0x400
 #define _NONE  0x000
@@ -133,12 +134,12 @@ enum MoType_enum { TRAINING = _TRAINING,
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2, DSC1, DSC1, DSC2, DSC2, TURNL, TURNR};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2, DSC1, DSC1, DSC2, DSC2, TURNL, TURNR, TURNR};
 
 
 #define _ASC_DSC_SIZE       3
 #define _WALK_RUN_SIZE      3
-#define _TURNR_TURNL_SIZE   2 //++
+#define _TURNR_TURNL_SIZE   3 //++
 #define _JUMP_SIZE          2 //++ 
 #define _1ST_LV_ALL_SIZE    5
 #define _WALK_LV2_SIZE      4
@@ -152,7 +153,7 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC, NONE};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {WALK, RUN, NONE};
-static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNL, NONE};    //++
+static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNL, TURNR, NONE};    //++
 static const MoType JUMP_MODEL[_JUMP_SIZE] =  {JUMP, NONE};    //++
 static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN, TURNL};
 static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] =          {RUN1, RUN2, RUN3};

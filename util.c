@@ -254,13 +254,13 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9] = zaccel_features[*f_num*_ZACCEL_N_FEATURES];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+1];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+11] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+2];
-        /*f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = xgyro_features[*f_num*_XGYRO_N_FEATURES];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
-        */
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = fntype;          //change to 17
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = xgyro_features[*f_num*_XGYRO_N_FEATURES];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
+        
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+17] = fntype;          //change to 17
          
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
@@ -279,6 +279,18 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     free(rel_min);
     free(rel_max);
     free(ygyro_features);
+    free(z_accel);
+    free(abs_max_z);
+    free(z_accel_at_peak);
+    free(abs_min_z);
+    free(zaccel_features);
+    free(x_gyro);
+    free(abs_max_x);
+    free(x_gyro_at_peak);	
+    free(x_gyro_mean);
+    free(x_gyro_rms);
+    free(x_gyro_kurt);
+    free(xgyro_features);
     
     return (*f_num+1==*seg_num);
 
