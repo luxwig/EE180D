@@ -3,10 +3,13 @@
 
 #define _BUFFER     65536
 #define _SBUFFER    256
-#define _TRAIN_DATA_SIZE 15
-#define _TEST_DATA_SIZE  13
+#define _FBUFFER    1000
+#define _FMBUFFER   500
+#define _ALLFBUFFER 10000
+#define _TRAIN_DATA_SIZE 16   //change to increment amoutn of data
+#define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       5
+#define _FIRST_LEVEL_FEATURES       12 //change to 17
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -20,11 +23,14 @@
 #define _GYRO_Z_OFFSET  7
 
 
-//walk neural network and run neural network use same number of features
-#define _WALK_N_FEATURES    (5+4) //second level + first level
+//walk neural network and run neural network use same number of features          //not sure how these things should change 
+#define _WALK_N_FEATURES    (5+4) //second level + first level                 
 #define _RUN_N_FEATURES     (5+4) //second level +  first level 
 #define _ASCEND_N_FEATURES  (5+4) //second level
 #define _DESCEND_N_FEATURES (5+4) //second level
+#define _YGYRO_N_FEATURES 4 //first level 
+#define _ZACCEL_N_FEATURES 3 //first level 
+#define _XGYRO_N_FEATURES 5 //first level
 
 #define _TRUE   1
 #define _FALSE  0
@@ -50,7 +56,9 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/DSC_SPEED/dsc_1.csv",
                          "data/DSC_SPEED/dsc_1_2.csv",
                          "data/DSC_SPEED/dsc_2_1.csv",
-                         "data/DSC_SPEED/dsc_2_2.csv", 
+                         "data/DSC_SPEED/dsc_2_2.csv",
+                         "data/TL/turn_left_1.csv",
+                       //  "data/TR/turn_right_1.csv"
                    };
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
@@ -66,7 +74,10 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
                          "data/ASCEND/6.csv",
                          "data/DESCEND/4.csv",
                          "data/DESCEND/5.csv",
-                         "data/DESCEND/6.csv" };   
+                         "data/DESCEND/6.csv" ,
+                          "data/TL/turn_left_1_t.csv",
+                          "data/TR/turn_right_1_t.csv"
+                          };   
 
 #define _WALK  0x100
 #define _WALK1 0x101
@@ -84,6 +95,9 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _DSC   0x220
 #define _DSC1  0x221
 #define _DSC2  0x222
+  #define _TURNL 0x300
+#define _TURNR 0x310
+#define _JUMP  0x400
 #define _NONE  0x000
 
 #define _TEST  0xFF0
@@ -92,12 +106,15 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 
 #define _ASC_DSC_OFFSET         0  // offset for 1lv ASC_DSC     mod in result 
 #define _WALK_RUN_OFFSET        1  // offset for 1lv WALK_RUN    mod in result
-#define _1ST_LV_ALL_OFFSET      2  // offset for 1lv combime     mod in result
-#define _WALK_RUN_MOD_OFFSET    3  // offset for 2lv WALK_RUN    mod in result
-#define _ASC_DSC_MOD_OFFSET     4  // offset for 2lv ASC_DSC     mod in result
+#define _TURNR_TURNL_MOD_OFFSET 2 //offset for 1st level TURN mod in result
+#define _JUMP_MOD_OFFSET        3 //ofset for jump mod in result       
+#define _1ST_LV_ALL_OFFSET      4  // offset for 1lv combime     mod in result
+#define _WALK_RUN_MOD_OFFSET    5  // offset for 2lv WALK_RUN    mod in result
+#define _ASC_DSC_MOD_OFFSET     6  // offset for 2lv ASC_DSC     mod in result
 
-#define _FIRST_LEVEL_MOD_COUNT  3  // total 1   lv mod count
-#define _TOTAL_MOD_COUNT        5  // total 1+2 lv mod count
+
+#define _FIRST_LEVEL_MOD_COUNT  5  // total 1   lv mod count
+#define _TOTAL_MOD_COUNT        7  // total 1+2 lv mod count
 
 enum MoType_enum { TRAINING = _TRAINING,
                    WALK = _WALK, 
@@ -108,18 +125,22 @@ enum MoType_enum { TRAINING = _TRAINING,
                    ASC1 = _ASC1, ASC2 = _ASC2,
                    DSC = _DSC,
                    DSC1 = _DSC1, DSC2 = _DSC2,
+                   TURNR = _TURNR, TURNL = _TURNL,
+                   JUMP = _JUMP,
                    TEST = _TEST,
                    NONE = _NONE};
 
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2,  DSC1, DSC1, DSC2, DSC2};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2, DSC1, DSC1, DSC2, DSC2, TURNL, TURNR};
 
 
 #define _ASC_DSC_SIZE       3
 #define _WALK_RUN_SIZE      3
-#define _1ST_LV_ALL_SIZE    4
+#define _TURNR_TURNL_SIZE   2 //++
+#define _JUMP_SIZE          2 //++ 
+#define _1ST_LV_ALL_SIZE    5
 #define _WALK_LV2_SIZE      4
 #define _RUN_LV2_SIZE       3
 #define _ASC_LV2_SIZE       2
@@ -131,7 +152,9 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC, NONE};
 static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {WALK, RUN, NONE};
-static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN};
+static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNL, NONE};    //++
+static const MoType JUMP_MODEL[_JUMP_SIZE] =  {JUMP, NONE};    //++
+static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN, TURNL};
 static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] =          {RUN1, RUN2, RUN3};
 static const MoType WALK_LV2_MODEL[_WALK_LV2_SIZE] =        {WALK1, WALK2, WALK3, WALK4};
 static const MoType ASC_LV2_MODEL[_ASC_LV2_SIZE] =          {ASC1, ASC2};
@@ -139,6 +162,8 @@ static const MoType DSC_LV2_MODEL[_DSC_LV2_SIZE] =          {DSC1, DSC2};
 
 static const char* ASC_DSC_FN =         "ASC_DSC.net";
 static const char* WALK_RUN_FN =        "WALK_RUN.net";
+static const char* TURNR_TURNL_FN =     "TURNR_TURNL.net";
+static const char* JUMP_FN =            "JUMP.net";
 static const char* FIRST_LV_ALL_FN =    "FIRST_LV_ALL.net"; 
 static const char* RUN_LV2_FN =         "RUN_LV2.net";
 static const char* ASC_LV2_FN =         "ASC_LV2.net";

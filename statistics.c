@@ -199,3 +199,118 @@ double w_RMS_seg_double (double arr[], int size)
 int cmpfunc (const void *a, const void *b) {
     return ( *(float*) a - *(float*) b);
 }
+
+
+
+
+float calculate_mean(float *segment, int n)
+{
+	int i;
+    float sum = 0;
+	
+    for (i=0; i<n; i++) {
+        sum += segment[i];
+    }
+    return sum/((float) n);
+}
+float calculate_standard_deviation(float* segment, int n)
+{
+    float mean = 0;
+	float sum = 0;
+	float standard_deviation = 0;
+    int i;
+    
+	mean = calculate_mean(segment, n);
+    
+    for(i=0; i<n; i++){
+        sum += (float)pow((double)segment[i] - (double)mean, 2);
+    }
+	standard_deviation = sqrt(sum/n);
+    return standard_deviation;
+}
+
+void swap(float *a, float *b){
+	float c;
+
+	c = *a;
+	*a = *b;
+	*b = c;	
+}
+
+float calculate_median(float *segment, int n){
+	int i, j, k;
+	float median = 0;
+	
+	for(i=0; i<n; i++){
+		for(j=0; j<n-i;j++){
+			if(segment[j]>segment[j+1])
+				swap(&segment[j],&segment[j+1]);
+		}
+	}
+	
+	if (n/2 % 2 == 0){
+		k = n/2 - 1;
+		median = segment[k];
+	}
+	else {
+		k = (n+1)/2 -1;
+		median = segment[k];
+	
+	}
+ 	return median;
+}
+	
+	
+float calculate_moment_skew(float *segment, int n){
+	float skew;
+	int i;
+	float k = 0;
+	float mean_3 =0;
+	float mean = calculate_mean(segment, n);
+	float standard_deviation = calculate_standard_deviation(segment, n);
+	
+	for(i=0;i<n;i++){
+		k = segment[i] - mean;
+		mean_3 += (float)pow((double)k, 3.0);
+	}
+	
+	skew = ((n*mean_3)/((n-1)*(n-2)* (float)pow((double)standard_deviation, 3.0)));
+		
+	return skew;
+	
+}
+
+float calculate_kurtosis(float *segment, int n){
+	float mean = calculate_mean(segment, n);
+	float standard_deviation = calculate_standard_deviation(segment, n);
+	int i;
+	float mean_4 = 0;
+	float kurtosis;
+	float k = 0;
+	
+	for(i=0;i<n;i++){
+		k = segment[i] - mean;
+		mean_4 += (float)pow((double)k, 4.0);
+	}
+	
+	kurtosis = mean_4/(n*(float)pow((double)standard_deviation, 4.0));
+	return kurtosis; 
+}
+
+double calculate_kurtosis_d(double *segment, int n)
+{
+double mean = w_mean(segment, n); 
+double standard_deviation = w_std(segment, n); 
+int i;
+double mean_4 = 0.0; 
+double kurtosis;
+double k = 0; 
+for(i=0;i<n;i++){
+		k = segment[i] - mean;
+		mean_4 += pow(k, 4.0);
+	}
+ kurtosis = mean_4/(n*pow(standard_deviation, 4.0)); 
+ return kurtosis; 
+	
+}
+
