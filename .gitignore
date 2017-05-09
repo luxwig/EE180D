@@ -1,0 +1,28 @@
+# file itself
+
+# autosave file
+*.sw*
+*.orig
+
+# runtime file
+*.txt
+*.net
+*.forest
+
+# testfile
+*test*
+
+# executable file
+*.so
+*.o
+*_main
+*_main
+
+# misc
+imu_data.*
+matlab/fig*
+
+# output file 
+out*
+# temp
+JUMP/
