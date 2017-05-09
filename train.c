@@ -16,7 +16,7 @@ int main(int argc, const char * const argv[])
 
     int i,j;
     int*   seg_val; 
-    double *data_fm  = (double*)malloc(sizeof(double)*_ALLFBUFFER);
+    double *data_fm  = (double*)malloc(sizeof(double)*_LBUFFER);
     double *data_val = (double*)malloc(sizeof(double)*_BUFFER*2);
     double *data_buf;
     double* f_m=NULL;
@@ -28,7 +28,7 @@ int main(int argc, const char * const argv[])
     while (i<_TRAIN_DATA_SIZE)
     {
         fprintf(stderr, "%s\n", TRAINING_DATASET[i]);
-        f_m = (double*)malloc(sizeof(double*)*(_FBUFFER));
+        f_m = (double*)malloc(sizeof(double*)*(_MBUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);
         segmentation(data_val, data_num, f_m, &n, seg_val, &seg_num,  fntype[i]);     //garbage values here for some reason 

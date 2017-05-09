@@ -3,9 +3,8 @@
 
 #define _BUFFER     65536
 #define _SBUFFER    256
-#define _FBUFFER    2000
-#define _FMBUFFER   1000
-#define _ALLFBUFFER 15000
+#define _MBUFFER    2048
+#define _LBUFFER    16384
 #define _TRAIN_DATA_SIZE 18   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
@@ -50,7 +49,7 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/ASC_SPEED/asc_1_2.csv",
                          "data/ASC_SPEED/asc_2_1.csv",
                          "data/ASC_SPEED/asc_2_2.csv",
-                   /*    "data/DESCEND/1.csv",
+                       /*"data/DESCEND/1.csv",
                          "data/DESCEND/2.csv",
                          "data/DESCEND/3.csv",*/
                          "data/DSC_SPEED/dsc_1.csv",
@@ -58,9 +57,9 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/DSC_SPEED/dsc_2_1.csv",
                          "data/DSC_SPEED/dsc_2_2.csv",
                          "data/TL/turn_left_1.csv",
-						 "data/TR/turn_right_2.csv",
-						 "data/TR/turn_right_4.csv"
-                   };
+                         "data/TR/turn_right_2.csv",
+                         "data/TR/turn_right_4.csv",
+};
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
                          "data/WALK/ludwig/1_t.csv",  
@@ -99,12 +98,10 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 
 #define _TURNL 0x310
 #define _TURNR 0x320
-#define _JUMP  0x400
-
-#define _JMP   0x410
-#define _JMP1  0x411
-#define _JMP2  0x412
-#define _JMP3  0x413
+#define _JUMP  0x410
+#define _JUMP1 0x411
+#define _JUMP2 0x412
+#define _JUMP3 0x413
 
 #define _NONE  0x000
 
@@ -115,11 +112,11 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
 #define _ASC_DSC_OFFSET         0  // offset for 1lv ASC_DSC     mod in result 
 #define _WALK_RUN_OFFSET        1  // offset for 1lv WALK_RUN    mod in result
 #define _TURNR_TURNL_OFFSET       2 //offset for 1st level TURN mod in result
-#define _JMP_OFFSET         3 //ofset for jump mod in result       
+#define _JUMP_OFFSET         3 //ofset for jump mod in result       
 #define _1ST_LV_ALL_OFFSET      4  // offset for 1lv combime     mod in result
 #define _WALK_RUN_MOD_OFFSET    5  // offset for 2lv WALK_RUN    mod in result
 #define _ASC_DSC_MOD_OFFSET     6  // offset for 2lv ASC_DSC     mod in result
-#define _JMP_MOD_OFFSET         7
+#define _JUMP_MOD_OFFSET         7
 
 #define _FIRST_LEVEL_MOD_COUNT  5  // total 1   lv mod count
 #define _TOTAL_MOD_COUNT        8  // total 1+2 lv mod count
@@ -136,7 +133,7 @@ enum MoType_enum { TRAINING = _TRAINING,
                    TURNR = _TURNR, 
                    TURNL = _TURNL,
                    JUMP = _JUMP,
-                   JMP1 = _JMP1, JMP2 = _JMP2, JMP3 = _JMP3,
+                   JUMP1 = _JUMP1, JUMP2 = _JUMP2, JUMP3 = _JUMP3,
                    TEST = _TEST,
                    NONE = _NONE};
 
@@ -158,7 +155,7 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 #define _RUN_LV2_SIZE       3
 #define _ASC_LV2_SIZE       2
 #define _DSC_LV2_SIZE       2
-#define _JMP_LV2_SIZE       3
+#define _JUMP_LV2_SIZE       3
 
 #define _MASK_LV1 0xFFFF0
 #define _MASK_LV2 0XFFFFF
@@ -173,7 +170,7 @@ static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] =          {RUN1, RUN2, RUN3};
 static const MoType WALK_LV2_MODEL[_WALK_LV2_SIZE] =        {WALK1, WALK2, WALK3, WALK4};
 static const MoType ASC_LV2_MODEL[_ASC_LV2_SIZE] =          {ASC1, ASC2};
 static const MoType DSC_LV2_MODEL[_DSC_LV2_SIZE] =          {DSC1, DSC2};
-static const MoType JMP_LV2_MODEL[_JMP_LV2_SIZE] =          {JMP1, JMP2, JMP3};
+static const MoType JUMP_LV2_MODEL[_JUMP_LV2_SIZE] =          {JUMP1, JUMP2, JUMP3};
 
 static const char* ASC_DSC_FN =         "ASC_DSC.net";
 static const char* WALK_RUN_FN =        "WALK_RUN.net";
@@ -184,5 +181,5 @@ static const char* RUN_LV2_FN =         "RUN_LV2.net";
 static const char* ASC_LV2_FN =         "ASC_LV2.net";
 static const char* DSC_LV2_FN =         "DSC_LV2.net";
 static const char* WALK_NEURAL_NETWORK= "./walk_neural_network.net";
-static const char* JMP_LV2_FN =         "JMP_LV2.net";
+static const char* JUMP_LV2_FN =         "JUMP_LV2.net";
 #endif

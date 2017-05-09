@@ -172,7 +172,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     double* abs_max = (double*)malloc(sizeof(double));
     double* rel_min = (double*)malloc(sizeof(double));
     double* rel_max = (double*)malloc(sizeof(double));
-    double* ygyro_features = (double*)malloc(sizeof(double)*_FBUFFER);
+    double* ygyro_features = (double*)malloc(sizeof(double)*_MBUFFER);
     
     get_ygyro(data_buf, data_buf_size, y_gyro); //data_val is complete //data num is size
     
@@ -206,7 +206,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     double* abs_max_z = (double*)malloc(sizeof(double));
     double* z_accel_at_peak = (double*)malloc(sizeof(double));
     double* abs_min_z = (double*)malloc(sizeof(double));
-    double* zaccel_features = (double*)malloc(sizeof(double)*_FBUFFER);   
+    double* zaccel_features = (double*)malloc(sizeof(double)*_MBUFFER);   
     get_zaccel(data_buf, data_buf_size, z_accel); 
    
     iterate = *seg_num;
@@ -224,7 +224,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     double* x_gyro_mean = (double*)malloc(sizeof(double));
     double* x_gyro_rms = (double*)malloc(sizeof(double));
     double* x_gyro_kurt = (double*)malloc(sizeof(double)); 
-    double* xgyro_features = (double*)malloc(sizeof(double)*_FBUFFER);  
+    double* xgyro_features = (double*)malloc(sizeof(double)*_MBUFFER);  
     get_xgyro(data_buf, data_buf_size, x_gyro);
     
     iterate = *seg_num;
@@ -384,7 +384,7 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
     flag |=
         ( result[_TURNR_TURNL_OFFSET ] = test_cl(data_fm,TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, TURNR_TURNL_FN));
 
-    result[_JMP_OFFSET] = 0;    
+    result[_JUMP_OFFSET] = 0;    
     if (!flag) {
         result[_1ST_LV_ALL_OFFSET] =
             test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,

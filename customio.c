@@ -54,7 +54,7 @@ void get_motion_str_from_array(MoType* result, char* str)
         MoType_to_str(result[_ASC_DSC_MOD_OFFSET],
                       str+strlen(str), _IO_ALL_SPACE);
     MoType_to_str(result[_TURNR_TURNL_OFFSET], str+strlen(str), _IO_ALL_SPACE);
-    MoType_to_str(result[_JMP_OFFSET], str+strlen(str), _IO_ALL_SPACE);
+    MoType_to_str(result[_JUMP_OFFSET], str+strlen(str), _IO_ALL_SPACE);
 }
 
 
