@@ -8,7 +8,7 @@
 
 #include "statistics.h"
 
-double w_mean(double *arr, int n)
+double w_mean(const double *arr, int n)
 {
     double total;
     int i;
@@ -20,7 +20,7 @@ double w_mean(double *arr, int n)
     return total/((float) n);
 }
 
-double w_mean_float(float *arr, int n)
+double w_mean_float(const float *arr, int n)
 {
     double total;
     int i;
@@ -32,7 +32,7 @@ double w_mean_float(float *arr, int n)
     return total/((float) n);
 }
 
-double w_std(double* data, int n)
+double w_std(const double* data, int n)
 {
     double sum = 0.0, mean, standardDeviation = 0.0;
     
@@ -177,7 +177,7 @@ double w_RMS_seg (float arr[], int size)
     return RMS;
 }
 
-double w_RMS_seg_double (double arr[], int size)
+double w_RMS_seg_double (const double  arr[], int size)
 
 {
     int i;
@@ -203,7 +203,7 @@ int cmpfunc (const void *a, const void *b) {
 
 
 
-float calculate_mean(float *segment, int n)
+float calculate_mean(const float *segment, int n)
 {
 	int i;
     float sum = 0;
@@ -213,7 +213,7 @@ float calculate_mean(float *segment, int n)
     }
     return sum/((float) n);
 }
-float calculate_standard_deviation(float* segment, int n)
+float calculate_standard_deviation(const float* segment, int n)
 {
     float mean = 0;
 	float sum = 0;
@@ -297,7 +297,7 @@ float calculate_kurtosis(float *segment, int n){
 	return kurtosis; 
 }
 
-double calculate_kurtosis_d(double *segment, int n)
+double calculate_kurtosis_d(const double *segment, int n)
 {
 double mean = w_mean(segment, n); 
 double standard_deviation = w_std(segment, n); 

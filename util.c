@@ -350,8 +350,8 @@ void mo_training(double* data_fm, size_t n)
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, ASC_DSC_MODEL, _ASC_DSC_SIZE, _MASK_LV1, ASC_DSC_FN);
     // train WALK
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
-    // train TURNR_TURNL
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, _MASK_LV1, TURNR_TURNL_FN);   //++
+    // train TL_TR
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TL_TR_MODEL, _TL_TR_SIZE, _MASK_LV1, TL_TR_FN);   //++
     /*//train JUMP
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN); */ //we aren't doing jump yet  
     // train FIRST_LV_ALL
@@ -370,8 +370,9 @@ void mo_classfication(double* data_fm, size_t n, MoType* result)
         ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, WALK_RUN_FN));
          
     flag |=
-        ( result[_TURNR_TURNL_MOD_OFFSET] = test_cl(data_fm, TURNR_TURNL_MODEL, _TURNR_TURNL_SIZE, TURNR_TURNL_FN));
-    
+        ( result[_TL_TR_OFFSET] = test_cl(data_fm, TL_TR_MODEL, _TL_TR_SIZE, TL_TR_FN));
+
+    result[_JMP_OFFSET] = 0;    
     if (!flag) {
         result[_1ST_LV_ALL_OFFSET] =
             test_cl(data_fm, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,
@@ -622,7 +623,7 @@ return total/x;
 
 // takes an xaccel segment and eliminates offset
 void eliminate_offset( double *x_accel_data, int segment_length, double gravity_offset ) {
-	int i, j; 
+	int i; 
 	for (i =0; i < segment_length; i++){
 		x_accel_data[i] += gravity_offset;  //should be -= if using real time and not macro 
 	}
