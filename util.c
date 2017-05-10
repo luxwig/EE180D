@@ -398,9 +398,10 @@ void mo_training(double* data_fm, size_t n)
 void mo_classfication(double* data_fm, size_t n, MoType* result)
 {
     int flag = _FALSE;
-    flag |= 
+/*    flag |= 
         ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, ASC_DSC_FN));
-    
+*/
+    result[_ASC_DSC_OFFSET]= 0;      
     flag |= 
         ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, WALK_RUN_FN));
          
