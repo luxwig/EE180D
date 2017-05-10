@@ -248,7 +248,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     for(x=0; x < iterate - 1; x++){
       int length = seg[x+1] - seg[x];
       x_accel_features_2(x_accel, z_gyro, length, seg[x], seg[x+1], x_accel_mean, x_accel_std);
-      create_xaccel_feature_array(x, xaccel_features,x_accel_mean,x_accel_std,);
+      create_xaccel_feature_array(x, xaccel_features,x_accel_mean,x_accel_std);
     }    
     
 	//jump features 
@@ -818,7 +818,7 @@ void x_accel_features_2(const double* x_accel, const double* z_gyro, int segment
     z_gyro_min = z_gyro[begin];
     index = begin;
     for (c = index; c < end; c++) {
-        if (z_gyro[c] < min) {
+        if (z_gyro[c] < z_gyro_min) {
             index = c;
             z_gyro_min = z_gyro[c];
         }
@@ -832,15 +832,15 @@ void x_accel_features_2(const double* x_accel, const double* z_gyro, int segment
 	int num = index - begin; 
 	int standardDeviation = 0.0; 
 	
-    x_accel_mean = total / ((double)num); 
+    *x_accel_mean = total / ((double)num); 
 	
     for(i=begin; i< index; ++i)
-        standardDeviation += pow(x_accel[i] - x_accel_mean, 2);
-    x_accel_std = sqrt(standardDeviation/((double)num));
+        standardDeviation += pow(x_accel[i] - *x_accel_mean, 2);
+    *x_accel_std = sqrt(standardDeviation/((double)num));
 }
 void create_xaccel_feature_array(int i, double* xaccel_features, double* x_accel_mean, double* x_accel_std)
 {
-   double feature_1 = *x_accel_mean              /* peak z gyro value at x gyro peak */  //maybe should be relative to surrounding data 
+   double feature_1 = *x_accel_mean;              /* peak z gyro value at x gyro peak */  //maybe should be relative to surrounding data 
    double feature_2 = *x_accel_std;           		  /* x gyro mean*/
 
    
