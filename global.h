@@ -30,6 +30,7 @@
 #define _YGYRO_N_FEATURES 4 //first level 
 #define _ZACCEL_N_FEATURES 3 //first level 
 #define _XGYRO_N_FEATURES 5 //first level
+#define _XACCEL_N_FEATURES 2 //first level (for jump)
 
 #define _TRUE   1
 #define _FALSE  0

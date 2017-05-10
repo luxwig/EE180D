@@ -88,5 +88,10 @@ void get_xgyro(const double* data_val, const int data_buf_size, double *x_gyro);
 void x_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt);
 double x_gyro_features_1( const double* segment, int begin, int end);
 void create_xgyro_feature_array(int i, double* xgyro_features, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt);
+
+ void create_xaccel_feature_array(int i, double* xaccel_features, double* x_accel_mean, double* x_accel_std);
+ void x_accel_features_2(const double* x_accel, const double* z_gyro, int segment_length, int begin, int end, double* x_accel_mean, double* x_accel_std);
+ void get_xaccel(const double* data_val, const int data_buf_size, double* x_accel);
+ void get_zgyro(const double* data_val, const int data_buf_size, double* z_gyro); 
 #endif
 
