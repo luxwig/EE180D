@@ -11,6 +11,8 @@
 
 #include "global.h"
 #include "util.h"
+#include "statistics.h"
+#include "math.h"
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/get_feature.h"
 #include "matlab_import/get_feature_terminate.h"
@@ -234,8 +236,22 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
       create_xgyro_feature_array(x, xgyro_features,abs_max_x, x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
     }    
       //x_gyro features 
+    double* z_gyro = (double*)malloc(sizeof(double)*data_buf_size);
+	double* x_accel = (double*)malloc(sizeof(double)*data_buf_size);
+    double* x_accel_mean = (double*)malloc(sizeof(double));   //this is the feature 
+    double* x_accel_std = (double*)malloc(sizeof(double)); 	  //this is the feature 
+    //double* x_accel_kurt = (double*)malloc(sizeof(double)); 
+    double* xaccel_features = (double*)malloc(sizeof(double)*_MBUFFER);  
+    get_zgyro(data_buf, data_buf_size, z_gyro);
+    get_xaccel(data_buf, data_buf_size, x_accel); 
+    iterate = *seg_num;
+    for(x=0; x < iterate - 1; x++){
+      int length = seg[x+1] - seg[x];
+      x_accel_features_2(x_accel, z_gyro, length, seg[x], seg[x+1], x_accel_mean, x_accel_std);
+      create_xaccel_feature_array(x, xaccel_features,x_accel_mean,x_accel_std);
+    }    
     
-    
+	//jump features 
             
              //adding features to array 
     int seg_iterator = 0;
@@ -259,7 +275,10 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
-        
+		/*
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+17] = xaccel_features[*f_num*_XACCEL_N_FEATURES];
+	    f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+18] = xaccel_features[*f_num*_XACCEL_N_FEATURES+1];
+		*/
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+17] = fntype;          //change to 17
          
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
@@ -291,7 +310,11 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     free(x_gyro_rms);
     free(x_gyro_kurt);
     free(xgyro_features);
-    
+	free(z_gyro);
+	free(x_accel);
+	free(x_accel_mean);
+	free(x_accel_std);
+	free(xaccel_features);
     return (*f_num+1==*seg_num);
 
 }
@@ -375,9 +398,10 @@ void mo_training(double* data_fm, size_t n)
 void mo_classfication(double* data_fm, size_t n, MoType* result)
 {
     int flag = _FALSE;
-    flag |= 
+/*    flag |= 
         ( result[_ASC_DSC_OFFSET] = test_cl(data_fm, ASC_DSC_MODEL, _ASC_DSC_SIZE, ASC_DSC_FN));
-    
+*/
+    result[_ASC_DSC_OFFSET]= 0;      
     flag |= 
         ( result[_WALK_RUN_OFFSET] = test_cl(data_fm, WALK_RUN_MODEL, _WALK_RUN_SIZE, WALK_RUN_FN));
          
@@ -741,6 +765,17 @@ void get_xgyro(const double* data_val, const int data_buf_size, double *x_gyro) 
 	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
     x_gyro[j] = data_val[j*_DATA_ACQ_SIZE + _GYRO_X_OFFSET];
 }
+void get_zgyro(const double* data_val, const int data_buf_size, double* z_gyro){
+	int j;
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+    z_gyro[j] = data_val[j*_DATA_ACQ_SIZE + _GYRO_Z_OFFSET];
+}
+void get_xaccel(const double* data_val, const int data_buf_size, double* x_accel){
+	int j;
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+    x_accel[j] = data_val[j*_DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
+}
+	
 void x_gyro_features_2(const double* segment, int segment_length, int begin, int end, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, 
 double* x_gyro_rms, 
 double* x_gyro_kurt)
@@ -776,4 +811,40 @@ void create_xgyro_feature_array(int i, double* xgyro_features, double* abs_max, 
    xgyro_features[i*_XGYRO_N_FEATURES+3] = feature_4; 
    xgyro_features[i*_XGYRO_N_FEATURES+4] = feature_5;    
                                                                        
+}
+	
+void x_accel_features_2(const double* x_accel, const double* z_gyro, int segment_length, int begin, int end, double* x_accel_mean, double* x_accel_std){
+	 int c, index;
+    double z_gyro_min;
+    z_gyro_min = z_gyro[begin];
+    index = begin;
+    for (c = index; c < end; c++) {
+        if (z_gyro[c] < z_gyro_min) {
+            index = c;
+            z_gyro_min = z_gyro[c];
+        }
+    }  //now index is at minimum
+	double total;
+    int i;
+    total = 0.0;
+    for (i = begin; i < index; i++) {
+        total += x_accel[i];
+    }
+	int num = index - begin; 
+	int standardDeviation = 0.0; 
+	
+    *x_accel_mean = total / ((double)num); 
+	
+    for(i=begin; i< index; ++i)
+        standardDeviation += pow(x_accel[i] - *x_accel_mean, 2);
+    *x_accel_std = sqrt(standardDeviation/((double)num));
+}
+void create_xaccel_feature_array(int i, double* xaccel_features, double* x_accel_mean, double* x_accel_std)
+{
+   double feature_1 = *x_accel_mean;              /* peak z gyro value at x gyro peak */  //maybe should be relative to surrounding data 
+   double feature_2 = *x_accel_std;           		  /* x gyro mean*/
+
+   
+   xaccel_features[i*_XACCEL_N_FEATURES] = feature_1; 
+   xaccel_features[i*_XACCEL_N_FEATURES +1] = feature_2;                                                                                                                                    
 }

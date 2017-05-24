@@ -5,7 +5,7 @@
 #define _SBUFFER    256
 #define _MBUFFER    2048
 #define _LBUFFER    16384
-#define _TRAIN_DATA_SIZE 18   //change to increment amoutn of data
+#define _TRAIN_DATA_SIZE 5   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  15
 #define _DATA_ACQ_SIZE   8
 #define _FIRST_LEVEL_FEATURES       17 //change to 17
@@ -30,6 +30,7 @@
 #define _YGYRO_N_FEATURES 4 //first level 
 #define _ZACCEL_N_FEATURES 3 //first level 
 #define _XGYRO_N_FEATURES 5 //first level
+#define _XACCEL_N_FEATURES 2 //first level (for jump)
 
 #define _TRUE   1
 #define _FALSE  0
@@ -39,26 +40,26 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/WALK/ludwig/2.csv",
                          "data/WALK/ludwig/3.csv",
                          "data/WALK/ludwig/4.csv",
-                         "data/RUN/6.csv",  
+                       /*"data/RUN/6.csv",  
                          "data/RUN/8.csv",
                          "data/RUN/10.csv",
-                       /*"data/ASCEND/1.csv",
+                         "data/ASCEND/1.csv",
                          "data/ASCEND/2.csv",
                          "data/ASCEND/3.csv",*/
-                         "data/ASC_SPEED/asc_1.csv",
+                       /*"data/ASC_SPEED/asc_1.csv",
                          "data/ASC_SPEED/asc_1_2.csv",
                          "data/ASC_SPEED/asc_2_1.csv",
                          "data/ASC_SPEED/asc_2_2.csv",
-                       /*"data/DESCEND/1.csv",
+                         "data/DESCEND/1.csv",
                          "data/DESCEND/2.csv",
-                         "data/DESCEND/3.csv",*/
+                         "data/DESCEND/3.csv",
                          "data/DSC_SPEED/dsc_1.csv",
                          "data/DSC_SPEED/dsc_1_2.csv",
                          "data/DSC_SPEED/dsc_2_1.csv",
-                         "data/DSC_SPEED/dsc_2_2.csv",
+                         "data/DSC_SPEED/dsc_2_2.csv",*/
                          "data/TL/turn_left_1.csv",
-                         "data/TR/turn_right_2.csv",
-                         "data/TR/turn_right_4.csv",
+                         //"data/TR/turn_right_2.csv",
+                         //"data/TR/turn_right_4.csv",
 };
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
@@ -140,17 +141,18 @@ enum MoType_enum { TRAINING = _TRAINING,
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2, DSC1, DSC1, DSC2, DSC2, TURNL, TURNR, TURNR};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, TURNL};
+//static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2, DSC1, DSC1, DSC2, DSC2, TURNL, TURNR, TURNR};
 
 
 
 #define _ASC_DSC_SIZE       3
-#define _WALK_RUN_SIZE      3
+#define _WALK_RUN_SIZE      2
 
-#define _TURNR_TURNL_SIZE   3 //++
+#define _TURNR_TURNL_SIZE   2 //++
 #define _JUMP_SIZE          2 //++ 
 
-#define _1ST_LV_ALL_SIZE    6
+#define _1ST_LV_ALL_SIZE    2
 #define _WALK_LV2_SIZE      4
 #define _RUN_LV2_SIZE       3
 #define _ASC_LV2_SIZE       2
@@ -162,10 +164,10 @@ static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, AS
 
 
 static const MoType ASC_DSC_MODEL[_ASC_DSC_SIZE] =          {ASC, DSC, NONE};
-static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {WALK, RUN, NONE};
-static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNL, TURNR, NONE};    //++
+static const MoType WALK_RUN_MODEL[_WALK_RUN_SIZE] =        {RUN, NONE};
+static const MoType TURNR_TURNL_MODEL[_TURNR_TURNL_SIZE] =  {TURNL, NONE};    //++
 static const MoType JUMP_MODEL[_JUMP_SIZE] =  {JUMP, NONE};    //++
-static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {ASC, DSC, WALK, RUN, TURNL, TURNR};
+static const MoType FIRST_LV_ALL_MODEL[_1ST_LV_ALL_SIZE] =  {WALK,TURNL};
 static const MoType RUN_LV2_MODEL[_RUN_LV2_SIZE] =          {RUN1, RUN2, RUN3};
 static const MoType WALK_LV2_MODEL[_WALK_LV2_SIZE] =        {WALK1, WALK2, WALK3, WALK4};
 static const MoType ASC_LV2_MODEL[_ASC_LV2_SIZE] =          {ASC1, ASC2};
