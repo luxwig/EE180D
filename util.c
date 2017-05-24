@@ -238,7 +238,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	iterate = *seg_num;
 	for (x = 0; x < iterate - 1; x++) {
 		int length = seg[x + 1] - seg[x];
-		double angle = segment_angle_change(x_gyro,	seg[x], seg[x + 1]);
+		double angle = segment_angle_change(x_gyro,		seg[x], seg[x + 1]);
 		angle_features[x] = angle; 
 	} //angle measurements 
 	
@@ -792,7 +792,7 @@ double segment_angle_change(double* lpf_input, int begin, int end) {
 		mdeg = 17.50;  //i think this is default anyway 
 		break;
 	}
-	double deg_d = .001 * mdeg;  // degrees per digit 
+	double deg_d = mdeg;  // degrees per digit 
 	double angle = 0;  //assume angle 0 start as we are looking for angle change in a given segment anyway 
 	double gyroRate;
 	for (int i = begin; i < end; i++) {
