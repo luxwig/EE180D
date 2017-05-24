@@ -383,7 +383,7 @@ void mo_training(double* data_fm, size_t n)
     // train TL_TR
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TL_TR_MODEL, _TL_TR_SIZE, _MASK_LV1, TL_TR_FN);   //++
     //train JUMP
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN);  //we aren't doing jump yet  
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JMP_MODEL, _JMP_SIZE, _MASK_LV1, JMP_FN);  //we aren't doing jump yet  
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,  _MASK_LV1, FIRST_LV_ALL_FN);
     
@@ -894,7 +894,7 @@ void low_pass_filter(double* input, double* output, int filter_order, float f_cu
 float f0 = 0.0f; //ignored
 float As = 0.0f;      //ignored
 float Ap = 0.0f;	//ignored
-iirfilt_rrrf lpf = iirfilt_rrrf_create_prototype(LIQUID_IIRDES_BUTTER,LIQUID_IIRDES_LOWPASS,LIQUID_IIRDES_SOS,filter_order,f_cutoff,f0,Ap,As)
+iirfilt_rrrf lpf = iirfilt_rrrf_create_prototype(LIQUID_IIRDES_BUTTER,LIQUID_IIRDES_LOWPASS,LIQUID_IIRDES_SOS,filter_order,f_cutoff,f0,Ap,As);
 iirfilt_rrrf_execute(lpf,(float)input,(float)output);
 iirfilt_rrrf_destroy(lpf);
 }
