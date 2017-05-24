@@ -266,7 +266,8 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 			matlab_features[k] = features->data[get_index(j, k, features->size[0])];
 	}
 	double extracted_feature = matlab_features[2] - matlab_features[0]/(matlab_feature[3]-matlab_feature[1])*/
-
+	FILE* fp; 
+	fp = fopen("features.txt","w"); 
     for (j = 0; j < features->size[0]; j++) { //combine these maybe? fp2 - fp1 / t2 - t1?
         for (k = 0; k < 4; k++) 
             f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k] = features->data[get_index(j,k,features->size[0])];
@@ -276,8 +277,8 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 6] = jump_features[*f_num];	
 		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+7] = fntype;          //change to 17
 		
-		FILE* fp; 
-		fp = fopen("features.txt","w"); 
+		
+		
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(fp, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
         fprintf(fp,"\n"); 
@@ -849,7 +850,7 @@ void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin
     double z_max, z_min;
     index_max = begin; //assume max is start of strde 
 	index_min = begin; 
-	for( c = index_min; c < end; c+){ //find min value 
+	for( c = index_min; c < end; c++){ //find min value 
 		if(z_gyro[c] < z_min){
 			index_min = c;
 		z_min = z_gyro[c]; }
