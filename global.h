@@ -6,10 +6,10 @@
 #define _FBUFFER    1000
 #define _FMBUFFER   500
 #define _ALLFBUFFER 10000
-#define _TRAIN_DATA_SIZE 16   //change to increment amoutn of data
-#define _TEST_DATA_SIZE  15
+#define _TRAIN_DATA_SIZE 18   //change to increment amoutn of data
+#define _TEST_DATA_SIZE  20
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       8 //change to 17  
+#define _FIRST_LEVEL_FEATURES       6 //change to 17  
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -58,7 +58,8 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/DSC_SPEED/dsc_2_1.csv",
                          "data/DSC_SPEED/dsc_2_2.csv",
                          "data/TL/turn_left_1.csv",
-                       //  "data/TR/turn_right_1.csv"
+                         "data/TR/turn_right_2.csv",
+					     "data/TR/turn_right_4.csv"
                    };
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
@@ -75,8 +76,13 @@ static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
                          "data/DESCEND/4.csv",
                          "data/DESCEND/5.csv",
                          "data/DESCEND/6.csv" ,
-                          "data/TL/turn_left_1_t.csv",
-                          "data/TR/turn_right_1_t.csv"
+                         "data/TL/turn_left_1_t.csv",
+                         "data/TR/turn_right_1_t.csv",
+						 "data/COMPOSITE/gradual_turn_lefts_test.csv",
+					     "data/COMPOSITE/gradual_turn_rights_test.csv",
+						 "data/COMPOSITE/walking_turnright_newturn_left_turn_left.csv",
+						 "data/COMPOSITE/ascend_turn_right_ascend.csv",
+						 "data/COMPOSITE/descend_turn_left_descend.csv"
                           };   
 
 #define _WALK  0x100

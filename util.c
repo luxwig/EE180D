@@ -261,15 +261,15 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
        /* f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator]; */ //should this even be in first level?? 
 		seg_iterator++;
         f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature 
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = zaccel_features[*f_num*_ZACCEL_N_FEATURES]; //left turn / right turn (z accel value at z gyro peak)
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = xgyro_features[*f_num*_XGYRO_N_FEATURES]; //left turn /right turn (xgyro at z gyro epak) 
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 7] =angle_features[*f_num];			//segment angle change 
+        //f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = zaccel_features[*f_num*_ZACCEL_N_FEATURES]; //left turn / right turn (z accel value at z gyro peak)
+        //f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = xgyro_features[*f_num*_XGYRO_N_FEATURES]; //left turn /right turn (xgyro at z gyro epak) 
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 5] =angle_features[*f_num];			//segment angle change 
         /*f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
         *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
         *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
         *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
         */
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+8] = fntype;          //change to 17
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = fntype;          //change to 17
          
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
@@ -352,7 +352,19 @@ void mo_training(double* data_fm, size_t n)
                 sizeof(double)*_FIRST_LEVEL_FEATURES);
         mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+_MATLAB_OFFSET_FIRST_LEVEL-1]; //not sure if mo_type will be right
     }
-     
+	/*feature analysis .txt 
+	File *feat_file; 
+	feat_file = fopen("feature_analysis.txt", "w"); 
+	MoType previous = mo_types[0];
+	MoType current = mo_types[0];
+	for(int i = 0; i < n; i++){
+		current = mo_types[i]; 
+		if(curret != previous)
+				
+		previous = current; 	
+	}
+    fclose(feat_file); 
+	*/
         
         
     // train ASC_DSC
