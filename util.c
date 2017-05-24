@@ -895,7 +895,7 @@ float f0 = 0.0f; //ignored
 float As = 0.0f;      //ignored
 float Ap = 0.0f;	//ignored
 iirfilt_rrrf lpf = iirfilt_rrrf_create_prototype(LIQUID_IIRDES_BUTTER,LIQUID_IIRDES_LOWPASS,LIQUID_IIRDES_SOS,filter_order,f_cutoff,f0,Ap,As);
-iirfilt_rrrf_execute(lpf,(float)input,*(float)output);
+iirfilt_rrrf_execute(lpf,input,*output);
 iirfilt_rrrf_destroy(lpf);
 }
 
