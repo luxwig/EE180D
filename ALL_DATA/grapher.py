@@ -52,7 +52,7 @@ def graph(fields):
 
 
 #data = getAllData("./DESCEND/1.csv")
-data = getAllData("./walking_turnright_newturn_left_turn_left.csv")
+data = getAllData("./WALK/ludwig/1.csv")
 
 
 collect(data)
