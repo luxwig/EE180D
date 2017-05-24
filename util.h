@@ -9,6 +9,7 @@
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/rtwtypes.h"
 #include "matlab_import/get_feature_types.h"
+#include <liquid/liquid.h>
 #include "statistics.h"
 #define _BUFFER 65536
 #define _SBUFFER 256
@@ -27,21 +28,12 @@ struct TrainingData_struct
     double* m_1st_feature;
     MoType  m_type;
 };
-
 typedef struct TrainingData_struct TrainingData;
-
-
 /*
-
-
-
 MoType test_for_walking_speed(double *segment,int length);
 void rotate(const double *rotated_data_buf, double *correctly_ordered, int size, int pos);
 */
-
-
 void mo_training (double* data_fm, size_t n);
-
 void classify_segments(double* correct_data_buf, int pos, int size, MoType* latestMotions, int* latestMotions_num);
 
 

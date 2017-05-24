@@ -382,8 +382,8 @@ void mo_training(double* data_fm, size_t n)
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
     // train TL_TR
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TL_TR_MODEL, _TL_TR_SIZE, _MASK_LV1, TL_TR_FN);   //++
-    /*//train JUMP
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN); */ //we aren't doing jump yet  
+    //train JUMP
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN);  //we aren't doing jump yet  
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,  _MASK_LV1, FIRST_LV_ALL_FN);
     
@@ -869,9 +869,34 @@ void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin
 	*hang_time = sqrt(sum);
 }
 
+/*
+void ascend_descend_feature(const double *z_gyro, const double* x_accel, int begin int end, double * peak_character, double threshold)
+{
+	double a, b; 
+	for(c = begin; c < end; c++){ //count the troughs in a given signal  
+		if(){
+			index_min = c;
+		z_min = z_gyro[c]; }
+	}
+	
+}
+*/ 
+
 void create_jump_feature_array(int i, double* jump_features, double* hang_time)
 {
    double feature_1 = *hang_time;              
-    jump_features[i] = feature_1;                                                                        
+   jump_features[i] = feature_1;                                                                        
 }
+
+
+void low_pass_filter(double* input, double* output, int filter_order, float f_cutoff){
+
+float f0 = 0.0f; //ignored
+float As = 0.0f;      //ignored
+float Ap = 0.0f;	//ignored
+iirfilt_rrrf lpf = iirfilt_rrrf_create_prototype(LIQUID_IIRDES_BUTTER,LIQUID_IIRDES_LOWPASS,LIQUID_IIRDES_SOS,filter_order,f_cutoff,f0,Ap,As)
+iirfilt_rrrf_execute(lpf,(float)input,(float)output);
+iirfilt_rrrf_destroy(lpf);
+}
+
 
