@@ -238,7 +238,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	iterate = *seg_num;
 	for (x = 0; x < iterate - 1; x++) {
 		int length = seg[x + 1] - seg[x];
-		double angle = segment_angle_change(x_gyro, length, seg[x], seg[x + 1]);
+		double angle = segment_angle_change(x_gyro,	seg[x], seg[x + 1]);
 		angle_features[x] = angle; 
 	} //angle measurements 
 	
