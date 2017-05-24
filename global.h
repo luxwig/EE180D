@@ -6,10 +6,10 @@
 #define _FBUFFER    1000
 #define _FMBUFFER   500
 #define _ALLFBUFFER 10000
-#define _TRAIN_DATA_SIZE 18   //change to increment amoutn of data
+#define _TRAIN_DATA_SIZE 19   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  20
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       6 //change to 17  
+#define _FIRST_LEVEL_FEATURES       7 //change to 17  
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
@@ -59,7 +59,8 @@ static const char TRAINING_DATASET [_TRAIN_DATA_SIZE][_SBUFFER]={
                          "data/DSC_SPEED/dsc_2_2.csv",
                          "data/TL/turn_left_1.csv",
                          "data/TR/turn_right_2.csv",
-					     "data/TR/turn_right_4.csv"
+					     "data/TR/turn_right_4.csv",
+						 "data/JUMP/jump_low.csv",
                    };
 
 static const char TEST_DATASET[_TEST_DATA_SIZE][_SBUFFER]={
@@ -144,7 +145,7 @@ enum MoType_enum { TRAINING = _TRAINING,
 
 typedef enum MoType_enum MoType;
 
-static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2, DSC1, DSC1, DSC2, DSC2, TL, TR};
+static const MoType fntype[] = {WALK1, WALK2, WALK3, WALK4, RUN1, RUN2, RUN3, ASC1, ASC1, ASC2, ASC2, DSC1, DSC1, DSC2, DSC2, TL, TR, TR, JMP};
 
 
 #define _ASC_DSC_SIZE       3
