@@ -90,177 +90,186 @@ void read_from_file(const char * filename, double * buffer, size_t* n) {
 
 int segmentation(const double* data_buf, const int data_buf_size, double* f, size_t* f_num, int* seg, size_t* seg_num, int fntype) //seg_num is number of dividers, not number of seg
 {
-    int j, k, n;
-    double* data_r = (double*)malloc(sizeof(double)*_BUFFER*2);
-    emxArray_real_T *r;
-    emxArray_real_T *pos;
-    emxArray_real_T *features;
-    emxArray_real_T *m;
-    *f_num = 0;
+	int j, k, n;
+	double* data_r = (double*)malloc(sizeof(double)*_BUFFER * 2);
+	emxArray_real_T *r;
+	emxArray_real_T *pos;
+	emxArray_real_T *features;
+	emxArray_real_T *m;
+	*f_num = 0;
 
-    n = data_buf_size-1;
+	n = data_buf_size - 1;
 
-    double* gyro_z = (double*)malloc(sizeof(double)*n);
-    for (k = 0; k < n; k++){
-        for (j = 1 ; j < 8; j++)
-            data_r[get_index(k,(j-1),n)] = data_buf[k*8+j];
-        gyro_z[k] = data_buf[k*8+7];
-    }
-    double mean = w_mean(gyro_z, n);
-    double std = w_std(gyro_z,n); 
-    double th = mean + std;
-    double int_count[_SBUFFER]={};
-    int count = -1;
-    for (j = 0; j < n; j++)
-    {
-        // below thold
-        if ((gyro_z[j]) <= th && gyro_z[j] >= mean-std)
-        {
-            // first time ignore
-            if (count == -1) {
-                while ((gyro_z[j]) <= th && gyro_z[j] >= mean-std) 
-                    j++; 
-                count++; 
-                continue;
-            }
+	double* gyro_z = (double*)malloc(sizeof(double)*n);
+	for (k = 0; k < n; k++) {
+		for (j = 1; j < 8; j++)
+			data_r[get_index(k, (j - 1), n)] = data_buf[k * 8 + j];
+		gyro_z[k] = data_buf[k * 8 + 7];
+	}
+	double mean = w_mean(gyro_z, n);
+	double std = w_std(gyro_z, n);
+	double th = mean + std;
+	double int_count[_SBUFFER] = {0};  ///what is this?? 
+	int count = -1;
+	for (j = 0; j < n; j++)
+	{
+		// below thold
+		if ((gyro_z[j]) <= th && gyro_z[j] >= mean - std)
+		{
+			// first time ignore
+			if (count == -1) {
+				while ((gyro_z[j]) <= th && gyro_z[j] >= mean - std)
+					j++;
+				count++;
+				continue;
+			}
 
-            int_count[count] += 1;
-        }
-        else
-        {
-            if (int_count[count] != 0)
-                count++;
-        }
-    }
-    count--;
-    double interval_mean = w_mean(int_count,count);
-    double interval_std  = w_std(int_count,count);
-    double interval_th = interval_mean + 1* interval_std;
-    if (count==0)
-        interval_th = 90;
-    fprintf(stderr,"interval_th = %lf\n", interval_th);
-    emxInitArray_real_T(&r, 2);
-    emxInitArray_real_T(&features, 2);
-    emxInitArray_real_T(&pos, 1);
-    
-    m = emxCreateWrapper_real_T(data_r,n,7);
+			int_count[count] += 1;
+		}
+		else
+		{
+			if (int_count[count] != 0)
+				count++;
+		}
+	}
+	count--;
+	double interval_mean = w_mean(int_count, count);
+	double interval_std = w_std(int_count, count);
+	double interval_th = interval_mean + 1 * interval_std;
+	if (count == 0)
+		interval_th = 90;
+	fprintf(stderr, "interval_th = %lf\n", interval_th);
+	emxInitArray_real_T(&r, 2);
+	emxInitArray_real_T(&features, 2);
+	emxInitArray_real_T(&pos, 1);
 
-    fprintf(stderr, "MEAN+STD:%f\n" , mean+std);
-    get_feature(abs(interval_th), mean+std, m, pos, r, features);
-    
-    fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
+	m = emxCreateWrapper_real_T(data_r, n, 7);
 
-    if (seg!=NULL && seg_num!=NULL)
-    {
-        *seg_num = pos->size[0];
-        for (j = 0; j < pos->size[0];j++)
-                seg[j] = (int)(pos->data[j]);
-    }
-    //iterate through f
-    for (j = 0; j < pos->size[0]; j++)
-    {
-        fprintf(stderr,"%d,",(int)(pos->data[j]));
-    }
-    fprintf(stderr,"\n");
-   
-   
-   
-   
-   
-    //getting y gyro data and extracting features 
-    double* y_gyro = (double*)malloc(sizeof(double)*data_buf_size);
-    double* abs_max = (double*)malloc(sizeof(double));
-    double* rel_min = (double*)malloc(sizeof(double));
-    double* rel_max = (double*)malloc(sizeof(double));
-    double* ygyro_features = (double*)malloc(sizeof(double)*_FBUFFER);
-    
-    get_ygyro(data_buf, data_buf_size, y_gyro); //data_val is complete //data num is size
-    
-    /* fprintf(stderr," TESTING \n");
-     for (j = 0; j <data_buf_size; j++)
-    {
-        fprintf(stderr,"%f,",y_gyro[j]);          //CORRECT
-        fprintf(stderr,"\n");
-    }
-       fprintf(stderr,"\n");
-    */
-       
-    int x; 
-    int iterate = *seg_num;
-     fprintf(stderr,"number of segment dividers: %d \n", iterate);
-    for(x=0; x < iterate - 1; x++){
-      int length = seg[x+1] - seg[x];
-      y_gyro_features_2(y_gyro, length, seg[x], seg[x+1],abs_max,rel_min, rel_max);
-      create_ygyro_feature_array(x, ygyro_features,abs_max, rel_min, rel_max);
-    }
-      
-     /*  fprintf(stderr," TESTING2 \n");
-      for (j = 0; j < *seg_num *_YGYRO_N_FEATURES - 4; j+=4)
-    {
-        fprintf(stderr,"%f, %f, %f, %f",ygyro_features[j], ygyro_features[j+1], ygyro_features[j+2], ygyro_features[j+3]);                          //CORRECT
-        fprintf(stderr,"\n");
-    }
-    fprintf(stderr,"number of features: %d \n", j); */
-       
-    double* z_accel = (double*)malloc(sizeof(double)*data_buf_size);
-    double* abs_max_z = (double*)malloc(sizeof(double));
-    double* z_accel_at_peak = (double*)malloc(sizeof(double));
-    double* abs_min_z = (double*)malloc(sizeof(double));
-    double* zaccel_features = (double*)malloc(sizeof(double)*_FBUFFER);   
-    get_zaccel(data_buf, data_buf_size, z_accel); 
-   
-    iterate = *seg_num;
-    for(x=0; x < iterate - 1; x++){
-      int length = seg[x+1] - seg[x];
-      z_accel_features_2(z_accel, length, seg[x], seg[x+1],abs_max_z,z_accel_at_peak);
-      *abs_min_z = z_accel_features_1(z_accel, seg[x], seg[x+1]);
-      create_zaccel_feature_array(x, zaccel_features,abs_max_z, z_accel_at_peak, abs_min_z);
-    }
-    //zaccel features
-      
-    double* x_gyro = (double*)malloc(sizeof(double)*data_buf_size);
-    double* abs_max_x = (double*)malloc(sizeof(double));
-    double* x_gyro_at_peak = (double*)malloc(sizeof(double));
-    double* x_gyro_mean = (double*)malloc(sizeof(double));
-    double* x_gyro_rms = (double*)malloc(sizeof(double));
-    double* x_gyro_kurt = (double*)malloc(sizeof(double)); 
-    double* xgyro_features = (double*)malloc(sizeof(double)*_FBUFFER);  
-    get_xgyro(data_buf, data_buf_size, x_gyro);
-    
-    iterate = *seg_num;
-    for(x=0; x < iterate - 1; x++){
-      int length = seg[x+1] - seg[x];
-      x_gyro_features_2(x_gyro, length, seg[x], seg[x+1],abs_max_x,x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
-      create_xgyro_feature_array(x, xgyro_features,abs_max_x, x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
-    }    
-      //x_gyro features 
-    
-    
-            
-             //adding features to array 
-    int seg_iterator = 0;
-    if (features->size[0] == 0 || features->size[1] == 0)
-        return _FALSE;
-    for (j = 0; j < features->size[0]; j++) {
+	fprintf(stderr, "MEAN+STD:%f\n", mean + std);
+	get_feature(abs(interval_th), mean + std, m, pos, r, features);
+
+	fprintf(stderr, "%d %d\n", r->size[0], r->size[1]);
+
+	if (seg != NULL && seg_num != NULL)
+	{
+		*seg_num = pos->size[0];
+		for (j = 0; j < pos->size[0]; j++)
+			seg[j] = (int)(pos->data[j]);
+	}
+	//iterate through f
+	for (j = 0; j < pos->size[0]; j++)
+	{
+		fprintf(stderr, "%d,", (int)(pos->data[j]));
+	}
+	fprintf(stderr, "\n");
+
+
+
+
+
+	//getting y gyro data and extracting features 
+	double* y_gyro = (double*)malloc(sizeof(double)*data_buf_size);
+	double* abs_max = (double*)malloc(sizeof(double));
+	double* rel_min = (double*)malloc(sizeof(double));
+	double* rel_max = (double*)malloc(sizeof(double));
+	double* ygyro_features = (double*)malloc(sizeof(double)*_FBUFFER);
+
+	get_ygyro(data_buf, data_buf_size, y_gyro); //data_val is complete //data num is size
+
+	/* fprintf(stderr," TESTING \n");
+	 for (j = 0; j <data_buf_size; j++)
+	{
+		fprintf(stderr,"%f,",y_gyro[j]);          //CORRECT
+		fprintf(stderr,"\n");
+	}
+	   fprintf(stderr,"\n");
+	*/
+
+	int x;
+	int iterate = *seg_num;
+	fprintf(stderr, "number of segment dividers: %d \n", iterate);
+	for (x = 0; x < iterate - 1; x++) {
+		int length = seg[x + 1] - seg[x];
+		y_gyro_features_2(y_gyro, length, seg[x], seg[x + 1], abs_max, rel_min, rel_max);
+		create_ygyro_feature_array(x, ygyro_features, abs_max, rel_min, rel_max);
+	}
+
+	/*  fprintf(stderr," TESTING2 \n");
+	 for (j = 0; j < *seg_num *_YGYRO_N_FEATURES - 4; j+=4)
+   {
+	   fprintf(stderr,"%f, %f, %f, %f",ygyro_features[j], ygyro_features[j+1], ygyro_features[j+2], ygyro_features[j+3]);                          //CORRECT
+	   fprintf(stderr,"\n");
+   }
+   fprintf(stderr,"number of features: %d \n", j); */
+
+	double* z_accel = (double*)malloc(sizeof(double)*data_buf_size);
+	double* abs_max_z = (double*)malloc(sizeof(double));
+	double* z_accel_at_peak = (double*)malloc(sizeof(double));
+	double* abs_min_z = (double*)malloc(sizeof(double));
+	double* zaccel_features = (double*)malloc(sizeof(double)*_FBUFFER);
+	get_zaccel(data_buf, data_buf_size, z_accel);
+
+	iterate = *seg_num;
+	for (x = 0; x < iterate - 1; x++) {
+		int length = seg[x + 1] - seg[x];
+		z_accel_features_2(z_accel, length, seg[x], seg[x + 1], abs_max_z, z_accel_at_peak);
+		*abs_min_z = z_accel_features_1(z_accel, seg[x], seg[x + 1]);
+		create_zaccel_feature_array(x, zaccel_features, abs_max_z, z_accel_at_peak, abs_min_z);
+	}
+	//zaccel features
+
+	double* x_gyro = (double*)malloc(sizeof(double)*data_buf_size);
+	double* abs_max_x = (double*)malloc(sizeof(double));
+	double* x_gyro_at_peak = (double*)malloc(sizeof(double));
+	double* x_gyro_mean = (double*)malloc(sizeof(double));
+	double* x_gyro_rms = (double*)malloc(sizeof(double));
+	double* x_gyro_kurt = (double*)malloc(sizeof(double));
+	double* xgyro_features = (double*)malloc(sizeof(double)*_FBUFFER);
+	get_xgyro(data_buf, data_buf_size, x_gyro);
+
+	iterate = *seg_num;
+	for (x = 0; x < iterate - 1; x++) {
+		int length = seg[x + 1] - seg[x];
+		x_gyro_features_2(x_gyro, length, seg[x], seg[x + 1], abs_max_x, x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
+		create_xgyro_feature_array(x, xgyro_features, abs_max_x, x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
+	}     //x_gyro features 
+
+	double* angle_features = (double*)malloc(sizeof(double)*_FBUFFER);
+	iterate = *seg_num;
+	for (x = 0; x < iterate - 1; x++) {
+		int length = seg[x + 1] - seg[x];
+		double angle = segment_angle_change(x_gyro, length, seg[x], seg[x + 1]);
+		angle_features[x] = angle; 
+	} //angle measurements 
+	
+
+    //adding features to array 
+	int seg_iterator = 0;
+	if (features->size[0] == 0 || features->size[1] == 0)
+		return _FALSE;
+	/*
+	double matlab_features[4];
+	for (j = 0; j < features->size[0]; j++) {
+		for (k = 0; k < 4; k++)
+			matlab_features[k] = features->data[get_index(j, k, features->size[0])];
+	}
+	double extracted_feature = matlab_features[2] - matlab_features[0]/(matlab_feature[3]-matlab_feature[1])*/
+
+    for (j = 0; j < features->size[0]; j++) { //combine these maybe? fp2 - fp1 / t2 - t1?
         for (k = 0; k < 4; k++) 
             f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k] = features->data[get_index(j,k,features->size[0])];
-        //use seg array to get length of interval //can we make this the interval length? 
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator];
-	seg_iterator++;
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = ygyro_features[*f_num*_YGYRO_N_FEATURES];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = ygyro_features[*f_num*_YGYRO_N_FEATURES+1];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+7] = ygyro_features[*f_num*_YGYRO_N_FEATURES+2];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+8] = ygyro_features[*f_num*_YGYRO_N_FEATURES+3];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9] = zaccel_features[*f_num*_ZACCEL_N_FEATURES];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+1];
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+11] = zaccel_features[*f_num*_ZACCEL_N_FEATURES+2];
-        /*f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = xgyro_features[*f_num*_XGYRO_N_FEATURES];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
+       /* f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator]; */ //should this even be in first level?? 
+		seg_iterator++;
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature 
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = zaccel_features[*f_num*_ZACCEL_N_FEATURES]; //left turn / right turn (z accel value at z gyro peak)
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = xgyro_features[*f_num*_XGYRO_N_FEATURES]; //left turn /right turn (xgyro at z gyro epak) 
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 7] =angle_features[*f_num];			//segment angle change 
+        /*f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
         *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
         *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
         *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
         */
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+12] = fntype;          //change to 17
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+8] = fntype;          //change to 17
          
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
@@ -665,16 +674,17 @@ void y_gyro_features_2( const double* segment, int segment_length, int begin, in
 
 void create_ygyro_feature_array(int i, double* ygyro_features, double* abs_max, double* rel_min, double* rel_max)
 {
-	 double feature_1 = *abs_max / *rel_max;               /* max1/max2 */
+   double feature_1 = *abs_max / *rel_max;               /* max1/max2 */
    double feature_2 = *abs_max / *rel_min ;               /* max1/min */
    double feature_3 = *rel_max / *rel_min ;                /*max2/min */
-   double feature_4 = (*rel_max + *abs_max) / *rel_min;   /* (max1 + max2)/min */
-   
-		ygyro_features[i*_YGYRO_N_FEATURES] = feature_1; 
+   double feature_4 = (*rel_max + *abs_max) / *rel_min;    /* max1 + max2/min*/
+   double feature_5 = sqrt((pow((*abs_max - *rel_min), 2) + pow((*rel_max - *rel_min), 2)) / 2);  /*new composite feature*/
+
+	ygyro_features[i*_YGYRO_N_FEATURES] = feature_1; 
     ygyro_features[i*_YGYRO_N_FEATURES +1] = feature_2;                                                            
     ygyro_features[i*_YGYRO_N_FEATURES +2] =  feature_3;                                                            
     ygyro_features[i*_YGYRO_N_FEATURES +3] =  feature_4;                                                          
-               
+	ygyro_features[i*_YGYRO_N_FEATURES + 4] = feature_5; 
 }
 
 void get_zaccel(const double* data_val, const int data_buf_size, double *z_accel) //data_val is complete //data num is size
@@ -765,3 +775,38 @@ void create_xgyro_feature_array(int i, double* xgyro_features, double* abs_max, 
    xgyro_features[i*_XGYRO_N_FEATURES+4] = feature_5;    
                                                                        
 }
+
+double segment_angle_change(double* lpf_input, int begin, int end) {
+	double mdeg; // mdps/digit gyro setting 
+	switch (a_rate) {
+	case 245:
+		mdeg = 8.75;
+		break; 
+	case 500:
+		mdeg = 17.50;
+		break;
+	case 2000:
+		mdeg = 70.0; 
+		break; 
+	default: 
+		mdeg = 17.50;  //i think this is default anyway 
+		break;
+	}
+	double deg_d = .001 * mdeg;  // degrees per digit 
+	double angle = 0;  //assume angle 0 start as we are looking for angle change in a given segment anyway 
+	double gyroRate;
+	for (int i = begin; i < end; i++) {
+		gyroRate = deg_d*lpf_input[i]*dx; 
+		angle += gyroRate;
+	}
+	return angle; 
+
+}
+
+/*
+Angular rate FS = ±245 dps 8.75 mdps/digit
+
+Angular rate FS = ±500 dps 17.50 mdps/digit
+Angular rate FS = ±2000 dps 70 mdps/digit
+*/
+
