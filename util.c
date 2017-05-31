@@ -869,6 +869,99 @@ void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin
 	*hang_time = sqrt(sum);
 }
 
+void zgyro_ascend_feature(const double *z_gyro, int begin, int end, double* minima_character){
+	//split the segment in half, and analyze each half for the minima present. The absolute value of the difference of these two minima will be the feature.
+	double min1, min2; 
+	int index1, index2, c; 
+	int half_seg = (end - begin)/2; 
+	
+	min1 = z_gyro[begin]; 
+	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
+		if (z_gyro[c] < min1) {
+            index1 = c;
+            min1 = segment[c];
+        }
+	}
+	
+	min2 = z_gyro[begin + half_seg];
+	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
+		if (z_gyro[c] < min2) {
+            index2 = c;
+            min2 = segment[c];
+        }
+	}
+	*minima_character = fabs(min1 - min2); 
+	return;
+}
+
+void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* intensity1, double* intensity2){ //this feature is weaker rn and should take less precedence
+	//split the z gyro segment in half, and analyze each half for the minima present.
+	//these correspond to the values in y gyro where the peaks are centered.
+	//could also do this just by searching for peaks in gyro z data but...
+	double min1, min2; 
+	int index1, index2, c; 
+	int half_seg = (end - begin)/2; 
+	
+	min1 = z_gyro[begin]; 
+	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
+		if (z_gyro[c] < min1) {
+            index1 = c;
+            min1 = segment[c];
+        }
+	}
+	
+	min2 = z_gyro[begin + half_seg];
+	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
+		if (z_gyro[c] < min2) {
+            index2 = c;
+            min2 = segment[c];
+        }
+	}
+	//index 1 and index 2 should now correspond to y gyro peaks.
+	
+	//thiscould be modified to have the "intensity" of the peak using an integral, not just the max value 
+intensity1 = z_gyro[index1];
+intensity2 = z_gyro[index2];
+
+}
+
+void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* max, double* mean, double* std_dev){ //could remove absolute max or change somehow
+	//split the z gyro segment in half, and analyze each half for the minima present.
+	//these correspond to the values in y gyro where the steady data oscillating about 0 is contained
+	double min1, min2; 
+	int index1, index2, c; 
+	int half_seg = (end - begin)/2; 
+	
+	min1 = z_gyro[begin]; 
+	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
+		if (z_gyro[c] < min1) {
+            index1 = c;
+            min1 = segment[c];
+        }
+	}
+	
+	min2 = z_gyro[begin + half_seg];
+	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
+		if (z_gyro[c] < min2) {
+            index2 = c;
+            min2 = segment[c];
+        }
+	}
+	max = y_gyro[begin];
+	
+	double total = 0.0;
+	int n =(index2 - index1); 
+    for (int i = index1; i < index2; i++) {
+        total += y_gyro[i];
+    }
+    
+
+    for(i=index1; i<index2; ++i)
+        std_dev += pow(y_gyro[i] - mean, 2);
+    
+	std_dev = sqrt(std_dev/(n-1));
+	
+}
 /*
 void ascend_descend_feature(const double *z_gyro, const double* x_accel, int begin int end, double * peak_character, double threshold)
 {
@@ -888,7 +981,7 @@ void create_jump_feature_array(int i, double* jump_features, double* hang_time)
    jump_features[i] = feature_1;                                                                        
 }
 
-
+/*
 void low_pass_filter(double* input, double* output, int filter_order, float f_cutoff){
 
 float f0 = 0.0f; //ignored
@@ -898,5 +991,6 @@ iirfilt_rrrf lpf = iirfilt_rrrf_create_prototype(LIQUID_IIRDES_BUTTER,LIQUID_IIR
 iirfilt_rrrf_execute(lpf,(float)input,(float)*output);
 iirfilt_rrrf_destroy(lpf);
 }
+*/
 
 

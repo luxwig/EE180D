@@ -91,5 +91,10 @@ void create_jump_feature_array(int i, double* jump_features, double* hang_time);
 void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin, int end, double* hang_time);
 void get_xaccel(const double* data_val, const int data_buf_size, double *x_accel);
 void get_zgyro(const double* data_val, const int data_buf_size, double *z_gyro);
+
+
+void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* intensity1, double* intensity2);
+
+void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* intensity1, double* intensity2);
 #endif
 
