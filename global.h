@@ -32,6 +32,7 @@
 #define _ZACCEL_N_FEATURES 3 //first level 
 #define _XGYRO_N_FEATURES 5 //first level
 
+
 #define _TRUE   1
 #define _FALSE  0
 static const char * MO_NEURAL_NETWORK = "mo_neural_network.net";
