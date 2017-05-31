@@ -276,7 +276,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	iterate = *seg_num;
 	for (x = 0; x < iterate - 1; x++) {
 		zgyro_ascend_feature(z_gyro,seg[x], seg[x+1],minima_character);
-		create_ascend_feature_array(x,descend_features,minima_character);
+		create_ascend_feature_array(x,ascend_features,minima_character);
 	} 	
 		
 		
@@ -926,25 +926,37 @@ void get_zgyro(const double* data_val, const int data_buf_size, double *z_gyro)
 		z_gyro[j] = data_val[j*_DATA_ACQ_SIZE + _GYRO_Z_OFFSET];
 }
 
+
 void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin, int end, double* hang_time)
 {
     int c, index_max, index_min;
-    double z_max, z_min;
+    double z_max;
+	
+	double z_min = z_gyro[begin];
     index_max = begin; //assume max is start of strde 
 	index_min = begin; 
 	for( c = index_min; c < end; c++){ //find min value 
 		if(z_gyro[c] < z_min){
 			index_min = c;
-		z_min = z_gyro[c]; }
+			z_min = z_gyro[c]; 
+			}
 	}
 	
 	//if the min is before the max, we are definitely not looking at a jump; 
 	if(index_min < index_max){
 		*hang_time = -1.0; //error check 
 	}
-	int n = (index_min - (index_max + 1)); 
+	
+	//offset seen in graphs
+	index_max += 10;
+	index_min -= 10;
+	int n = (index_max - index_min); 
+	
+	//debugging
+	fprint(stderr, "number of points in hang time %d \n", n);
+	
 	double sum = 0; 
-	for (c = index_max + 1; c < index_min; c++){
+	for (c = index_max; c < index_min; c++){
 		sum += pow((x_accel[c]),2);
 	}
 	sum /= ((double)n-1.0); 
@@ -961,7 +973,7 @@ void zgyro_ascend_feature(const double *z_gyro, int begin, int end, double* mini
 	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
 		if (z_gyro[c] < min1) {
             index1 = c;
-            min1 = segment[c];
+            min1 = z_gyro[c];
         }
 	}
 	
@@ -969,7 +981,7 @@ void zgyro_ascend_feature(const double *z_gyro, int begin, int end, double* mini
 	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
 		if (z_gyro[c] < min2) {
             index2 = c;
-            min2 = segment[c];
+            min2 = z_gyro[c];
         }
 	}
 	*minima_character = fabs(min1 - min2); 
@@ -978,7 +990,7 @@ void zgyro_ascend_feature(const double *z_gyro, int begin, int end, double* mini
 
 void create_ascend_feature_array(int i, double* ascend_features, double* minima_character)
 {             
-  ascend_features[i] = minima_character;    
+  ascend_features[i] = *minima_character;    
 }
 
 void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* intensity1, double* intensity2){ //this feature is weaker rn and should take less precedence
@@ -993,7 +1005,7 @@ void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, in
 	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
 		if (z_gyro[c] < min1) {
             index1 = c;
-            min1 = segment[c];
+            min1 = z_gyro[c];
         }
 	}
 	
@@ -1001,20 +1013,20 @@ void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, in
 	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
 		if (z_gyro[c] < min2) {
             index2 = c;
-            min2 = segment[c];
+            min2 = z_gyro[c];
         }
 	}
 	//index 1 and index 2 should now correspond to y gyro peaks.
 	
 	//thiscould be modified to have the "intensity" of the peak using an integral, not just the max value 
-intensity1 = z_gyro[index1];
-intensity2 = z_gyro[index2];
+*intensity1 = z_gyro[index1];
+*intensity2 = z_gyro[index2];
 }
 
 void create_run_feature_array(int i, double* run_features, double* intensity1, double* intensity2)
 {             
-  run_features[i*2] = intensity1;    
-  run_features[i*2 + 1] = intensity2;    
+  run_features[i*2] = *intensity1;    
+  run_features[i*2 + 1] = *intensity2;    
 }
 
 void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* max, double* mean, double* std_dev){ //could remove absolute max or change somehow
@@ -1028,7 +1040,7 @@ void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin
 	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
 		if (z_gyro[c] < min1) {
             index1 = c;
-            min1 = segment[c];
+            min1 = z_gyro[c];
         }
 	}
 	
@@ -1036,29 +1048,29 @@ void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin
 	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
 		if (z_gyro[c] < min2) {
             index2 = c;
-            min2 = segment[c];
+            min2 = z_gyro[c];
         }
 	}
-	max = y_gyro[begin];
+	*max = y_gyro[begin];
 	
 	double total = 0.0;
 	int n =(index2 - index1); 
     for (int i = index1; i < index2; i++) {
         total += y_gyro[i];
     }
-    
+    *mean = total/(n-1);
 
-    for(i=index1; i<index2; ++i)
-        std_dev += pow(y_gyro[i] - mean, 2);
+    for(int i=index1; i<index2; ++i)
+        *std_dev += pow(y_gyro[i] - *mean, 2);
     
-	std_dev = sqrt(std_dev/(n-1));
+	*std_dev = sqrt(*std_dev/(n-1));
 	
 }
 void create_descend_feature_array(int i, double* descend_features, double* max, double* mean, double* std_dev)
 {             
-   descend_features[i*3] = max;    
-   descend_features[i*3 + 1] = mean;    
-   descend_features[i*3 + 2] = std_dev; 
+   descend_features[i*3] = *max;    
+   descend_features[i*3 + 1] = *mean;    
+   descend_features[i*3 + 2] = *std_dev; 
 }
 
 /*
