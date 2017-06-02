@@ -250,7 +250,7 @@ double calculate_standard_deviation_double(const double* segment, int n)
     double standard_deviation = 0;
     int i;
     
-    mean = calculate_mean(segment, n);
+    mean = calculate_mean_double(segment, n);
     
     for(i=0; i<n; i++){
         sum += (double)pow((double)segment[i] - (double)mean, 2);
