@@ -4,7 +4,7 @@
 #include "global.h"
 #include "util.h"
 #include <pthread.h>
-
+#include <signal.h>
 
 #define _IO_NAME_ONLY_NO_SPACE 0x00
 #define _IO_NAME_ONLY_SPACE    0x0F
