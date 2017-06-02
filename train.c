@@ -27,7 +27,7 @@ int main(int argc, const char * const argv[])
     i = 0;
     while (i<_TRAIN_DATA_SIZE)
     {
-        fprintf(stderr, "%s\n", TRAINING_DATASET[i]);
+        printf(stderr, "%s\n", TRAINING_DATASET[i]);
         f_m = (double*)malloc(sizeof(double*)*(_FBUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);
@@ -55,10 +55,7 @@ int main(int argc, const char * const argv[])
         td[i].m_1st_feature = f_m;
         i++;
     }
-	 
-    
- 
-    fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %zu \n \n \n", train_num);
+   // fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %zu \n \n \n", train_num);
     
     mo_training(data_fm, train_num);
       

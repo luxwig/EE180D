@@ -41,29 +41,38 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
   segment(min_peak_distance, min_peak_height, b_m, pos, r);
   
   double *peaks, *new_peaks;
-  peaks = pos->data;
   int n;
+  //number of peaks
   n = pos->size[0]; //> pos->size[1] ? pos->size[0] : pos->size[1];
+  peaks = malloc(n*sizeof(double));
+
+  double *gyro_z;
+  int n_gyro_z, ii;
+  n_gyro_z = m->size[0];
+
+  gyro_z = malloc(n_gyro_z*sizeof(double));
+
+  for(ii = 0; ii < n_gyro_z; ii++)
+  {
+    gyro_z[ii] = m->data[6*n_gyro_z+ii];
+  }
+
+
+  int jdx, peak_index;
+  for(jdx=0; jdx < n; jdx++)
+  {
+    peak_index = pos->data[jdx];
+    peaks[jdx] = gyro_z[peak_index]; 
+  }
   new_peaks = (double *)malloc(n*sizeof(double));
   double mean, std;
   mean = calculate_mean_double(peaks, n);
   std = calculate_standard_deviation_double(peaks, n);
-  int number_of_valid_peaks;
-  number_of_valid_peaks = 0;
-  int idx, new_idx;
-  idx = new_idx = 0;
   if(std > 0.15*mean)
   {
     segment(min_peak_distance, mean-std, b_m, pos, r);
-
-    // for(idx = 0; idx < n; idx++)
-    // {
-    //   if(peaks[idx] > mean-std)
-    //   {
-    //     new_peaks[new_idx++] = peaks[idx];
-    //   }
-    // }
   }
+
   zanalysis(min_peak_height, r, varargin_1, varargin_2);
   emxFree_real_T(&b_m);
   if (!((varargin_1->size[0] == 0) || (varargin_1->size[1] == 0))) {
