@@ -41,8 +41,11 @@ double w_RMS_seg (float arr[], int size);
 
 void swap(float *a, float *b);
 float calculate_mean(const float *segment, int n);
+double calculate_mean_double(const double *segment, int n);
+
 float calculate_median(float *segment, int n);
 float calculate_standard_deviation(const float *segment, int n);
+double calculate_standard_deviation_double(const double *segment, int n);
 
 float calculate_moment_skew(float *segment, int n);
 
