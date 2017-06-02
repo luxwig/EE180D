@@ -27,9 +27,9 @@ int main(int argc, const char * const argv[])
     i = 0;
     while (i<_TRAIN_DATA_SIZE)
     {
-		FILE *fp; 
-		fp = fopen("features.txt", "w");
-		fprintf(fp, "%s\n", TRAINING_DATASET[i]);
+		//FILE *fp; 
+		//fp = fopen("features.txt", "w");
+		//fprintf(fp, "%s\n", TRAINING_DATASET[i]);
         fprintf(stderr, "%s\n", TRAINING_DATASET[i]);
         f_m = (double*)malloc(sizeof(double*)*(_FBUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
@@ -58,10 +58,10 @@ int main(int argc, const char * const argv[])
         td[i].m_1st_feature = f_m;
         i++;
     }
-	 fclose(fp); 
+	 //fclose(fp); 
     
  
-    fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %zu \n \n \n", train_num);
+   // fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %zu \n \n \n", train_num);
     
     mo_training(data_fm, train_num);
       

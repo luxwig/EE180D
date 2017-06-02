@@ -953,7 +953,7 @@ void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin
 	int n = (index_max - index_min); 
 	
 	//debugging
-	fprint(stderr, "number of points in hang time %d \n", n);
+	fprintf(stderr, "number of points in hang time %d \n", n);
 	
 	double sum = 0; 
 	for (c = index_max; c < index_min; c++){
