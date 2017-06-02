@@ -9,6 +9,7 @@
 #include "matlab_import/rt_nonfinite.h"
 #include "matlab_import/rtwtypes.h"
 #include "matlab_import/get_feature_types.h"
+#include <liquid/liquid.h>
 #include "statistics.h"
 #define _BUFFER 65536
 #define _SBUFFER 256
@@ -27,21 +28,12 @@ struct TrainingData_struct
     double* m_1st_feature;
     MoType  m_type;
 };
-
 typedef struct TrainingData_struct TrainingData;
-
-
 /*
-
-
-
 MoType test_for_walking_speed(double *segment,int length);
 void rotate(const double *rotated_data_buf, double *correctly_ordered, int size, int pos);
 */
-
-
 void mo_training (double* data_fm, size_t n);
-
 void classify_segments(double* correct_data_buf, int pos, int size, MoType* latestMotions, int* latestMotions_num);
 
 
@@ -92,7 +84,31 @@ void x_gyro_features_2(const double* segment, int segment_length, int begin, int
 double x_gyro_features_1( const double* segment, int begin, int end);
 void create_xgyro_feature_array(int i, double* xgyro_features, double* abs_max, double* x_gyro_at_peak, double* x_gyro_mean, double* x_gyro_rms, double* x_gyro_kurt);
 
+//helper functions 
+void get_xaccel(const double* data_val, const int data_buf_size, double *x_accel);
+void get_zgyro(const double* data_val, const int data_buf_size, double *z_gyro);
 
+//////////////// New feature set /////////////////////////////
+
+//turn (left/right) :should change to include accumulation over surrounding segments 
 double segment_angle_change(double* lpf_input,int begin, int end);
+
+//jump_features
+void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin, int end, double* hang_time);
+void create_jump_feature_array(int i, double* jump_features, double* hang_time);
+
+//ascend_features
+void zgyro_ascend_feature(const double *z_gyro, int begin, int end, double* minima_character); 
+void create_ascend_feature_array(int i, double* ascend_features, double* minima_character);
+
+//run_features
+void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* intensity1, double* intensity2);
+void create_run_feature_array(int i, double* run_features, double* intensity1, double* intensity2);
+
+//descend_features
+void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* max, double* mean, double* std_dev);
+void create_descend_feature_array(int i, double* descend_features, double* max, double* mean, double* std_dev);
+
+
 #endif
 

@@ -186,7 +186,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	*/
 
 	int x;
-	int iterate = *seg_num;
+	int iterate = *seg_num;	
 	fprintf(stderr, "number of segment dividers: %d \n", iterate);
 	for (x = 0; x < iterate - 1; x++) {
 		int length = seg[x + 1] - seg[x];
@@ -232,17 +232,68 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 		int length = seg[x + 1] - seg[x];
 		x_gyro_features_2(x_gyro, length, seg[x], seg[x + 1], abs_max_x, x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
 		create_xgyro_feature_array(x, xgyro_features, abs_max_x, x_gyro_at_peak, x_gyro_mean, x_gyro_rms, x_gyro_kurt);
-	}     //x_gyro features 
+	}   //x_gyro features 
 
 	double* angle_features = (double*)malloc(sizeof(double)*_FBUFFER);
 	iterate = *seg_num;
 	for (x = 0; x < iterate - 1; x++) {
 		int length = seg[x + 1] - seg[x];
-		double angle = segment_angle_change(x_gyro,		seg[x], seg[x + 1]);
+		double angle = segment_angle_change(x_gyro, seg[x], seg[x + 1]);
 		angle_features[x] = angle; 
 	} //angle measurements 
 	
+	double* x_accel = (double*)malloc(sizeof(double)*data_buf_size);
+	double* z_gyro = (double*)malloc(sizeof(double)*data_buf_size);
+	double* jump_features = (double*)malloc(sizeof(double)*_FBUFFER);
+	double* hang_time = (double*)malloc(sizeof(double));
+	get_xaccel(data_buf,data_buf_size, x_accel);
+	get_zgyro(data_buf,data_buf_size, z_gyro);
+	iterate = *seg_num;
+	for (x = 0; x < iterate - 1; x++) {
+		x_accel_jump_feature(z_gyro,x_accel,seg[x], seg[x+1],hang_time);
+		create_jump_feature_array(x,jump_features,hang_time);
+	} //jump measurements 
+	
+	/****************************
+		Run features
+		*************************/
+	double* run_features = (double*)malloc(sizeof(double)*_FBUFFER);
+	double* intensity1 = (double*)malloc(sizeof(double));
+	double* intensity2 = (double*)malloc(sizeof(double));
+		
+	iterate = *seg_num;
+	for (x = 0; x < iterate - 1; x++) {
+		ygyro_run_feature(z_gyro,y_gyro,seg[x], seg[x+1],intensity1, intensity2);
+		create_run_feature_array(x,run_features,intensity1, intensity2);
+	} 
 
+	/****************************
+		Ascend features
+		*************************/
+	double* ascend_features = (double*)malloc(sizeof(double)*_FBUFFER);
+	double* minima_character = (double*)malloc(sizeof(double));	
+	
+	iterate = *seg_num;
+	for (x = 0; x < iterate - 1; x++) {
+		zgyro_ascend_feature(z_gyro,seg[x], seg[x+1],minima_character);
+		create_ascend_feature_array(x,ascend_features,minima_character);
+	} 	
+		
+		
+	/****************************
+		Descend features
+		*************************/
+	double* descend_features = (double*)malloc(sizeof(double)*_FBUFFER);
+	double* max_dsc = (double*)malloc(sizeof(double));
+	double* mean_dsc = (double*)malloc(sizeof(double));
+	double* std_dev_dsc = (double*)malloc(sizeof(double));
+		
+	iterate = *seg_num;
+	for (x = 0; x < iterate - 1; x++) {
+		ygyro_descend_feature(z_gyro,y_gyro,seg[x], seg[x+1],max_dsc,mean_dsc,std_dev_dsc);
+		create_descend_feature_array(x,descend_features,max_dsc,mean_dsc,std_dev_dsc);
+	} 
+		
     //adding features to array 
 	int seg_iterator = 0;
 	if (features->size[0] == 0 || features->size[1] == 0)
@@ -254,23 +305,35 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 			matlab_features[k] = features->data[get_index(j, k, features->size[0])];
 	}
 	double extracted_feature = matlab_features[2] - matlab_features[0]/(matlab_feature[3]-matlab_feature[1])*/
-
     for (j = 0; j < features->size[0]; j++) { //combine these maybe? fp2 - fp1 / t2 - t1?
         for (k = 0; k < 4; k++) 
             f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k] = features->data[get_index(j,k,features->size[0])];
-       /* f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = seg[seg_iterator + 1] - seg[seg_iterator]; */ //should this even be in first level?? 
 		seg_iterator++;
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature 
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+5] = zaccel_features[*f_num*_ZACCEL_N_FEATURES]; //left turn / right turn (z accel value at z gyro peak)
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+6] = xgyro_features[*f_num*_XGYRO_N_FEATURES]; //left turn /right turn (xgyro at z gyro epak) 
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 7] =angle_features[*f_num];			//segment angle change 
-        /*f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = xgyro_features[*f_num*_XGYRO_N_FEATURES+1];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+14] = xgyro_features[*f_num*_XGYRO_N_FEATURES+2];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+15] = xgyro_features[*f_num*_XGYRO_N_FEATURES+3];
-        *f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+16] = xgyro_features[*f_num*_XGYRO_N_FEATURES+4];
-        */
-        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+8] = fntype;          //change to 17
-         
+        f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+4] = ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature  old
+		
+		//Turn feature 
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 5] = angle_features[*f_num];			//segment angle change 
+		
+		//Jump Feature
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 6] = jump_features[*f_num];	
+		
+		//Run Features
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 7] = run_features[*f_num*2];
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 8] = run_features[*f_num*2 + 1];
+		
+		//Descend Features
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 9] = descend_features[*f_num*3];
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 10] = descend_features[*f_num*3 + 1];
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 11] = descend_features[*f_num*3 + 2];
+
+		//Ascend Feature
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 12] = ascend_features[*f_num];
+		
+		//Motion type
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+13] = fntype;
+		
+		
+		
         for (k = 0; k < _MATLAB_OFFSET_FIRST_LEVEL; k++)
             fprintf(stderr, "\t%lf", f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+k]);
         fprintf(stderr,"\n"); 
@@ -283,12 +346,40 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
     emxDestroyArray_real_T(r);
     emxDestroyArray_real_T(m);
 
-    free(y_gyro);
-    free(abs_max);
-    free(rel_min);
-    free(rel_max);
-    free(ygyro_features);
-    
+//Freeing memory!	
+free(data_r);
+free(gyro_z);
+free(y_gyro);
+free(abs_max);
+free(rel_min);
+free(rel_max);
+free(ygyro_features);
+free(z_accel);
+free(abs_max_z);
+free(z_accel_at_peak);
+free(abs_min_z);
+free(zaccel_features);
+free(x_gyro);
+free(abs_max_x);
+free(x_gyro_at_peak);
+free(x_gyro_mean);
+free(x_gyro_rms);
+free(x_gyro_kurt);
+free(xgyro_features);
+free(angle_features);
+free(x_accel);
+free(z_gyro);
+free(jump_features);
+free(hang_time);
+free(run_features);
+free(intensity1);
+free(intensity2);
+free(ascend_features);
+free(minima_character);
+free(descend_features);
+free(max_dsc);
+free(mean_dsc);
+		
     return (*f_num+1==*seg_num);
 
 }
@@ -352,7 +443,19 @@ void mo_training(double* data_fm, size_t n)
                 sizeof(double)*_FIRST_LEVEL_FEATURES);
         mo_types[i] = (int)data_fm[i*_MATLAB_OFFSET_FIRST_LEVEL+_MATLAB_OFFSET_FIRST_LEVEL-1]; //not sure if mo_type will be right
     }
-     
+	/*feature analysis .txt 
+	File *feat_file; 
+	feat_file = fopen("feature_analysis.txt", "w"); 
+	MoType previous = mo_types[0];
+	MoType current = mo_types[0];
+	for(int i = 0; i < n; i++){
+		current = mo_types[i]; 
+		if(curret != previous)
+				
+		previous = current; 	
+	}
+    fclose(feat_file); 
+	*/
         
         
     // train ASC_DSC
@@ -361,8 +464,8 @@ void mo_training(double* data_fm, size_t n)
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, WALK_RUN_MODEL, _WALK_RUN_SIZE, _MASK_LV1, WALK_RUN_FN); 
     // train TL_TR
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, TL_TR_MODEL, _TL_TR_SIZE, _MASK_LV1, TL_TR_FN);   //++
-    /*//train JUMP
-    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JUMP_SIZE, _MASK_LV1, JUMP_FN); */ //we aren't doing jump yet  
+    //train JUMP
+    create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, JUMP_MODEL, _JMP_SIZE, _MASK_LV1, JUMP_FN);  //we aren't doing jump yet  
     // train FIRST_LV_ALL
     create_cl(features, _FIRST_LEVEL_FEATURES, n, mo_types, FIRST_LV_ALL_MODEL, _1ST_LV_ALL_SIZE,  _MASK_LV1, FIRST_LV_ALL_FN);
     
@@ -809,4 +912,196 @@ Angular rate FS = ±245 dps 8.75 mdps/digit
 Angular rate FS = ±500 dps 17.50 mdps/digit
 Angular rate FS = ±2000 dps 70 mdps/digit
 */
+
+void get_xaccel(const double* data_val, const int data_buf_size, double *x_accel) //data_val is complete //data num is size
+{
+	int j;
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+		x_accel[j] = data_val[j*_DATA_ACQ_SIZE + _ACCEL_X_OFFSET];
+}
+void get_zgyro(const double* data_val, const int data_buf_size, double *z_gyro)
+{
+	int j;
+	for (j = 0; j < data_buf_size; j++)                     //might need to be data_buf_size -1
+		z_gyro[j] = data_val[j*_DATA_ACQ_SIZE + _GYRO_Z_OFFSET];
+}
+
+
+void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin, int end, double* hang_time)
+{
+    int c, index_max, index_min;
+    double z_max;
+	
+	double z_min = z_gyro[begin];
+    index_max = begin; //assume max is start of strde 
+	index_min = begin; 
+	for( c = index_min; c < end; c++){ //find min value 
+		if(z_gyro[c] < z_min){
+			index_min = c;
+			z_min = z_gyro[c]; 
+			}
+	}
+	
+	//if the min is before the max, we are definitely not looking at a jump; 
+	if(index_min < index_max){
+		*hang_time = -1.0; //error check 
+	}
+	
+	//offset seen in graphs
+	index_max += 10;
+	index_min -= 10;
+	int n = (index_max - index_min); 
+	
+	//debugging
+	fprint(stderr, "number of points in hang time %d \n", n);
+	
+	double sum = 0; 
+	for (c = index_max; c < index_min; c++){
+		sum += pow((x_accel[c]),2);
+	}
+	sum /= ((double)n-1.0); 
+	*hang_time = sqrt(sum);
+}
+
+void zgyro_ascend_feature(const double *z_gyro, int begin, int end, double* minima_character){
+	//split the segment in half, and analyze each half for the minima present. The absolute value of the difference of these two minima will be the feature.
+	double min1, min2; 
+	int index1, index2, c; 
+	int half_seg = (end - begin)/2; 
+	
+	min1 = z_gyro[begin]; 
+	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
+		if (z_gyro[c] < min1) {
+            index1 = c;
+            min1 = z_gyro[c];
+        }
+	}
+	
+	min2 = z_gyro[begin + half_seg];
+	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
+		if (z_gyro[c] < min2) {
+            index2 = c;
+            min2 = z_gyro[c];
+        }
+	}
+	*minima_character = fabs(min1 - min2); 
+	return;
+}
+
+void create_ascend_feature_array(int i, double* ascend_features, double* minima_character)
+{             
+  ascend_features[i] = *minima_character;    
+}
+
+void ygyro_run_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* intensity1, double* intensity2){ //this feature is weaker rn and should take less precedence
+	//split the z gyro segment in half, and analyze each half for the minima present.
+	//these correspond to the values in y gyro where the peaks are centered.
+	//could also do this just by searching for peaks in gyro z data but...
+	double min1, min2; 
+	int index1, index2, c; 
+	int half_seg = (end - begin)/2; 
+	
+	min1 = z_gyro[begin]; 
+	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
+		if (z_gyro[c] < min1) {
+            index1 = c;
+            min1 = z_gyro[c];
+        }
+	}
+	
+	min2 = z_gyro[begin + half_seg];
+	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
+		if (z_gyro[c] < min2) {
+            index2 = c;
+            min2 = z_gyro[c];
+        }
+	}
+	//index 1 and index 2 should now correspond to y gyro peaks.
+	
+	//thiscould be modified to have the "intensity" of the peak using an integral, not just the max value 
+*intensity1 = z_gyro[index1];
+*intensity2 = z_gyro[index2];
+}
+
+void create_run_feature_array(int i, double* run_features, double* intensity1, double* intensity2)
+{             
+  run_features[i*2] = *intensity1;    
+  run_features[i*2 + 1] = *intensity2;    
+}
+
+void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* max, double* mean, double* std_dev){ //could remove absolute max or change somehow
+	//split the z gyro segment in half, and analyze each half for the minima present.
+	//these correspond to the values in y gyro where the steady data oscillating about 0 is contained
+	double min1, min2; 
+	int index1, index2, c; 
+	int half_seg = (end - begin)/2; 
+	
+	min1 = z_gyro[begin]; 
+	for(c = begin; c < begin+half_seg; c++){ //first half of signal 
+		if (z_gyro[c] < min1) {
+            index1 = c;
+            min1 = z_gyro[c];
+        }
+	}
+	
+	min2 = z_gyro[begin + half_seg];
+	for(c = begin + half_seg ; c < end; c++){ //second half of signal  
+		if (z_gyro[c] < min2) {
+            index2 = c;
+            min2 = z_gyro[c];
+        }
+	}
+	*max = y_gyro[begin];
+	
+	double total = 0.0;
+	int n =(index2 - index1); 
+    for (int i = index1; i < index2; i++) {
+        total += y_gyro[i];
+    }
+    *mean = total/(n-1);
+
+    for(int i=index1; i<index2; ++i)
+        *std_dev += pow(y_gyro[i] - *mean, 2);
+    
+	*std_dev = sqrt(*std_dev/(n-1));
+	
+}
+void create_descend_feature_array(int i, double* descend_features, double* max, double* mean, double* std_dev)
+{             
+   descend_features[i*3] = *max;    
+   descend_features[i*3 + 1] = *mean;    
+   descend_features[i*3 + 2] = *std_dev; 
+}
+
+/*
+void ascend_descend_feature(const double *z_gyro, const double* x_accel, int begin int end, double * peak_character, double threshold)
+{
+	double a, b; 
+	for(c = begin; c < end; c++){ //count the troughs in a given signal  
+		if(){
+			index_min = c;
+		z_min = z_gyro[c]; }
+	}
+	
+}
+*/ 
+
+void create_jump_feature_array(int i, double* jump_features, double* hang_time)
+{
+   double feature_1 = *hang_time;              
+   jump_features[i] = feature_1;                                                                        
+}
+
+/*
+void low_pass_filter(double* input, double* output, int filter_order, float f_cutoff){
+
+float f0 = 0.0f; //ignored
+float As = 0.0f;      //ignored
+float Ap = 0.0f;	//ignored
+iirfilt_rrrf lpf = iirfilt_rrrf_create_prototype(LIQUID_IIRDES_BUTTER,LIQUID_IIRDES_LOWPASS,LIQUID_IIRDES_SOS,filter_order,f_cutoff,f0,Ap,As);
+iirfilt_rrrf_execute(lpf,(float)input,(float)*output);
+iirfilt_rrrf_destroy(lpf);
+}
+*/
+
 
