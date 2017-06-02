@@ -38,6 +38,31 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
   emxInit_real_T(&varargin_1, 2);
   emxInit_real_T(&varargin_2, 2);
   segment(min_peak_distance, min_peak_height, b_m, pos, r);
+  
+  double *peaks, new_peaks;
+  peaks = pos->data;
+  double n;
+  n = pos->size;
+  new_peaks = malloc(n*double);
+  double mean, std;
+  mean = calculate_mean_double(peaks, n);
+  std = calculate_standard_deviation_double(peaks, n);
+  int number_of_valid_peaks;
+  number_of_valid_peaks = 0;
+  int idx, new_idx;
+  idx = new_idx = 0;
+  if(std > 0.15*mean)
+  {
+    segment(min_peak_distance, mean-std, b_m, pos, r);
+
+    // for(idx = 0; idx < n; idx++)
+    // {
+    //   if(peaks[idx] > mean-std)
+    //   {
+    //     new_peaks[new_idx++] = peaks[idx];
+    //   }
+    // }
+  }
   zanalysis(min_peak_height, r, varargin_1, varargin_2);
   emxFree_real_T(&b_m);
   if (!((varargin_1->size[0] == 0) || (varargin_1->size[1] == 0))) {
