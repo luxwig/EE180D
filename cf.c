@@ -18,6 +18,7 @@
 
 #include "matlab_import/get_feature_terminate.h"
 #include "matlab_import/get_feature_initialize.h"
+sig_atomic_t volatile r_flag = 1;
 
 int main(int argc, const char * const argv[])
 {

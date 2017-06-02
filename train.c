@@ -5,12 +5,24 @@
 #include "matlab_import/get_feature_terminate.h"
 #include "matlab_import/get_feature_emxAPI.h"
 #include "matlab_import/get_feature_initialize.h"
-
+#include "customio.h"
 #include "FANN/fann_util.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, const char * const argv[])
+{
+    int buf_size,i, j;
+    buftype buffer[_BUFFER*8];
+    get_data("TESTING HERE",1000, buffer, &buf_size);
+    for (i = 0; i < buf_size; i++) {
+        for (j = 0; j  < 8; j++)
+            printf("%lf\t", buffer[i*8+j]);
+        printf("\n");
+    }
+    return 0;
+}
+int mainx(int argc, const char * const argv[])
 {
     get_feature_initialize();
 
@@ -67,4 +79,5 @@ int main(int argc, const char * const argv[])
     train_lv2_neural_network(td, i, DSC, _DESCEND_N_FEATURES, _DSC_LV2_SIZE, DSC_LV2_MODEL, DSC_LV2_FN);
     //train_lv2_neural_network(td, i, ,)
     get_feature_terminate();
+    return 0;
 }
