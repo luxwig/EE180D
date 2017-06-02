@@ -109,6 +109,9 @@ void create_run_feature_array(int i, double* run_features, double* intensity1, d
 void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin, int end, double* max, double* mean, double* std_dev);
 void create_descend_feature_array(int i, double* descend_features, double* max, double* mean, double* std_dev);
 
+//new descend features 
+void ygyro_descend_feature_new(const double *z_gyro, const double *y_gyro, int begin, int end, double* min_max_ratio);
+void create_descend_feature_array_new(int i, double* descend_features, double* min_max_ratio);
 
 #endif
 
