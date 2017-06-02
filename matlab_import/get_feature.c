@@ -42,7 +42,7 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
   double *peaks, *new_peaks;
   peaks = pos->data;
   int n;
-  n = pos->size;
+  n = pos->size[0] > pos->size[1] ? pos->size[0] : pos->size[1];
   new_peaks = (double *)malloc(n*sizeof(double));
   double mean, std;
   mean = calculate_mean_double(peaks, n);
