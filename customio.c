@@ -83,6 +83,9 @@ void get_data(const char* cmd_text, int rate, double* buffer, int* buf_size)
 {
     signal(SIGINT, do_signal);
     printf("%s\n",cmd_text);
+    printf("PRESS ENTER TO CONTINUE...\n");
+    printf("PRESS CTRL+C TO BREAK...\n");
+    getchar();
     buftype  current_data[_DATA_ACQ_SIZE];
 #ifndef _DEBUG
     printf(ANSI_COLOR_YELLOW "Start to init 9DOF...");    
@@ -110,7 +113,7 @@ void get_data(const char* cmd_text, int rate, double* buffer, int* buf_size)
 
     Go = calc_gyro_offset(gyro, g_res);
 
-    printf(" Finished.\n" ANSI_COLOR_RESET);
+    printf("Finished.\n" ANSI_COLOR_RESET);
 #else
 /*    
     FILE* fd = fopen(fn, "r"); 
@@ -121,8 +124,8 @@ void get_data(const char* cmd_text, int rate, double* buffer, int* buf_size)
     getline(&line, &len, fd);
 */
     fprintf(stderr, ANSI_COLOR_YELLOW "** DEBUG MODE **\n" ANSI_COLOR_RESET);
-#endif
 
+#endif
     *buf_size = 0;
     while (r_flag_io) {
 #ifndef _DEBUG

@@ -13,13 +13,14 @@
 int main(int argc, const char * const argv[])
 {
     int buf_size,i, j;
-    buftype buffer[_BUFFER*8];
-    get_data("TESTING HERE",1000, buffer, &buf_size);
+    buftype buffer[_BUFFER];
+    get_data("TESTING HERE", 1000, buffer, &buf_size);
+    /*
     for (i = 0; i < buf_size; i++) {
         for (j = 0; j  < 8; j++)
             printf("%lf\t", buffer[i*8+j]);
         printf("\n");
-    }
+    }*/
     return 0;
 }
 int mainx(int argc, const char * const argv[])
