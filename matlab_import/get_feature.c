@@ -54,7 +54,7 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
 
   for(ii = 0; ii < n_gyro_z; ii++)
   {
-    gyro_z[ii] = m->data[6*n_gyro_z+ii];
+    gyro_z[ii] = m->data[6*m->size[0]+ii];
   }
 
 
@@ -64,13 +64,21 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
     peak_index = pos->data[jdx];
     peaks[jdx] = gyro_z[peak_index]; 
   }
-  new_peaks = (double *)malloc(n*sizeof(double));
+
   double mean, std;
   mean = calculate_mean_double(peaks, n);
   std = calculate_standard_deviation_double(peaks, n);
-  if(std > 0.15*mean)
+  fprintf(stderr, "mean: %lf std: %lf\n", mean, std);
+  int uu;
+  if(std > 0.25*mean)
   {
-    segment(min_peak_distance, mean-std, b_m, pos, r);
+    segment(min_peak_distance, mean-0.6*std, b_m, pos, r);  
+    fprintf(stderr, "NUMBER_OF_SAMPLES: %u, POINTS: ", pos->size[0]);
+    for(uu=0;uu<pos->size[0];uu++)
+    {
+      fprintf(stderr, "%lf ", pos->data[uu]);
+    }
+    fprintf(stderr,"\n");
   }
 
   zanalysis(min_peak_height, r, varargin_1, varargin_2);
