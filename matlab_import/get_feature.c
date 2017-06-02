@@ -39,11 +39,11 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
   emxInit_real_T(&varargin_2, 2);
   segment(min_peak_distance, min_peak_height, b_m, pos, r);
   
-  double *peaks, new_peaks;
+  double *peaks, *new_peaks;
   peaks = pos->data;
-  double n;
+  int n;
   n = pos->size;
-  new_peaks = malloc(n*double);
+  new_peaks = (double *)malloc(n*sizeof(double));
   double mean, std;
   mean = calculate_mean_double(peaks, n);
   std = calculate_standard_deviation_double(peaks, n);
