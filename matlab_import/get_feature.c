@@ -11,6 +11,7 @@
 #include "get_feature_emxutil.h"
 #include "zanalysis.h"
 #include "segment.h"
+#include "../statistics.h"
 
 /* Function Definitions */
 void get_feature(double min_peak_distance, double min_peak_height, const emxArray_real_T *m, emxArray_real_T *pos, emxArray_real_T
