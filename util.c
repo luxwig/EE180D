@@ -283,6 +283,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	/****************************
 		Descend features
 		*************************/
+		/*
 	double* descend_features = (double*)malloc(sizeof(double)*_FBUFFER);
 	double* max_dsc = (double*)malloc(sizeof(double));
 	double* mean_dsc = (double*)malloc(sizeof(double));
@@ -292,7 +293,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	for (x = 0; x < iterate - 1; x++) {
 		ygyro_descend_feature_new(z_gyro,y_gyro,seg[x], seg[x+1], min_max_ratio);
 		create_descend_feature_array_new(x,descend_features,min_max_ratio);
-	} 
+	} */
 		
     //adding features to array 
 	int seg_iterator = 0;
@@ -317,21 +318,21 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 5] = ascend_features[*f_num];
 		
 			//Descend Feature
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 6] = descend_features[*f_num];
+		//f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 6] = descend_features[*f_num];
 	
 		//Run Features
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 7] = run_features[*f_num*2];
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 8] = run_features[*f_num*2 + 1];
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 6] = run_features[*f_num*2];
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 7] = run_features[*f_num*2 + 1];
 		
 	
 		//Turn feature 
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 9] = angle_features[*f_num];			//segment angle change 
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 8] = angle_features[*f_num];			//segment angle change 
 		 
-	f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10]= ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature  old
+	f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9]= ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature  old
 		
 		
 		//Motion type
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+11] = fntype;
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10] = fntype;
 		
 		
 		
@@ -377,9 +378,11 @@ free(intensity1);
 free(intensity2);
 free(ascend_features);
 free(minima_character);
+/*
 free(descend_features);
 free(max_dsc);
 free(mean_dsc);
+		*/
 		
     return (*f_num+1==*seg_num);
 

@@ -27,7 +27,7 @@ int main(int argc, const char * const argv[])
     i = 0;
     while (i<_TRAIN_DATA_SIZE)
     {
-        printf(stderr, "%s\n", TRAINING_DATASET[i]);
+        fprintf(stderr, "%s\n", TRAINING_DATASET[i]);
         f_m = (double*)malloc(sizeof(double*)*(_FBUFFER));
         seg_val = (int*)malloc(sizeof(int)*_SBUFFER);
         read_from_file(TRAINING_DATASET[i], data_val, &data_num);

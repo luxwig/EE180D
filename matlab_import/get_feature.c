@@ -70,7 +70,9 @@ void get_feature(double min_peak_distance, double min_peak_height, const emxArra
   std = calculate_standard_deviation_double(peaks, n);
   if(std > 0.15*mean)
   {
+	  fprintf(stderr, "%lf", mean-std); 
     segment(min_peak_distance, mean-std, b_m, pos, r);
+	
   }
 
   zanalysis(min_peak_height, r, varargin_1, varargin_2);
