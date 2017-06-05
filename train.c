@@ -56,7 +56,7 @@ int main(int argc, const char * const argv[])
         i++;
     }
    // fprintf(stderr, " \n \n \n MO_TRAINING CALLED: train num = %zu \n \n \n", train_num);
-    
+    exit(1); 
     mo_training(data_fm, train_num);
       
     train_lv2_neural_network(td, i, WALK, _WALK_N_FEATURES, _WALK_LV2_SIZE, WALK_LV2_MODEL, WALK_NEURAL_NETWORK);

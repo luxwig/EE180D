@@ -248,6 +248,7 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	double* hang_time = (double*)malloc(sizeof(double));
 	get_xaccel(data_buf,data_buf_size, x_accel);
 	get_zgyro(data_buf,data_buf_size, z_gyro);
+	
 	iterate = *seg_num;
 	for (x = 0; x < iterate - 1; x++) {
 		x_accel_jump_feature(z_gyro,x_accel,seg[x], seg[x+1],hang_time);
@@ -277,23 +278,25 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 	for (x = 0; x < iterate - 1; x++) {
 		zgyro_ascend_feature(z_gyro,seg[x], seg[x+1],minima_character);
 		create_ascend_feature_array(x,ascend_features,minima_character);
+		
+		
 	} 	
 		
 		
 	/****************************
 		Descend features
 		*************************/
-		/*
+		
 	double* descend_features = (double*)malloc(sizeof(double)*_FBUFFER);
-	double* max_dsc = (double*)malloc(sizeof(double));
-	double* mean_dsc = (double*)malloc(sizeof(double));
-	double* std_dev_dsc = (double*)malloc(sizeof(double));
 	double* min_max_ratio = (double*)malloc(sizeof(double));
+	int* distance = (int*)malloc(sizeof(int)); 
+	
 	iterate = *seg_num;
 	for (x = 0; x < iterate - 1; x++) {
-		ygyro_descend_feature_new(z_gyro,y_gyro,seg[x], seg[x+1], min_max_ratio);
-		create_descend_feature_array_new(x,descend_features,min_max_ratio);
-	} */
+	fprintf(stderr, "begin and end: %d %d \n",seg[x],seg[x+1]);
+		ygyro_descend_feature_new(z_gyro,y_gyro,seg[x], seg[x+1], min_max_ratio, distance);
+		create_descend_feature_array(x,descend_features,min_max_ratio, distance);	
+	} 
 		
     //adding features to array 
 	int seg_iterator = 0;
@@ -317,9 +320,6 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 		//Ascend Feature
 		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 5] = ascend_features[*f_num];
 		
-			//Descend Feature
-		//f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 6] = descend_features[*f_num];
-	
 		//Run Features
 		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 6] = run_features[*f_num*2];
 		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 7] = run_features[*f_num*2 + 1];
@@ -328,11 +328,16 @@ int segmentation(const double* data_buf, const int data_buf_size, double* f, siz
 		//Turn feature 
 		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 8] = angle_features[*f_num];			//segment angle change 
 		 
-	f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9]= ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature  old
+		
+			//Descend Feature
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 9] = descend_features[*f_num*2];
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL + 10] = descend_features[*f_num*2 +1];
+		
+		//f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+9]= ygyro_features[*f_num*_YGYRO_N_FEATURES+4]; //ascend descend feature  old
 		
 		
 		//Motion type
-		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+10] = fntype;
+		f[*f_num*_MATLAB_OFFSET_FIRST_LEVEL+11] = fntype;
 		
 		
 		
@@ -378,13 +383,11 @@ free(intensity1);
 free(intensity2);
 free(ascend_features);
 free(minima_character);
-/*
+
 free(descend_features);
-free(max_dsc);
-free(mean_dsc);
-		*/
-		
-    return (*f_num+1==*seg_num);
+free(min_max_ratio);
+
+return (*f_num+1==*seg_num);
 
 }
 
@@ -935,7 +938,7 @@ void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin
 {
 	
 	//debugging
-	//fprintf(stderr, "beginning and ending segment index: %d %d \n", begin, end);
+	fprintf(stderr, "beginning and ending segment index: %d %d \n", begin, end);
     int c, index_max, index_min;
     double z_max;
 	int half_seg = (end - begin)/2; 
@@ -952,7 +955,7 @@ void x_accel_jump_feature(const double* z_gyro, const double* x_accel, int begin
 	}
 	
 	
-	//fprintf(stderr, "beginning and ending segment cutoffs: %d %d \n", index_max, index_min);
+	fprintf(stderr, "beginning and ending segment cutoffs: %d %d \n", index_max, index_min);
 	//offset seen in graphs
 	index_max += 10;
 	index_min -= 10;
@@ -1093,24 +1096,25 @@ void ygyro_descend_feature(const double *z_gyro, const double *y_gyro, int begin
 	*std_dev = sqrt(*std_dev/(n-1));
 	
 }
-void create_descend_feature_array(int i, double* descend_features, double* max, double* mean, double* std_dev)
+void create_descend_feature_array(int i, double* descend_features, double* min_max_ratio, int* distance)
 {             
-   descend_features[i*3] = *max;    
-   descend_features[i*3 + 1] = *mean;    
-   descend_features[i*3 + 2] = *std_dev; 
+   descend_features[i*2] = *min_max_ratio;    
+   descend_features[i*2 + 1] = *distance;  
 }
 
-void ygyro_descend_feature_new(const double *z_gyro, const double *y_gyro, int begin, int end, double* min_max_ratio){ //could remove absolute max or change somehow
+void ygyro_descend_feature_new(const double *z_gyro, const double *y_gyro, int begin, int end, double* min_max_ratio, int* distance){ //could remove absolute max or change somehow
 	//split the z gyro segment in half, and analyze each half for the minima present.
 	//these correspond to the values in y gyro where the steady data oscillating about 0 is contained
 	//
-	fprintf(stderr, "beginning and ending segment index: %d %d \n", begin, end);
+	//fprintf(stderr, "beginning and ending segment index: %d %d \n", begin, end);
 	double min, max; 
-	int index1, index2, c; 
+	int index1, index2, c, d; 
 	int half_seg = (end - begin)/2; 
 	
-	min = y_gyro[end]; 
-	for(c = end; c < end - half_seg; c--){ //first half of signal 
+	fprintf(stderr, "begin, end, half_seg in function: %d %d %d \n", begin, end, half_seg);
+	min = y_gyro[end-1]; 
+	max = y_gyro[end-1];
+	for(c = end-1; c > end - half_seg; c--){ //first half of signal 
 		if (y_gyro[c] < min) {
             index1 = c;
             min = y_gyro[c];
@@ -1120,11 +1124,11 @@ void ygyro_descend_feature_new(const double *z_gyro, const double *y_gyro, int b
 	//debugging
 	fprintf(stderr, "minimum value and index: %f %d \n", min, index1);
 	
-	max = y_gyro[end];
-	for(c = end ; c < end - half_seg; c--){ //second half of signal  
-		if (y_gyro[c] > max) {
-            index2 = c;
-            max = y_gyro[c];
+	
+	for(d = end-1 ; d > end - half_seg; d--){ //second half of signal  
+		if (y_gyro[d] > max) {
+            index2 = d;
+            max = y_gyro[d];
         }
 	}
 	
@@ -1135,13 +1139,17 @@ void ygyro_descend_feature_new(const double *z_gyro, const double *y_gyro, int b
 
 					//i'm doing difference right now but I could do ratio?? 
 
-	*min_max_ratio = fabs(max-min); 	
+	*min_max_ratio = fabs(max-min); 
+	*distance = index1 - index2; //should be small and positive for descend. 
+	if (abs(*distance) > 200)
+		*distance = 0;
 }
 
 
-void create_descend_feature_array_new(int i, double* descend_features, double* min_max_ratio)
+void create_descend_feature_array_new(int i, double* descend_features, double* min_max_ratio, int* distance)
 {             
-   descend_features[i] = *min_max_ratio;    
+   descend_features[i*2] = *min_max_ratio;    
+   descend_features[i*2 + 1] = *distance; 
 }
 /*
 void ascend_descend_feature(const double *z_gyro, const double* x_accel, int begin int end, double * peak_character, double threshold)

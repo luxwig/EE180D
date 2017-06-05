@@ -9,7 +9,7 @@
 #define _TRAIN_DATA_SIZE 19   //change to increment amoutn of data
 #define _TEST_DATA_SIZE  20
 #define _DATA_ACQ_SIZE   8
-#define _FIRST_LEVEL_FEATURES       7 //change to 17  
+#define _FIRST_LEVEL_FEATURES       11 //change to 17  
 #define _MATLAB_OFFSET_FIRST_LEVEL  (_FIRST_LEVEL_FEATURES+1)
 #define _MATLAB_OFFSET_SECOND_LEVEL 10
 
