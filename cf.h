@@ -6,8 +6,8 @@
 #include <pthread.h>
 #include <signal.h>
 
-#define _MAX_BUF_SIZE   65536
-#define _WAKE_UP_SPEED	100
+#define _MAX_BUF_SIZE   65536999
+#define _WAKE_UP_SPEED	3000
 int bufpos  = 0;
 int bufsize = 0;
 
