@@ -75,16 +75,16 @@ void get_motion_str_from_array(MoType* result, char* str)
 
 
 
-void get_data(MoType cmd_text, int speed, int rate, double* buffer, int* buf_size)
+void get_data(MoType cmd_text, char* t, int speed, int rate, double* buffer, int* buf_size)
 {
     
     r_flag_io = -1;
     char tt[10];
     signal(SIGINT, do_signal);
     if (speed != -1)
-        printf("ACQUIRING DATA FOR %s AT LEVEL %d \n",MoType_to_str(cmd_text,tt,0),speed);
+        printf("ACQUIRING DATA FOR %s AT LEVEL %d \n%s\n",MoType_to_str(cmd_text,tt,0),speed,t);
     else
-        printf("ACQUIRING DATA FOR %s \n",MoType_to_str(cmd_text,tt,0x00));
+        printf("ACQUIRING DATA FOR %s \n%s\n",MoType_to_str(cmd_text,tt,0x00),t);
     printf("PRESS CTRL+C TO BREAK...\n");
     buftype  current_data[_DATA_ACQ_SIZE];
 #ifndef _DEBUG
@@ -113,7 +113,7 @@ void get_data(MoType cmd_text, int speed, int rate, double* buffer, int* buf_siz
 
     Go = calc_gyro_offset(gyro, g_res);
 
-    printf("Finished.\n" ANSI_COLOR_RESET);
+    printf("9DOF offset calculated.\n" ANSI_COLOR_RESET);
 #else
 /*    
     FILE* fd = fopen(fn, "r"); 

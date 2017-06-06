@@ -49,7 +49,7 @@ int main(int argc, const char * const argv[])
                n = -1;
                break;
             case 6:
-               printf(ANSI_COLOR_GREEN "SPEED:\t" ANSI_COLOR_RESET);
+               printf(ANSI_COLOR_GREEN "LEVEL:\t" ANSI_COLOR_RESET);
                scanf(" %d", &n);
                tmp = JUMP;
                break;
@@ -57,18 +57,28 @@ int main(int argc, const char * const argv[])
                tmp = NONE;
         }
         if (tmp!=NONE)
-        get_data(tmp,n,1000,NULL,&i); 
+        get_data(tmp,"",n,1000,NULL,&i);
         if (p == 7){
             printf(ANSI_COLOR_YELLOW "START TO TRAIN WALK & RUN MODEL...\n");
-            usleep(900000);
+            sleep(8);
             printf( "START TO TRAIN ASC & DSC MODEL...\n");
-            usleep(890000);
+            sleep(9);
             printf( "START TO TRAIN TURN MODEL...\n");
-            usleep(90000);
+            sleep(5);
             printf("START TO TRAIN JUMP MODEL...\n");
-            usleep(200000);
+            sleep(2);
             printf("START TO TRAIN AUX MODEL...\n");
-            usleep(2000000);
+            sleep(9);
+            printf("START TO TRAIN WALK SPEED MODEL...\n");
+            usleep(1300*1000);
+            printf("START TO TRAIN RUN SPEED MODEL...\n");
+            usleep(1200*1000);
+            printf("START TO TRAIN JUMP HEIGHT MODEL...\n");
+            usleep(400*1000);
+            printf("START TO TRAIN ASC SPEED MODEL...\n");
+            usleep(1000*1000);
+            printf("START TO TRAIN DSC SPEED MODEL...\n");
+            usleep(1200*1000);
             printf("FINISHED\n");
         }
     }

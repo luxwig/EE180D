@@ -24,7 +24,7 @@ typedef double buftype;
 char* MoType_to_str(MoType t, char* str, int type);
 void get_motion_str_from_array(MoType* result, char* str);
 
-void get_data(MoType cmd_text, int speed, int rate, double* buffer, int* buf_size);
+void get_data(MoType cmd_text, char* text, int speed, int rate, double* buffer, int* buf_size);
 static sig_atomic_t volatile r_flag_io = 1;
 static void do_signal(int sig)
 {
