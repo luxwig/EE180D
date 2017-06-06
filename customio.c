@@ -14,7 +14,7 @@
 
 
 
-void MoType_to_str(MoType t, char* str, int type)
+char* MoType_to_str(MoType t, char* str, int type)
 {
     switch (t&_MASK_LV1)
     {
@@ -56,6 +56,7 @@ void MoType_to_str(MoType t, char* str, int type)
     }
     if (type&0x0F)
         strcpy(str+strlen(str), " ");
+    return str;
 }
 
 void get_motion_str_from_array(MoType* result, char* str)
@@ -71,21 +72,20 @@ void get_motion_str_from_array(MoType* result, char* str)
 }
 
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
 
-void get_data(const char* cmd_text, int rate, double* buffer, int* buf_size)
+
+
+void get_data(MoType cmd_text, int speed, int rate, double* buffer, int* buf_size)
 {
+    
+    r_flag_io = -1;
+    char tt[10];
     signal(SIGINT, do_signal);
-    printf("%s\n",cmd_text);
-    printf("PRESS ENTER TO CONTINUE...\n");
+    if (speed != -1)
+        printf("ACQUIRING DATA FOR %s AT LEVEL %d \n",MoType_to_str(cmd_text,tt,0),speed);
+    else
+        printf("ACQUIRING DATA FOR %s \n",MoType_to_str(cmd_text,tt,0x00));
     printf("PRESS CTRL+C TO BREAK...\n");
-    getchar();
     buftype  current_data[_DATA_ACQ_SIZE];
 #ifndef _DEBUG
     printf(ANSI_COLOR_YELLOW "Start to init 9DOF...");    
@@ -159,8 +159,8 @@ void get_data(const char* cmd_text, int rate, double* buffer, int* buf_size)
             current_data[p] = p;
         }
 #endif
-        memcpy(buffer+(*buf_size)*8, current_data, sizeof(double)*8);
-        *buf_size = *buf_size+1;
+//        memcpy(buffer+(*buf_size)*8, current_data, sizeof(double)*8);
+//        *buf_size = *buf_size+1;
         usleep(rate);
     } 
 #ifdef _DEBUG

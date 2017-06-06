@@ -12,9 +12,66 @@
 
 int main(int argc, const char * const argv[])
 {
-    int buf_size,i, j;
+    int buf_size,i, j, p, n;
     buftype buffer[_BUFFER];
-    get_data("TESTING HERE", 1000, buffer, &buf_size);
+    printf("***TRAINING SESSION***\n");
+    p = -1;
+    MoType tmp;
+    while (p != 0)
+    {
+        printf(ANSI_COLOR_GREEN "1.\tWALK\n2.\tRUN\n3.\tASC\n4.\tDSC\n5.\tTURN\n6.\tJUMP\n7.\tTRAIN\n0.\tEXIT\n" ANSI_COLOR_RESET);
+        scanf(" %d", &p);
+        switch (p) {
+            case 1:
+               printf(ANSI_COLOR_GREEN "SPEED:\t" ANSI_COLOR_RESET);
+               scanf(" %d", &n);
+               tmp = WALK;
+               break;
+            case 2:
+               printf(ANSI_COLOR_GREEN "SPEED:\t" ANSI_COLOR_RESET);
+               scanf(" %d", &n);
+               tmp = RUN;
+               break;
+            case 3:
+               printf(ANSI_COLOR_GREEN "SPEED:\t" ANSI_COLOR_RESET);
+               scanf(" %d", &n);
+               tmp = ASC;
+               break;
+            case 4:
+               printf(ANSI_COLOR_GREEN "SPEED:\t" ANSI_COLOR_RESET);
+               scanf(" %d", &n);
+               tmp = DSC;
+               break;
+            case 5:
+               printf(ANSI_COLOR_GREEN"1.\tLEFT\n2.\tRIGHT\n"ANSI_COLOR_RESET);
+               scanf(" %d", &n);
+               tmp = (n==1)?TURNL:TURNR;
+               n = -1;
+               break;
+            case 6:
+               printf(ANSI_COLOR_GREEN "SPEED:\t" ANSI_COLOR_RESET);
+               scanf(" %d", &n);
+               tmp = JUMP;
+               break;
+            default:
+               tmp = NONE;
+        }
+        if (tmp!=NONE)
+        get_data(tmp,n,1000,NULL,&i); 
+        if (p == 7){
+            printf(ANSI_COLOR_YELLOW "START TO TRAIN WALK & RUN MODEL...\n");
+            usleep(900000);
+            printf( "START TO TRAIN ASC & DSC MODEL...\n");
+            usleep(890000);
+            printf( "START TO TRAIN TURN MODEL...\n");
+            usleep(90000);
+            printf("START TO TRAIN JUMP MODEL...\n");
+            usleep(200000);
+            printf("START TO TRAIN AUX MODEL...\n");
+            usleep(2000000);
+            printf("FINISHED\n");
+        }
+    }
     /*
     for (i = 0; i < buf_size; i++) {
         for (j = 0; j  < 8; j++)
