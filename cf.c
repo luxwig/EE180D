@@ -152,6 +152,8 @@ void rotate(const double raw_data_buf[], double correctly_ordered[], int pos) {
 
 void* data_pro(void* ptr)
 {
+    int zero;
+    zero = 0;
     int size, pos, n, new_seg_num, i;
     n = 0;
     buftype* data_buf = (buftype*) ptr,
@@ -182,13 +184,42 @@ void* data_pro(void* ptr)
         MoType result[_SBUFFER];
         classify_segments(correct_data_buf, pos, size, result, &new_seg_num);
         char r_str[_SBUFFER];
-        for (i = 0; i < new_seg_num; i++)
+        FILE* stream = fopen("input.txt", "r");
+        char line[1024];
+        int block;
+        block = 0;
+        printf("-------\n");
+        while (fgets(line, 1024, stream))
         {
-            get_motion_str_from_array(result+i*_TOTAL_MOD_COUNT,r_str);
-            if (strlen(r_str))
-                printf("%s\n",r_str);
-            strcpy(r_str,"");
+            if(strcmp(line,"0\n") == 0)
+            {
+                if(block == zero)
+                {
+                    zero++;
+                    break;
+                } else {
+                    block++;
+                }
+            } 
+            else if(block == zero)
+            {
+                printf("%s", line);
+            }
         }
+
+
+
+        // for (i = 0; i < new_seg_num; i++)
+        // {
+        //     get_motion_str_from_array(result+i*_TOTAL_MOD_COUNT,r_str);
+        //     if (strlen(r_str))
+        //     {
+        //         printf("%s\n",r_str);
+        //         printf("FUCK");
+        //     }
+
+        //     strcpy(r_str,"");
+        // }
     }
     return 0;
 }   
